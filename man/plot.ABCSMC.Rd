@@ -4,10 +4,13 @@
 \alias{plot.ABCSMC}
 \title{Plots \code{ABCSMC} objects}
 \usage{
-\method{plot}{ABCSMC}(x, ...)
+\method{plot}{ABCSMC}(x, type = c("post", "output"))
 }
 \arguments{
 \item{x}{An \code{ABCSMC} object.}
+
+\item{type}{Takes the value \code{"post"} if you want to plot posterior distributions.
+Takes the value \code{"output"} if you want to plot the simulated outputs.}
 }
 \value{
 A plot of the ABC posterior distributions for different generations.

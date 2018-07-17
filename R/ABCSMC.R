@@ -21,7 +21,7 @@
 #'                      particles. Each element of the list corresponds to a generation 
 #'                      of ABC-SMC, with each matrix being of dimension 
 #'                      \code{npart} x \code{npars};}
-#' \item{\code{out}:}{ a \code{list} of \code{matrix} objects containing the simulated
+#' \item{\code{output}:}{ a \code{list} of \code{matrix} objects containing the simulated
 #'                      summary statistics. Each element of the list corresponds to a
 #'                      generation of ABC-SMC, with each matrix being of dimension 
 #'                      \code{npart} x \code{length(data)};}
@@ -114,7 +114,7 @@ ABC_SMC <- function(npart, tols, priors, func, data) {
     }
     
     ## output results
-    output <- list(pars = pars, out = out, weights = weights, accrate = accrate)
+    output <- list(pars = pars, output = out, weights = weights, accrate = accrate)
     class(output) <- "ABCSMC"
     output
 }

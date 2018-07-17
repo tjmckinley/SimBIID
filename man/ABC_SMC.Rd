@@ -29,7 +29,7 @@ An \code{ABCSMC} object, essentially a \code{list} containing:
                      particles. Each element of the list corresponds to a generation 
                      of ABC-SMC, with each matrix being of dimension 
                      \code{npart} x \code{npars};}
-\item{\code{out}:}{ a \code{list} of \code{matrix} objects containing the simulated
+\item{\code{output}:}{ a \code{list} of \code{matrix} objects containing the simulated
                      summary statistics. Each element of the list corresponds to a
                      generation of ABC-SMC, with each matrix being of dimension 
                      \code{npart} x \code{length(data)};}

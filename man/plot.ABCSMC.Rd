@@ -4,7 +4,7 @@
 \alias{plot.ABCSMC}
 \title{Plots \code{ABCSMC} objects}
 \usage{
-\method{plot}{ABCSMC}(x, type = c("post", "output"))
+\method{plot}{ABCSMC}(x, type = c("post", "output"), gen = NA)
 }
 \arguments{
 \item{x}{An \code{ABCSMC} object.}

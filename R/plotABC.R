@@ -11,7 +11,7 @@
 #' @return A plot of the ABC posterior distributions for different generations, or the distributions
 #'         of the simulated summary measures for different generations.
 
-plot.ABCSMC <- function(x, type = c("post", "output")) {
+plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA) {
     
     ## check x
     stopifnot(class(x) == "ABCSMC")
@@ -20,6 +20,13 @@ plot.ABCSMC <- function(x, type = c("post", "output")) {
     type <- type[1]
     stopifnot(is.character(type))
     stopifnot(type %in% c("post", "output"))
+    
+    ## check gens
+    if(is.na(gen[1])) {
+        gen <- 1:length(x$pars)
+    }
+    checkInput(gen, c("vector", "numeric"), int = T)
+    stopifnot(all(gen %in% 1:length(x$pars)))
     
     if(type == "post") {
         ## generate colorRamp
@@ -32,6 +39,9 @@ plot.ABCSMC <- function(x, type = c("post", "output")) {
                 set_names(paste("par", 1:ncol(.)))
             }) %>%
             bind_rows(.id = "Generation") %>%
+            mutate(Generation = as.numeric(Generation)) %>%
+            arrange(Generation) %>%
+            filter(Generation %in% gen) %>%
             gather(Parameter, value, -Generation) %>%
             ggplot(aes(x = value, fill = Generation)) +
                 geom_density(alpha = 0.8) +
@@ -49,6 +59,9 @@ plot.ABCSMC <- function(x, type = c("post", "output")) {
                 set_names(paste("output", 1:ncol(.)))
             }) %>%
             bind_rows(.id = "Generation") %>%
+            mutate(Generation = as.numeric(Generation)) %>%
+            arrange(Generation) %>%
+            filter(Generation %in% gen) %>%
             gather(Output, value, -Generation) %>%
             ggplot(aes(x = value, fill = Generation)) +
                 geom_density(alpha = 0.8) +

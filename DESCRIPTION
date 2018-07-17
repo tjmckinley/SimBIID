@@ -7,4 +7,10 @@ Author: TJ McKinley
 Maintainer: TJ McKinley <t.mckinley@exeter.ac.uk>
 Description: Implements ABC-SMC algorithm of Toni et al. (2009)
 License: GPL (>= 2)
+Imports:
+    dplyr,
+    purrr,
+    ggplot2,
+    tidyr,
+    mvtnorm
 RoxygenNote: 6.0.1

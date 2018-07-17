@@ -2,5 +2,8 @@
 
 S3method(plot,ABCSMC)
 export(ABC_SMC)
+import(dplyr)
+import(ggplot2)
 import(mvtnorm)
-import(tidyverse)
+import(purrr)
+import(tidyr)

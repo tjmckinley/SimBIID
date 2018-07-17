@@ -8,6 +8,10 @@
 #' @docType package
 #' @name ABCSMC-package
 #' @author TJ McKinley <t.mckinley@@exeter.ac.uk>
-#' @import mvtnorm tidyverse
+#' @import dplyr
+#' @import purrr
+#' @import ggplot2
+#' @import tidyr
+#' @import mvtnorm
 NULL
 

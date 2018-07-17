@@ -21,7 +21,7 @@ summary.ABCSMC <- function(object, gen = NA) {
     gen <- ifelse(is.na(gen), length(object$pars), gen)
     stopifnot(gen > 0)
     stopifnot(round(gen, 0) == gen)
-    stopifnot(gen <= length(object))
+    stopifnot(gen <= length(object$pars))
     
     ## extract relevant parts of the object
     weights <- object$weights[[gen]]

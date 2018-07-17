@@ -4,6 +4,7 @@
 #'
 #' @export
 #'
+#' @param x         An \code{ABCSMC} object.
 #' @param npart     The number of particles (must be a positive integer).
 #' @param tols 		A \code{matrix} of tolerances, with the number of rows defining
 #'                  the number of generations of required, and the number of columns
@@ -30,18 +31,80 @@
 #'                      generation of ABC-SMC, with each vector being of length
 #'                      \code{npart};}
 #' \item{\code{accrate}:}{ a \code{vector} of length \code{nrow(tols)} containing the
-#'                      acceptance rates for each generation of ABC.}
+#'                      acceptance rates for each generation of ABC;}
+#' \item{\code{tols}:}{ a copy of the \code{tols} input;}
+#' \item{\code{priors}:}{ a copy of the \code{priors} input;}
+#' \item{\code{data}:}{ a copy of the \code{data} input;}
+#' \item{\code{func}:}{ a copy of the \code{func} input.}
 #' }
-#'
+#' @rdname ABCSMC
 
-ABC_SMC <- function(npart, tols, priors, func, data) {
+ABCSMC <- function(x, ...) {
+    UseMethod("ABCSMC")
+}
+
+#' @rdname ABCSMC
+#' @export
+
+ABCSMC.ABCSMC <- function(x, tols) {
+    
+    ## check inputs
+    stopifnot(class(x) == "ABCSMC")
+    
+    ## extract tolerances and check against new tolerances
+    stopifnot(ncol(tols) == length(x$data))
+    if(sum(apply(rbind(x$tols[nrow(x$tols), ], tols), 2, function(x) {
+        sum(x[-1] >= x[1])
+    })) > 0) {
+        stop("New tolerances not less than original tolerances")
+    }
+    
+    ## run ABC-SMC
+    temp <- ABCSMC.default(nrow(x$pars[[1]]), tols, x$priors, x$func, x$data, 
+                           prevPars = x$pars[[length(x$pars)]], 
+                           prevWeights = x$weights[[length(x$weights)]])
+    
+    ## combine with original runs
+    x$pars <- c(x$pars, temp$pars)
+    x$output <- c(x$output, temp$output)
+    x$weights <- c(x$weights, temp$weights)
+    x$accrate <- c(x$accrate, temp$accrate)
+    x$tols <- rbind(x$tols, tols)
+    
+    ## return new object
+    x
+}
+
+#' @rdname ABCSMC
+#' @export
+
+ABCSMC.default <- function(npart, tols, priors, func, data, ...) {
+    
+    ## set timer
+    ptm_ini <- proc.time()
 
     ## set up output objects
     accrate <- rep(NA, nrow(tols))
     pars <- list(); out <- list(); weights <- list();
     
+    ## extract ellipsis arguments
+    args <- list(...)
+    
+    if(exists("args$prevPars")) {
+        stopifnot(exists("args$prevWeights"))
+        pars[[1]] <- args$prevPars
+        weights[[1]] <- args$prevWeights
+        tols <- rbind(rep(NA, ncol(tols)), tols)
+        accrate <- rep(NA, nrow(tols))
+        out[[1]] <- NA
+        propCov <- cov(pars[[1]]) * 2
+        init <- 2
+    } else {
+        init <- 1
+    }
+    
     ## run sequential algorithm
-    for(t in 1:nrow(tols)) {
+    for(t in init:nrow(tols)) {
         ## print progress to the screen
         cat(paste0("Generation ", t, ":\n"))
         
@@ -51,7 +114,6 @@ ABC_SMC <- function(npart, tols, priors, func, data) {
         accrate[t] <- 0
         weightsNew <- rep(NA, npart)
         
-<<<<<<< HEAD
         ## simulate particles
         for(i in 1:npart) {
             valid <- 0
@@ -102,22 +164,6 @@ ABC_SMC <- function(npart, tols, priors, func, data) {
             if(i %% 10 == 0) {
                 cat(paste0("i = ", i, ", accrate = ", signif(i / accrate[t], 2), "\n"))
             }
-=======
-        ## set timer
-        ptm <- proc.time()
-        
-        ## run generation
-        if(!require(parallel)) {
-            temp <- lapply(1:npart, runProp,
-                t = t, priors = priors, 
-                prevWeights = tempWeights, prevPars = tempPars, 
-                propCov = propCov, tols = tols[t, ], data = data, func = func)
-        } else  {
-            temp <- mclapply(1:npart, runProp,
-                t = t, priors = priors, 
-                prevWeights = tempWeights, prevPars = tempPars, 
-                propCov = propCov, tols = tols[t, ], data = data, func = func, mc.cores = mc.cores)
->>>>>>> 83c7044... Amended print rounding and set timer
         }
         
         ## set accrate
@@ -128,8 +174,6 @@ ABC_SMC <- function(npart, tols, priors, func, data) {
         
         ## set proposal covariance
         propCov <- cov(pars[[t]]) * 2
-<<<<<<< HEAD
-=======
         
         ## stop timer
         ptm1 <- proc.time() - ptm
@@ -137,47 +181,25 @@ ABC_SMC <- function(npart, tols, priors, func, data) {
         ## print progress to the screen
         cat(paste0("Generation ", t, ", accrate = ", signif(accrate[t], 2), 
                    ", time = ", signif(ptm1[3], 2), " secs\n"))
->>>>>>> 83c7044... Amended print rounding and set timer
+    }
+    
+    ## stop timer
+    ptm1 <- proc.time() - ptm_ini
+    cat(paste0("\nFinal run time = ", signif(ptm1[3], 2), " secs\n"))
+    
+    # remove extraneous components if extending runs
+    if(init > 1) {
+        pars <- pars[-1]
+        out <- out[-1]
+        tols <- tols[-1, ]
+        weights <- weights[-1]
+        accrate <- accrate[-1]
     }
     
     ## output results
-    output <- list(pars = pars, output = out, weights = weights, accrate = accrate)
+    output <- list(pars = pars, output = out, weights = weights, accrate = accrate,
+                   tols = tols, priors = priors, data = data, func = func)
     class(output) <- "ABCSMC"
     output
 }
 
-        
-<<<<<<< HEAD
-=======
-        if(all(apply(cbind(pars, priors), 1, function(x) {
-            x[1] > x[2] & x[1] < x[3]
-        }))) {
-            ## simulate from model
-            out <- func(pars)
-            
-            ## check matching
-            if(all(!is.na(out))) {
-                if(all(abs(out - data) < tols)) {
-                    valid <- 1
-                }
-            }
-        }
-        
-        ## update counter
-        accrate <- accrate + 1
-    }
-    
-    if(t == 1) {
-        weightsNew <- 1
-    } else {
-        ## calculate unnormalised weight
-        weightsNew <- prod(apply(cbind(pars, priors), 1, function(x) {
-            dunif(x[1], x[2], x[3])
-        }))
-        weightsNew <- weightsNew / sum(prevWeights * apply(prevPars, 1, function(x, pars, propCov) {
-            dmvnorm(pars, mean = x, sigma = propCov)
-        }, pars = pars, propCov = propCov))
-    }
-    list(pars = pars, out = out, weightsNew = weightsNew, accrate = accrate)
-}      
->>>>>>> 83c7044... Amended print rounding and set timer

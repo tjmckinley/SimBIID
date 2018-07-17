@@ -21,6 +21,9 @@ plot.ABCSMC <- function(x, type = c("post", "output")) {
     stopifnot(type %in% c("post", "output"))
     
     if(type == "post") {
+        ## generate colorRamp
+        getPalette <- colorRampPalette(brewer.pal(9, "YlOrRd"))
+        
         ## plot posteriors
         p <- x$pars %>%
             map(~{
@@ -32,9 +35,12 @@ plot.ABCSMC <- function(x, type = c("post", "output")) {
             ggplot(aes(x = value, fill = Generation)) +
                 geom_density(alpha = 0.8) +
                 xlab("Parameter value") + ylab("Density") +
-                scale_fill_brewer(palette = "YlOrRd") +
+                scale_fill_manual(values = getPalette(length(x$pars))) +
                 facet_wrap(~ Parameter, scales = "free")
      } else {
+        ## generate colorRamp
+        getPalette <- colorRampPalette(brewer.pal(9, "YlGnBu"))
+        
         ## plot outputs
         p <- x$output %>%
             map(~{
@@ -46,7 +52,7 @@ plot.ABCSMC <- function(x, type = c("post", "output")) {
             ggplot(aes(x = value, fill = Generation)) +
                 geom_density(alpha = 0.8) +
                 xlab("Output") + ylab("Density") +
-                scale_fill_brewer(palette = "YlGnBu") +
+                scale_fill_manual(values = getPalette(length(x$output))) +
                 facet_wrap(~ Output, scales = "free")
      }
      print(p)

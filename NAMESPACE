@@ -3,6 +3,7 @@
 S3method(plot,ABCSMC)
 S3method(summary,ABCSMC)
 export(ABC_SMC)
+import(RColorBrewer)
 import(dplyr)
 import(ggplot2)
 import(mvtnorm)

@@ -13,5 +13,6 @@
 #' @import ggplot2
 #' @import tidyr
 #' @import mvtnorm
+#' @import RColorBrewer
 NULL
 

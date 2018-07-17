@@ -12,6 +12,7 @@
 #'         of the simulated summary measures for different generations.
 
 plot.ABCSMC <- function(x, type = c("post", "output")) {
+    
     ## check x
     stopifnot(class(x) == "ABCSMC")
     

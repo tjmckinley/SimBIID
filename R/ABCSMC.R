@@ -80,6 +80,23 @@ ABCSMC.ABCSMC <- function(x, tols) {
 
 ABCSMC.default <- function(npart, tols, priors, func, data, ...) {
     
+    ## check inputs
+    checkInput(npart, "numeric", 1, int = T)
+    checkInput(tols, c("numeric", "matrix"))
+    checkInput(priors, c("numeric", "matrix"), ncol = 2)
+    checkInput(func, "function", 1)
+    checkInput(data, c("vector", "numeric"))
+    stopifnot(length(data) == ncol(tols))
+    fargs <- formals(func)
+    stopifnot(length(fargs) == 1)
+    stopifnot(names(fargs) == "pars")
+    stopifnot(all(apply(tols, 2, function(x) {
+        all(diff(x) < 0)
+    })))
+    stopifnot(npart > 1)
+    stopifnot(all(tols > 0))
+    stopifnot(all(apply(priors, 1, diff) > 0))
+    
     ## set timer
     ptm_ini <- proc.time()
 

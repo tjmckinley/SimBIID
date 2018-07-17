@@ -19,8 +19,8 @@ summary.ABCSMC <- function(object, gen = NA) {
     ## check gen is valid
     stopifnot(length(gen) == 1)
     gen <- ifelse(is.na(gen), length(object$pars), gen)
+    checkInput(gen, "numeric", 1, int = T)
     stopifnot(gen > 0)
-    stopifnot(round(gen, 0) == gen)
     stopifnot(gen <= length(object$pars))
     
     ## extract relevant parts of the object

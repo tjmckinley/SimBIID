@@ -17,15 +17,19 @@
 #'
 #' @return An \code{ABCSMC} object, essentially a \code{list} containing:
 #' \itemize{
-#' \item{\code{pars}}{a \code{list} of \code{matrix} objects containing the accepted
+#' \item{\code{pars}:}{ a \code{list} of \code{matrix} objects containing the accepted
 #'                      particles. Each element of the list corresponds to a generation 
 #'                      of ABC-SMC, with each matrix being of dimension 
 #'                      \code{npart} x \code{npars};}
-#' \item{\code{out}}{a \code{list} of \code{matrix} objects containing the simulated
+#' \item{\code{out}:}{ a \code{list} of \code{matrix} objects containing the simulated
 #'                      summary statistics. Each element of the list corresponds to a
 #'                      generation of ABC-SMC, with each matrix being of dimension 
 #'                      \code{npart} x \code{length(data)};}
-#' \item{\code{accrate}}{a \code{vector} of length \code{nrow(tols)} containing the
+#' \item{\code{weights}:}{ a \code{list} of \code{vector} objects containing the particle
+#'                      weights. Each element of the list corresponds to a
+#'                      generation of ABC-SMC, with each vector being of length
+#'                      \code{npart};}
+#' \item{\code{accrate}:}{ a \code{vector} of length \code{nrow(tols)} containing the
 #'                      acceptance rates for each generation of ABC.}
 #' }
 #'
@@ -34,7 +38,7 @@ ABC_SMC <- function(npart, tols, priors, func, data) {
 
     ## set up output objects
     accrate <- rep(NA, nrow(tols))
-    pars <- list(); out <- list();
+    pars <- list(); out <- list(); weights <- list();
     
     ## run sequential algorithm
     for(t in 1:nrow(tols)) {
@@ -58,7 +62,7 @@ ABC_SMC <- function(npart, tols, priors, func, data) {
                     }
                 } else {
                     ## sample from previous generation
-                    k <- sample(1:npart, 1, prob = weights)
+                    k <- sample(1:npart, 1, prob = weights[[t - 1]])
                     pars[[t]][i, ] <- rmvnorm(1, 
                         mean = pars[[t - 1]][k, ], 
                         sigma = propCov
@@ -90,7 +94,7 @@ ABC_SMC <- function(npart, tols, priors, func, data) {
                 weightsNew[i] <- prod(apply(cbind(pars[[t]][i, ], priors), 1, function(x) {
                     dunif(x[1], x[2], x[3])
                 }))
-                weightsNew[i] <- weightsNew[i] / sum(weights * apply(pars[[t - 1]], 1, function(x) {
+                weightsNew[i] <- weightsNew[i] / sum(weights[[t - 1]] * apply(pars[[t - 1]], 1, function(x) {
                     dmvnorm(pars[[t]][i, ], mean = x, sigma = propCov)
                 }))
             }
@@ -103,14 +107,14 @@ ABC_SMC <- function(npart, tols, priors, func, data) {
         accrate[t] <- npart / accrate[t] 
         
         ## set weights
-        weights <- weightsNew / sum(weightsNew)
+        weights[[t]] <- weightsNew / sum(weightsNew)
         
         ## set proposal covariance
         propCov <- cov(pars[[t]]) * 2
     }
     
     ## output results
-    output <- list(pars = pars, out = out, accrate = accrate)
+    output <- list(pars = pars, out = out, weights = weights, accrate = accrate)
     class(output) <- "ABCSMC"
     output
 }

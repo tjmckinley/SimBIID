@@ -25,15 +25,19 @@ and returns the simulated summary measures against which to compare.}
 \value{
 An \code{ABCSMC} object, essentially a \code{list} containing:
 \itemize{
-\item{\code{pars}}{a \code{list} of \code{matrix} objects containing the accepted
+\item{\code{pars}:}{ a \code{list} of \code{matrix} objects containing the accepted
                      particles. Each element of the list corresponds to a generation 
                      of ABC-SMC, with each matrix being of dimension 
                      \code{npart} x \code{npars};}
-\item{\code{out}}{a \code{list} of \code{matrix} objects containing the simulated
+\item{\code{out}:}{ a \code{list} of \code{matrix} objects containing the simulated
                      summary statistics. Each element of the list corresponds to a
                      generation of ABC-SMC, with each matrix being of dimension 
                      \code{npart} x \code{length(data)};}
-\item{\code{accrate}}{a \code{vector} of length \code{nrow(tols)} containing the
+\item{\code{weights}:}{ a \code{list} of \code{vector} objects containing the particle
+                     weights. Each element of the list corresponds to a
+                     generation of ABC-SMC, with each vector being of length
+                     \code{npart};}
+\item{\code{accrate}:}{ a \code{vector} of length \code{nrow(tols)} containing the
                      acceptance rates for each generation of ABC.}
 }
 }

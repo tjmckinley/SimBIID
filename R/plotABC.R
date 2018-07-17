@@ -8,8 +8,8 @@
 #' @param type  Takes the value \code{"post"} if you want to plot posterior distributions.
 #'              Takes the value \code{"output"} if you want to plot the simulated outputs.
 #'
-#' @return A plot of the ABC posterior distributions for different generations.
-#'
+#' @return A plot of the ABC posterior distributions for different generations, or the distributions
+#'         of the simulated summary measures for different generations.
 
 plot.ABCSMC <- function(x, type = c("post", "output")) {
     ## check x

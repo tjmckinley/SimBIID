@@ -13,7 +13,8 @@
 Takes the value \code{"output"} if you want to plot the simulated outputs.}
 }
 \value{
-A plot of the ABC posterior distributions for different generations.
+A plot of the ABC posterior distributions for different generations, or the distributions
+        of the simulated summary measures for different generations.
 }
 \description{
 Plot method for \code{ABCSMC} objects.

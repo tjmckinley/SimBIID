@@ -45,11 +45,14 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F) {
         fillCols <- getPalette(length(x$pars))
         fillCols <- fillCols[as.numeric(gen)]
         
+        ## get parameter names
+        pnames <- priors$parnames
+        
         p <- x$pars %>%
                 map(~{
                     as_tibble(.) %>%
-                    set_names(paste("par", 1:ncol(.)))
-                }) %>%
+                    set_names(pnames)
+                }, pnames = pnames) %>%
                 bind_rows(.id = "Generation") %>%
                 filter(Generation %in% gen) %>%
                 mutate(Generation = factor(Generation, levels = gen))
@@ -84,12 +87,15 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F) {
         fillCols <- getPalette(length(x$pars))
         fillCols <- fillCols[as.numeric(gen)]
         
+        ## get output names
+        onames <- colnames(x$output[[1]])
+        
         ## plot outputs
         p <- x$output %>%
             map(~{
                 as_tibble(.) %>%
-                set_names(paste("output", 1:ncol(.)))
-            }) %>%
+                set_names(onames)
+            }, onames = onames) %>%
             bind_rows(.id = "Generation") %>%
             filter(Generation %in% gen) %>%
             mutate(Generation = factor(Generation, levels = gen))

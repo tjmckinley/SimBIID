@@ -9,10 +9,11 @@
 #' @param tols 		A \code{matrix} of tolerances, with the number of rows defining
 #'                  the number of generations of required, and the number of columns
 #'                  defining the number of summary statistics / data points to match to.
-#' @param priors    A \code{data.frame} containing columns \code{dist}, \code{p1} and 
-#'                  \code{p2}, with number of rows equal to the number of parameters. Each entry in 
-#'                  the \code{dist} column must contain one of \code{c("unif", "norm", "gamma")}, and
-#'                  the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
+#' @param priors    A \code{data.frame} containing columns \code{parname}, \code{dist}, \code{p1} and 
+#'                  \code{p2}, with number of rows equal to the number of parameters. The column
+#'                  \code{parname} simply gives names to each parameter for plotting and summarising.
+#'                  Each entry in the \code{dist} column must contain one of \code{c("unif", "norm", "gamma")}, 
+#'                  and the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
 #'                  (lower and upper bounds in the uniform case; mean and standard deviation in the 
 #'                  normal case; and shape and scale in the gamma case).
 #'                  two columns containing the lower and upper bounds respectively.
@@ -90,7 +91,7 @@ ABCSMC.default <- function(npart, tols, priors, func, data, mc.cores = 1, ...) {
     ## check inputs
     checkInput(npart, "numeric", 1, int = T)
     checkInput(tols, c("numeric", "matrix"))
-    checkInput(priors, "data.frame", ncol = 3)
+    checkInput(priors, "data.frame", ncol = 4)
     checkInput(func, "function", 1)
     checkInput(data, c("vector", "numeric"))
     checkInput(mc.cores, "numeric", 1, int = T)
@@ -105,7 +106,9 @@ ABCSMC.default <- function(npart, tols, priors, func, data, mc.cores = 1, ...) {
     stopifnot(all(tols > 0))
     
     ## check priors
-    stopifnot(all(match(colnames(priors), c("dist", "p1", "p2")) - 1:3 == 0))
+    stopifnot(all(sort(match(colnames(priors), c("parnames", "dist", "p1", "p2"))) - 1:4 == 0))
+    priors <- select(priors, parnames, dist, p1, p2)
+    checkInput(priors$parnames, "character")
     checkInput(priors$dist, "character")
     checkInput(priors$p1, "numeric")
     checkInput(priors$p2, "numeric")
@@ -113,7 +116,7 @@ ABCSMC.default <- function(npart, tols, priors, func, data, mc.cores = 1, ...) {
     temp <- priors[priors$dist == "unif", , drop = F]
     if(nrow(temp) > 0) {
         ## check uniform bounds correct
-        stopifnot(all(apply(temp[, -1, drop = F], 1, diff) > 0))
+        stopifnot(all(apply(temp[, 3:4, drop = F], 1, diff) > 0))
     }
     temp <- priors[priors$dist == "norm", , drop = F]
     if(nrow(temp) > 0) {
@@ -128,7 +131,7 @@ ABCSMC.default <- function(npart, tols, priors, func, data, mc.cores = 1, ...) {
     }
     orig_priors <- priors
     priors$ddist <- paste0("d", priors$dist)
-    priors$dist <- paste0("r", priors$dist)
+    priors$dist <- paste0("r", priors$dist)    
     
     ## set timer
     ptm_ini <- proc.time()
@@ -192,6 +195,14 @@ ABCSMC.default <- function(npart, tols, priors, func, data, mc.cores = 1, ...) {
         out[[t]] <- do.call("rbind", out[[t]])
         accrate[t] <- npart / sum(map_dbl(temp, "accrate"))
         
+        ## set names
+        colnames(pars[[t]]) <- priors$parnames
+        if(is.null(names(data)[1])) {
+            colnames(out[[t]]) <- paste0("output ", 1:length(data))
+        } else {
+            colnames(out[[t]]) <- names(data)
+        }
+        
         ## set proposal covariance
         propCov <- cov(pars[[t]]) * 2
         
@@ -207,7 +218,7 @@ ABCSMC.default <- function(npart, tols, priors, func, data, mc.cores = 1, ...) {
     ptm1 <- proc.time() - ptm_ini
     cat(paste0("\nFinal run time = ", signif(ptm1[3], 2), " secs\n"))
     
-    # remove extraneous components if extending runs
+    ## remove extraneous components if extending runs
     if(init > 1) {
         pars <- pars[-1]
         out <- out[-1]

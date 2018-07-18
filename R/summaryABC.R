@@ -40,6 +40,7 @@ summary.ABCSMC <- function(object, gen = NA) {
     
     ## return summary
     postsum <- data.frame(Mean = postmn, SD = sqrt(postvar))
+    rownames(postsum) <- priors$parnames
     postsum
 }
     

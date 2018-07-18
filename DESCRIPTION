@@ -15,5 +15,6 @@ Imports:
     mvtnorm,
     RColorBrewer
 Suggests:
-    parallel
+    parallel,
+    GGally
 RoxygenNote: 6.0.1

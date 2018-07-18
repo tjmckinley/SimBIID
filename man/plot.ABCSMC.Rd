@@ -4,7 +4,7 @@
 \alias{plot.ABCSMC}
 \title{Plots \code{ABCSMC} objects}
 \usage{
-\method{plot}{ABCSMC}(x, type = c("post", "output"), gen = NA)
+\method{plot}{ABCSMC}(x, type = c("post", "output"), gen = NA, joint = F)
 }
 \arguments{
 \item{x}{An \code{ABCSMC} object.}
@@ -13,6 +13,8 @@
 Takes the value \code{"output"} if you want to plot the simulated outputs.}
 
 \item{gen}{A vector of generations to plot. If left missing then defaults to all generations.}
+
+\item{joint}{A logical describing whether joint or marginal distributions are wanted.}
 }
 \value{
 A plot of the ABC posterior distributions for different generations, or the distributions

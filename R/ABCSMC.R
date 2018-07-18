@@ -122,6 +122,10 @@ ABCSMC.default <- function(npart, tols, priors, func, data, ...) {
     
     ## run sequential algorithm
     for(t in init:nrow(tols)) {
+        
+        ## start timer
+        ptm <- proc.time()
+        
         ## print progress to the screen
         cat(paste0("Generation ", t, ":\n"))
         

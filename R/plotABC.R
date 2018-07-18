@@ -27,6 +27,7 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA) {
     }
     checkInput(gen, c("vector", "numeric"), int = T)
     stopifnot(all(gen %in% 1:length(x$pars)))
+    gen <- as.character(sort(gen))
     
     if(type == "post") {
         ## generate colorRamp
@@ -39,9 +40,8 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA) {
                 set_names(paste("par", 1:ncol(.)))
             }) %>%
             bind_rows(.id = "Generation") %>%
-            mutate(Generation = as.numeric(Generation)) %>%
-            arrange(Generation) %>%
             filter(Generation %in% gen) %>%
+            mutate(Generation = factor(Generation, levels = gen)) %>%
             gather(Parameter, value, -Generation) %>%
             ggplot(aes(x = value, fill = Generation)) +
                 geom_density(alpha = 0.8) +
@@ -59,9 +59,8 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA) {
                 set_names(paste("output", 1:ncol(.)))
             }) %>%
             bind_rows(.id = "Generation") %>%
-            mutate(Generation = as.numeric(Generation)) %>%
-            arrange(Generation) %>%
             filter(Generation %in% gen) %>%
+            mutate(Generation = factor(Generation, levels = gen)) %>%
             gather(Output, value, -Generation) %>%
             ggplot(aes(x = value, fill = Generation)) +
                 geom_density(alpha = 0.8) +

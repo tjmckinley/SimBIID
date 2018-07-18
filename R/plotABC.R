@@ -32,6 +32,8 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA) {
     if(type == "post") {
         ## generate colorRamp
         getPalette <- colorRampPalette(brewer.pal(9, "YlOrRd"))
+        fillCols <- getPalette(length(x$pars))
+        fillCols <- fillCols[as.numeric(gen)]
         
         ## plot posteriors
         p <- x$pars %>%
@@ -46,11 +48,13 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA) {
             ggplot(aes(x = value, fill = Generation)) +
                 geom_density(alpha = 0.8) +
                 xlab("Parameter value") + ylab("Density") +
-                scale_fill_manual(values = getPalette(length(x$pars))) +
+                scale_fill_manual(values = fillCols) +
                 facet_wrap(~ Parameter, scales = "free")
      } else {
         ## generate colorRamp
         getPalette <- colorRampPalette(brewer.pal(9, "YlGnBu"))
+        fillCols <- getPalette(length(x$pars))
+        fillCols <- fillCols[as.numeric(gen)]
         
         ## plot outputs
         p <- x$output %>%
@@ -65,7 +69,7 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA) {
             ggplot(aes(x = value, fill = Generation)) +
                 geom_density(alpha = 0.8) +
                 xlab("Output") + ylab("Density") +
-                scale_fill_manual(values = getPalette(length(x$output))) +
+                scale_fill_manual(values = fillCols) +
                 facet_wrap(~ Output, scales = "free")
      }
      print(p)

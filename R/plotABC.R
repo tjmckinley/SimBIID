@@ -31,12 +31,12 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
     if(is.na(gen[1])) {
         gen <- 1:length(x$pars)
     }
-    checkInput(gen, c("vector", "numeric"), int = T)
+    stopifnot(checkInput(gen, c("vector", "numeric"), int = T))
     stopifnot(all(gen %in% 1:length(x$pars)))
     gen <- as.character(sort(gen))
     
     ## check joint
-    checkInput(joint, c("vector", "logical"), 1)
+    stopifnot(checkInput(joint, c("vector", "logical"), 1))
     if(joint) {
         if(!require(GGally)) {
             stop("'GGally' package required for joint distribution plots")
@@ -94,7 +94,7 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
                     scale_fill_manual(values = fillCols) +
                     facet_wrap(~ Parameter, scales = "free")
          } else {
-            p <- ggpairs(p, mapping = aes(color = Generation), 
+            p <- ggpairs(p, mapping = aes(colour = Generation), 
                 columns = 2:ncol(p),
                 diag = list(continuous = wrap("densityDiag", alpha = 0.8)),
                 lower = list(continuous = "density"),
@@ -145,7 +145,7 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
                     scale_fill_manual(values = fillCols) +
                     facet_wrap(~ Output, scales = "free")
         } else {
-            p <- ggpairs(p, mapping = aes(color = Generation), 
+            p <- ggpairs(p, mapping = aes(colour = Generation), 
                 columns = 2:ncol(p),
                 diag = list(continuous = wrap("densityDiag", alpha = 0.8)),
                 lower = list(continuous = "density"),

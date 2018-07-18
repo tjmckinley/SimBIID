@@ -23,7 +23,7 @@ summary.ABCSMC <- function(object, gen = NA, transfunc = NA) {
     ## check gen is valid
     stopifnot(length(gen) == 1)
     gen <- ifelse(is.na(gen), length(object$pars), gen)
-    checkInput(gen, "numeric", 1, int = T)
+    stopifnot(checkInput(gen, "numeric", 1, int = T))
     stopifnot(gen > 0)
     stopifnot(gen <= length(object$pars))
     

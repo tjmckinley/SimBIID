@@ -89,12 +89,12 @@ ABCSMC.ABCSMC <- function(x, tols, mc.cores = 1) {
 ABCSMC.default <- function(npart, tols, priors, func, data, mc.cores = 1, ...) {
     
     ## check inputs
-    checkInput(npart, "numeric", 1, int = T)
-    checkInput(tols, c("numeric", "matrix"))
-    checkInput(priors, "data.frame", ncol = 4)
-    checkInput(func, "function", 1)
-    checkInput(data, c("vector", "numeric"))
-    checkInput(mc.cores, "numeric", 1, int = T)
+    stopifnot(checkInput(npart, "numeric", 1, int = T))
+    stopifnot(checkInput(tols, c("numeric", "matrix")))
+    stopifnot(checkInput(priors, "data.frame", ncol = 4))
+    stopifnot(checkInput(func, "function", 1))
+    stopifnot(checkInput(data, c("vector", "numeric")))
+    stopifnot(checkInput(mc.cores, "numeric", 1, int = T))
     stopifnot(length(data) == ncol(tols))
     fargs <- formals(func)
     stopifnot(length(fargs) == 1)
@@ -108,10 +108,10 @@ ABCSMC.default <- function(npart, tols, priors, func, data, mc.cores = 1, ...) {
     ## check priors
     stopifnot(all(sort(match(colnames(priors), c("parnames", "dist", "p1", "p2"))) - 1:4 == 0))
     priors <- select(priors, parnames, dist, p1, p2)
-    checkInput(priors$parnames, "character")
-    checkInput(priors$dist, "character")
-    checkInput(priors$p1, "numeric")
-    checkInput(priors$p2, "numeric")
+    stopifnot(checkInput(priors$parnames, "character"))
+    stopifnot(checkInput(priors$dist, "character"))
+    stopifnot(checkInput(priors$p1, "numeric"))
+    stopifnot(checkInput(priors$p2, "numeric"))
     stopifnot(all(priors$dist %in% c("unif", "norm", "gamma")))
     temp <- priors[priors$dist == "unif", , drop = F]
     if(nrow(temp) > 0) {

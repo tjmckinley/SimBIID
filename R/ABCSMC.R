@@ -15,6 +15,7 @@
 #' @param func      A function taking a single argument \code{pars} that runs the simulator
 #'                  and returns the simulated summary measures against which to compare.
 #' @param data      A \code{vector} containing the observed summary statistics to match to.
+#' @param mc.cores  Number of cores to use if using parallel processing.
 #'
 #' @return An \code{ABCSMC} object, essentially a \code{list} containing:
 #' \itemize{
@@ -46,7 +47,7 @@ ABCSMC <- function(x, ...) {
 #' @rdname ABCSMC
 #' @export
 
-ABCSMC.ABCSMC <- function(x, tols) {
+ABCSMC.ABCSMC <- function(x, tols, mc.cores = 1) {
     
     ## check inputs
     stopifnot(class(x) == "ABCSMC")
@@ -61,6 +62,7 @@ ABCSMC.ABCSMC <- function(x, tols) {
     
     ## run ABC-SMC
     temp <- ABCSMC.default(nrow(x$pars[[1]]), tols, x$priors, x$func, x$data, 
+                           mc.cores = mc.cores, 
                            prevPars = x$pars[[length(x$pars)]], 
                            prevWeights = x$weights[[length(x$weights)]],
                            genstart = nrow(x$tols) + 1)
@@ -79,7 +81,7 @@ ABCSMC.ABCSMC <- function(x, tols) {
 #' @rdname ABCSMC
 #' @export
 
-ABCSMC.default <- function(npart, tols, priors, func, data, ...) {
+ABCSMC.default <- function(npart, tols, priors, func, data, mc.cores = 1, ...) {
     
     ## check inputs
     checkInput(npart, "numeric", 1, int = T)
@@ -87,6 +89,7 @@ ABCSMC.default <- function(npart, tols, priors, func, data, ...) {
     checkInput(priors, c("numeric", "matrix"), ncol = 2)
     checkInput(func, "function", 1)
     checkInput(data, c("vector", "numeric"))
+    checkInput(mc.cores, "numeric", 1, int = T)
     stopifnot(length(data) == ncol(tols))
     fargs <- formals(func)
     stopifnot(length(fargs) == 1)
@@ -115,7 +118,6 @@ ABCSMC.default <- function(npart, tols, priors, func, data, ...) {
         pars[[1]] <- args$prevPars
         weights[[1]] <- args$prevWeights
         tols <- rbind(rep(NA, ncol(tols)), tols)
-        accrate <- rep(NA, nrow(tols))
         out[[1]] <- NA
         propCov <- cov(pars[[1]]) * 2
         init <- 2
@@ -126,77 +128,40 @@ ABCSMC.default <- function(npart, tols, priors, func, data, ...) {
     }
     
     ## run sequential algorithm
-    for(t in init:nrow(tols)) {
-        
-        ## start timer
-        ptm <- proc.time()
-        
-        ## print progress to the screen
-        cat(paste0("Generation ", t, ":\n"))
-        
-        ## set up inputs and outputs
-        pars[[t]] <- matrix(NA, npart, nrow(priors))
-        out[[t]] <- matrix(NA, npart, length(data))
-        accrate[t] <- 0
-        weightsNew <- rep(NA, npart)
-        
-        ## simulate particles
-        for(i in 1:npart) {
-            valid <- 0
-            while(valid == 0) {
-                if(t == 1) {
-                    ## sample from prior
-                    for(j in 1:nrow(priors)) {
-                        pars[[t]][i, j] <- runif(1, priors[, 1], priors[, 2])
-                    }
-                } else {
-                    ## sample from previous generation
-                    k <- sample(1:npart, 1, prob = weights[[t - 1]])
-                    pars[[t]][i, ] <- rmvnorm(1, 
-                        mean = pars[[t - 1]][k, ], 
-                        sigma = propCov
-                    )
-                }
-                
-                if(all(apply(cbind(pars[[t]][i, ], priors), 1, function(x) {
-                    x[1] > x[2] & x[1] < x[3]
-                }))) {
-                    ## simulate from model
-                    out[[t]][i, ] <- func(pars[[t]][i, ])
-                    
-                    ## check matching
-                    if(all(!is.na(out[[t]][i, ]))) {
-                        if(all(abs(out[[t]][i, ] - data) < tols[t, ])) {
-                            valid <- 1
-                        }
-                    }
-                }
-                
-                ## update counter
-                accrate[t] <- accrate[t] + 1
-            }
-            
-            if(t == 1) {
-                weightsNew[i] <- 1
-            } else {
-                ## calculate unnormalised weight
-                weightsNew[i] <- prod(apply(cbind(pars[[t]][i, ], priors), 1, function(x) {
-                    dunif(x[1], x[2], x[3])
-                }))
-                weightsNew[i] <- weightsNew[i] / sum(weights[[t - 1]] * apply(pars[[t - 1]], 1, function(x) {
-                    dmvnorm(pars[[t]][i, ], mean = x, sigma = propCov)
-                }))
-            }
-            if(i %% 10 == 0) {
-                cat(paste0("i = ", i, ", accrate = ", signif(i / accrate[t], 2), "\n"))
-            }
+    for(t in init:nrow(tols)) {  
+        ## set up arguments
+        if(t == 1) {
+            tempWeights <- rep(1, npart)
+            tempPars <- rep(1, npart)
+        } else {
+            tempWeights <- weights[[t - 1]]
+            tempPars <- pars[[t - 1]]
         }
         
-        ## set accrate
-        accrate[t] <- npart / accrate[t] 
+        ## set timer
+        ptm <- proc.time()
         
-        ## set weights
-        weights[[t]] <- weightsNew / sum(weightsNew)
+        ## run generation
+        if(!require(parallel)) {
+            temp <- lapply(1:npart, runProp,
+                t = t, priors = priors, 
+                prevWeights = tempWeights, prevPars = tempPars, 
+                propCov = propCov, tols = tols[t, ], data = data, func = func)
+        } else  {
+            temp <- mclapply(1:npart, runProp,
+                t = t, priors = priors, 
+                prevWeights = tempWeights, prevPars = tempPars, 
+                propCov = propCov, tols = tols[t, ], data = data, func = func, mc.cores = mc.cores)
+        }
+        
+        ## extract relative components
+        weights[[t]] <- map_dbl(temp, "weightsNew")
+        weights[[t]] <- weights[[t]] / sum(weights[[t]])
+        pars[[t]] <- map(temp, "pars")
+        pars[[t]] <- do.call("rbind", pars[[t]])
+        out[[t]] <- map(temp, "out")
+        out[[t]] <- do.call("rbind", out[[t]])
+        accrate[t] <- npart / sum(map_dbl(temp, "accrate"))
         
         ## set proposal covariance
         propCov <- cov(pars[[t]]) * 2
@@ -219,7 +184,6 @@ ABCSMC.default <- function(npart, tols, priors, func, data, ...) {
         out <- out[-1]
         tols <- tols[-1, ]
         weights <- weights[-1]
-        accrate <- accrate[-1]
     }
     
     ## output results

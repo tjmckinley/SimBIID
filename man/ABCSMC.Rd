@@ -16,7 +16,7 @@ ABCSMC(x, ...)
 \item{x}{An \code{ABCSMC} object.}
 
 \item{tols}{A \code{matrix} of tolerances, with the number of rows defining
-the number of generations of required, and the number of columns
+the number of generations required, and the number of columns
 defining the number of summary statistics / data points to match to.}
 
 \item{mc.cores}{Number of cores to use if using parallel processing.}

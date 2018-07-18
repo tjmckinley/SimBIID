@@ -7,7 +7,7 @@
 #' @param x         An \code{ABCSMC} object.
 #' @param npart     The number of particles (must be a positive integer).
 #' @param tols 		A \code{matrix} of tolerances, with the number of rows defining
-#'                  the number of generations of required, and the number of columns
+#'                  the number of generations required, and the number of columns
 #'                  defining the number of summary statistics / data points to match to.
 #' @param priors    A \code{data.frame} containing columns \code{parname}, \code{dist}, \code{p1} and 
 #'                  \code{p2}, with number of rows equal to the number of parameters. The column

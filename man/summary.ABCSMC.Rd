@@ -4,13 +4,17 @@
 \alias{summary.ABCSMC}
 \title{Summarises \code{ABCSMC} objects}
 \usage{
-\method{summary}{ABCSMC}(object, gen = NA)
+\method{summary}{ABCSMC}(object, gen = NA, transfunc = NA)
 }
 \arguments{
 \item{object}{An \code{ABCSMC} object.}
 
 \item{gen}{The generation of ABC that you want to extract. If left missing then
 defaults to final generation.}
+
+\item{transfunc}{Is a \code{function} object where the arguments to the function must
+match parameters in the model. This function needs to return a \code{data.frame}
+object with a single column containing the transformed parameters.}
 }
 \value{
 A \code{data.frame} with weighted posterior means and variances.

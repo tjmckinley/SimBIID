@@ -7,11 +7,14 @@
 #' @param object    An \code{ABCSMC} object.
 #' @param gen       The generation of ABC that you want to extract. If left missing then
 #'                  defaults to final generation.
+#' @param transfunc Is a \code{function} object where the arguments to the function must
+#'                  match parameters in the model. This function needs to return a \code{data.frame}
+#'                  object with a single column containing the transformed parameters.
 #'
 #' @return          A \code{data.frame} with weighted posterior means and variances.
 #'
 
-summary.ABCSMC <- function(object, gen = NA) {
+summary.ABCSMC <- function(object, gen = NA, transfunc = NA) {
     
     ## check x is an ABCSMC object
     stopifnot(class(object) == "ABCSMC")
@@ -26,6 +29,30 @@ summary.ABCSMC <- function(object, gen = NA) {
     ## extract relevant parts of the object
     weights <- object$weights[[gen]]
     pars <- object$pars[[gen]]
+    pars <- as.data.frame(pars)
+    
+    ## check transformations
+    stopifnot(length(transfunc) == 1)
+    if(is.function(transfunc)) {
+    
+        ## check function arguments
+        fargs <- formals(transfunc)
+        stopifnot(all(names(fargs) %in% colnames(pars)))
+        
+        ## perform transformations if required
+        temppars <- pars[, match(names(fargs), colnames(pars))]
+        temppars <- as.data.frame(temppars)
+        temppars <- as.list(temppars)
+        names(temppars) <- names(fargs)
+        temp <- do.call("transfunc", temppars)
+        stopifnot(checkInput(temp, "data.frame", nrow = nrow(pars), ncol = 1))
+        
+        ## bind to current posterior samples
+        pars <- cbind(pars, temp)
+    }
+    
+    ## extract parameter names
+    parnames <- colnames(pars)
     
     ## calculate weighted mean
     postmn <- apply(cbind(weights, pars), 1, function(x) x[-1] * x[1])
@@ -40,7 +67,7 @@ summary.ABCSMC <- function(object, gen = NA) {
     
     ## return summary
     postsum <- data.frame(Mean = postmn, SD = sqrt(postvar))
-    rownames(postsum) <- priors$parnames
+    rownames(postsum) <- parnames
     postsum
 }
     

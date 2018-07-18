@@ -11,6 +11,8 @@
 
 \item{type}{Takes the value \code{"post"} if you want to plot posterior distributions.
 Takes the value \code{"output"} if you want to plot the simulated outputs.}
+
+\item{gen}{A vector of generations to plot. If left missing then defaults to all generations.}
 }
 \value{
 A plot of the ABC posterior distributions for different generations, or the distributions

@@ -62,7 +62,8 @@ ABCSMC.ABCSMC <- function(x, tols) {
     ## run ABC-SMC
     temp <- ABCSMC.default(nrow(x$pars[[1]]), tols, x$priors, x$func, x$data, 
                            prevPars = x$pars[[length(x$pars)]], 
-                           prevWeights = x$weights[[length(x$weights)]])
+                           prevWeights = x$weights[[length(x$weights)]],
+                           genstart = nrow(x$tols) + 1)
     
     ## combine with original runs
     x$pars <- c(x$pars, temp$pars)
@@ -107,8 +108,10 @@ ABCSMC.default <- function(npart, tols, priors, func, data, ...) {
     ## extract ellipsis arguments
     args <- list(...)
     
-    if(exists("args$prevPars")) {
-        stopifnot(exists("args$prevWeights"))
+    if(exists("prevPars", where = args)) {
+        stopifnot(exists("prevWeights", where = args))
+        stopifnot(exists("genstart", where = args))
+        ## set up dummy objects (removed at the end)
         pars[[1]] <- args$prevPars
         weights[[1]] <- args$prevWeights
         tols <- rbind(rep(NA, ncol(tols)), tols)
@@ -116,8 +119,10 @@ ABCSMC.default <- function(npart, tols, priors, func, data, ...) {
         out[[1]] <- NA
         propCov <- cov(pars[[1]]) * 2
         init <- 2
+        genstart <- args$genstart - 2
     } else {
         init <- 1
+        genstart <- 0
     }
     
     ## run sequential algorithm
@@ -200,7 +205,7 @@ ABCSMC.default <- function(npart, tols, priors, func, data, ...) {
         ptm1 <- proc.time() - ptm
         
         ## print progress to the screen
-        cat(paste0("Generation ", t, ", accrate = ", signif(accrate[t], 2), 
+        cat(paste0("Generation ", t + genstart, ", accrate = ", signif(accrate[t], 2), 
                    ", time = ", signif(ptm1[3], 2), " secs\n"))
     }
     

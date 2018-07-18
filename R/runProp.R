@@ -7,7 +7,7 @@ runProp <- function(i, t, priors, prevWeights, prevPars, propCov, tols, data, fu
             pars <- rep(NA, nrow(priors))
             ## sample from prior
             for(j in 1:nrow(priors)) {
-                pars[j] <- runif(1, priors[, 1], priors[, 2])
+                pars[j] <- runif(1, priors[j, 1], priors[j, 2])
             }
         } else {
             ## sample from previous generation

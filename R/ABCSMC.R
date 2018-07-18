@@ -9,8 +9,12 @@
 #' @param tols 		A \code{matrix} of tolerances, with the number of rows defining
 #'                  the number of generations of required, and the number of columns
 #'                  defining the number of summary statistics / data points to match to.
-#' @param priors    A \code{matrix} containing the lower and upper bounds of uniform
-#'                  priors; with number of rows equal to the number of parameters, and
+#' @param priors    A \code{data.frame} containing columns \code{dist}, \code{p1} and 
+#'                  \code{p2}, with number of rows equal to the number of parameters. Each entry in 
+#'                  the \code{dist} column must contain one of \code{c("unif", "norm", "gamma")}, and
+#'                  the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
+#'                  (lower and upper bounds in the uniform case; mean and standard deviation in the 
+#'                  normal case; and shape and scale in the gamma case).
 #'                  two columns containing the lower and upper bounds respectively.
 #' @param func      A function taking a single argument \code{pars} that runs the simulator
 #'                  and returns the simulated summary measures against which to compare.
@@ -86,7 +90,7 @@ ABCSMC.default <- function(npart, tols, priors, func, data, mc.cores = 1, ...) {
     ## check inputs
     checkInput(npart, "numeric", 1, int = T)
     checkInput(tols, c("numeric", "matrix"))
-    checkInput(priors, c("numeric", "matrix"), ncol = 2)
+    checkInput(priors, "data.frame", ncol = 3)
     checkInput(func, "function", 1)
     checkInput(data, c("vector", "numeric"))
     checkInput(mc.cores, "numeric", 1, int = T)
@@ -99,7 +103,32 @@ ABCSMC.default <- function(npart, tols, priors, func, data, mc.cores = 1, ...) {
     })))
     stopifnot(npart > 1)
     stopifnot(all(tols > 0))
-    stopifnot(all(apply(priors, 1, diff) > 0))
+    
+    ## check priors
+    stopifnot(all(match(colnames(priors), c("dist", "p1", "p2")) - 1:3 == 0))
+    checkInput(priors$dist, "character")
+    checkInput(priors$p1, "numeric")
+    checkInput(priors$p2, "numeric")
+    stopifnot(all(priors$dist %in% c("unif", "norm", "gamma")))
+    temp <- priors[priors$dist == "unif", , drop = F]
+    if(nrow(temp) > 0) {
+        ## check uniform bounds correct
+        stopifnot(all(apply(temp[, -1, drop = F], 1, diff) > 0))
+    }
+    temp <- priors[priors$dist == "norm", , drop = F]
+    if(nrow(temp) > 0) {
+        ## check normal hyperparameters correct
+        stopifnot(all(temp$p2 > 0))
+    }
+    temp <- priors[priors$dist == "gamma", , drop = F]
+    if(nrow(temp) > 0) {
+        ## check gamma bounds correct
+        stopifnot(all(temp$p1 > 0))
+        stopifnot(all(temp$p2 > 0))
+    }
+    orig_priors <- priors
+    priors$ddist <- paste0("d", priors$dist)
+    priors$dist <- paste0("r", priors$dist)
     
     ## set timer
     ptm_ini <- proc.time()
@@ -188,7 +217,7 @@ ABCSMC.default <- function(npart, tols, priors, func, data, mc.cores = 1, ...) {
     
     ## output results
     output <- list(pars = pars, output = out, weights = weights, accrate = accrate,
-                   tols = tols, priors = priors, data = data, func = func)
+                   tols = tols, priors = orig_priors, data = data, func = func)
     class(output) <- "ABCSMC"
     output
 }

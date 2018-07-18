@@ -23,8 +23,12 @@ defining the number of summary statistics / data points to match to.}
 
 \item{npart}{The number of particles (must be a positive integer).}
 
-\item{priors}{A \code{matrix} containing the lower and upper bounds of uniform
-priors; with number of rows equal to the number of parameters, and
+\item{priors}{A \code{data.frame} containing columns \code{dist}, \code{p1} and 
+\code{p2}, with number of rows equal to the number of parameters. Each entry in 
+the \code{dist} column must contain one of \code{c("unif", "norm", "gamma")}, and
+the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
+(lower and upper bounds in the uniform case; mean and standard deviation in the 
+normal case; and shape and scale in the gamma case).
 two columns containing the lower and upper bounds respectively.}
 
 \item{func}{A function taking a single argument \code{pars} that runs the simulator

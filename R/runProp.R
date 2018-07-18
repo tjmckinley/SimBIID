@@ -7,7 +7,7 @@ runProp <- function(i, t, priors, prevWeights, prevPars, propCov, tols, data, fu
             pars <- rep(NA, nrow(priors))
             ## sample from prior
             for(j in 1:nrow(priors)) {
-                pars[j] <- runif(1, priors[j, 1], priors[j, 2])
+                pars[j] <- do.call(priors$dist[j], list(1, priors$p1[j], priors$p2[j]))
             }
         } else {
             ## sample from previous generation
@@ -19,9 +19,12 @@ runProp <- function(i, t, priors, prevWeights, prevPars, propCov, tols, data, fu
             pars <- as.vector(pars)
         }
         
-        if(all(apply(cbind(pars, priors), 1, function(x) {
-            x[1] > x[2] & x[1] < x[3]
-        }))) {
+        ## check valid proposals
+        chk <- 0
+        for(j in 1:nrow(priors)) {
+            chk <- chk + ifelse(do.call(priors$ddist[j], list(pars[j], priors$p1[j], priors$p2[j])) == 0, 1, 0)
+        }
+        if(chk == 0) {
             ## simulate from model
             out <- func(pars)
             
@@ -41,10 +44,11 @@ runProp <- function(i, t, priors, prevWeights, prevPars, propCov, tols, data, fu
         weightsNew <- 1
     } else {
         ## calculate unnormalised weight
-        weightsNew <- prod(apply(cbind(pars, priors), 1, function(x) {
-            dunif(x[1], x[2], x[3])
-        }))
-        weightsNew <- weightsNew / sum(prevWeights * apply(prevPars, 1, function(x, pars, propCov) {
+        weightsNew <- rep(NA, nrow(priors))
+        for(j in 1:nrow(priors)) {
+            weightsNew[j] <- do.call(priors$ddist[j], list(pars[j], priors$p1[j], priors$p2[j]))
+        }
+        weightsNew <- prod(weightsNew) / sum(prevWeights * apply(prevPars, 1, function(x, pars, propCov) {
             dmvnorm(pars, mean = x, sigma = propCov)
         }, pars = pars, propCov = propCov))
     }

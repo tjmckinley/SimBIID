@@ -15,7 +15,7 @@
 #'                  Each entry in the \code{dist} column must contain one of \code{c("unif", "norm", "gamma")}, 
 #'                  and the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
 #'                  (lower and upper bounds in the uniform case; mean and standard deviation in the 
-#'                  normal case; and shape and scale in the gamma case).
+#'                  normal case; and shape and rate in the gamma case).
 #'                  two columns containing the lower and upper bounds respectively.
 #' @param func      A function taking a single argument \code{pars} that runs the simulator
 #'                  and returns the simulated summary measures against which to compare.

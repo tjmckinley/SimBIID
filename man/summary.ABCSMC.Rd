@@ -13,8 +13,9 @@
 defaults to final generation.}
 
 \item{transfunc}{Is a \code{function} object where the arguments to the function must
-match parameters in the model. This function needs to return a \code{data.frame}
-object with a single column containing the transformed parameters.}
+match all or a subset of the parameters in the model. This function needs 
+to return a \code{data.frame} object with columns containing the transformed
+parameters.}
 }
 \value{
 A \code{data.frame} with weighted posterior means and variances.

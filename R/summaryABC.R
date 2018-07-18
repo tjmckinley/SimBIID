@@ -8,8 +8,9 @@
 #' @param gen       The generation of ABC that you want to extract. If left missing then
 #'                  defaults to final generation.
 #' @param transfunc Is a \code{function} object where the arguments to the function must
-#'                  match parameters in the model. This function needs to return a \code{data.frame}
-#'                  object with a single column containing the transformed parameters.
+#'                  match all or a subset of the parameters in the model. This function needs 
+#'                  to return a \code{data.frame} object with columns containing the transformed
+#'                  parameters.
 #'
 #' @return          A \code{data.frame} with weighted posterior means and variances.
 #'
@@ -45,7 +46,7 @@ summary.ABCSMC <- function(object, gen = NA, transfunc = NA) {
         temppars <- as.list(temppars)
         names(temppars) <- names(fargs)
         temp <- do.call("transfunc", temppars)
-        stopifnot(checkInput(temp, "data.frame", nrow = nrow(pars), ncol = 1))
+        stopifnot(checkInput(temp, "data.frame", nrow = nrow(pars)))
         
         ## bind to current posterior samples
         pars <- cbind(pars, temp)

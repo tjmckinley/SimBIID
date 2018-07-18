@@ -9,11 +9,15 @@
 #'              Takes the value \code{"output"} if you want to plot the simulated outputs.
 #' @param gen   A vector of generations to plot. If left missing then defaults to all generations.
 #' @param joint A logical describing whether joint or marginal distributions are wanted.
+#' @param transfunc Is a \code{function} object where the arguments to the function must
+#'                  match all or a subset of the parameters in the model. This function needs 
+#'                  to return a \code{data.frame} object with columns containing the transformed
+#'                  parameters.
 #'
 #' @return A plot of the ABC posterior distributions for different generations, or the distributions
 #'         of the simulated summary measures for different generations.
 
-plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F) {
+plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, transfunc = NA) {
     
     ## check x
     stopifnot(class(x) == "ABCSMC")
@@ -56,6 +60,29 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F) {
                 bind_rows(.id = "Generation") %>%
                 filter(Generation %in% gen) %>%
                 mutate(Generation = factor(Generation, levels = gen))
+                
+        ## check for transformations if required
+        stopifnot(length(transfunc) == 1)
+        if(is.function(transfunc)) {
+        
+            ## check function arguments
+            fargs <- formals(transfunc)
+            stopifnot(all(names(fargs) %in% colnames(p)))
+            
+            ## perform transformations if required
+            temppars <- p[, match(names(fargs), colnames(p))]
+            temppars <- as.list(temppars)
+            names(temppars) <- names(fargs)
+            temp <- do.call("transfunc", temppars)
+            stopifnot(checkInput(temp, "data.frame", nrow = nrow(p)))
+            
+            ## bind to current posterior samples
+            p <- cbind(p, temp)
+        } else {
+            if(!is.na(transfunc)) {
+                stop("'transfunc' incorrectly specified")
+            }
+        }
         
         ## plot posteriors
         if(!joint) {
@@ -99,6 +126,15 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F) {
             bind_rows(.id = "Generation") %>%
             filter(Generation %in% gen) %>%
             mutate(Generation = factor(Generation, levels = gen))
+            
+        stopifnot(length(transfunc) == 1)
+        if(is.function(transfunc)) {
+            stop("'transfunc' can't be used for output plots")
+        } else {
+            if(!is.na(transfunc)) {
+                stop("'transfunc' incorrectly specified")
+            }
+        }
             
         if(!joint) {
             p <- p %>%

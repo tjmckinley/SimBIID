@@ -135,6 +135,10 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
                 stop("'transfunc' incorrectly specified")
             }
         }
+        
+        ## extract data
+        dat <- x$data %>%
+            gather(Output, value)
             
         if(!joint) {
             p <- p %>%
@@ -143,7 +147,8 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
                     geom_density(alpha = 0.8) +
                     xlab("Output") + ylab("Density") +
                     scale_fill_manual(values = fillCols) +
-                    facet_wrap(~ Output, scales = "free")
+                    facet_wrap(~ Output, scales = "free") +
+                    geom_vline(aes(xintercept = value), data = dat, linetype = 2, colour = "red", size = 1.5)
         } else {
             p <- ggpairs(p, mapping = aes(colour = Generation), 
                 columns = 2:ncol(p),

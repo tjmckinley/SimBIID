@@ -20,6 +20,7 @@
 #' @param func      A function taking a single argument \code{pars} that runs the simulator
 #'                  and returns the simulated summary measures against which to compare.
 #' @param data      A \code{vector} containing the observed summary statistics to match to.
+#' @param parallel  A \code{logical} determining whether to use parallel processing or not.
 #' @param mc.cores  Number of cores to use if using parallel processing.
 #'
 #' @return An \code{ABCSMC} object, essentially a \code{list} containing:
@@ -52,7 +53,7 @@ ABCSMC <- function(x, ...) {
 #' @rdname ABCSMC
 #' @export
 
-ABCSMC.ABCSMC <- function(x, tols, mc.cores = 1) {
+ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
     
     ## check inputs
     stopifnot(class(x) == "ABCSMC")
@@ -67,6 +68,7 @@ ABCSMC.ABCSMC <- function(x, tols, mc.cores = 1) {
     
     ## run ABC-SMC
     temp <- ABCSMC.default(nrow(x$pars[[1]]), tols, x$priors, x$func, x$data, 
+                           parallel = parallel,
                            mc.cores = mc.cores, 
                            prevPars = x$pars[[length(x$pars)]], 
                            prevWeights = x$weights[[length(x$weights)]],
@@ -86,15 +88,30 @@ ABCSMC.ABCSMC <- function(x, tols, mc.cores = 1) {
 #' @rdname ABCSMC
 #' @export
 
-ABCSMC.default <- function(npart, tols, priors, func, data, mc.cores = 1, ...) {
+ABCSMC.default <- function(npart, tols, priors, func, data, parallel = F, mc.cores = NA, ...) {
     
     ## check inputs
+    stopifnot(checkInput(parallel, c("vector", "logical"), 1))
+    if(parallel) {
+        if(!require(parallel)) {
+            stop("Must have 'parallel' package installed to use parallelisation")
+        }
+        nc <- detectCores()
+        nc <- ifelse(is.na(nc), 1, nc)
+        if(!is.na(mc.cores[1])) {
+            stopifnot(checkInput(mc.cores, "numeric", 1, int = T))
+            mc.cores <- min(nc, mc.cores)
+        } else {
+            mc.cores <- nc
+        }
+        parallel <- (mc.cores > 1)
+        cat(paste0("Number of cores: ", mc.cores, "\n"))
+    }
     stopifnot(checkInput(npart, "numeric", 1, int = T))
     stopifnot(checkInput(tols, c("numeric", "matrix")))
     stopifnot(checkInput(priors, "data.frame", ncol = 4))
     stopifnot(checkInput(func, "function", 1))
     stopifnot(checkInput(data, c("vector", "numeric")))
-    stopifnot(checkInput(mc.cores, "numeric", 1, int = T))
     stopifnot(length(data) == ncol(tols))
     fargs <- formals(func)
     stopifnot(length(fargs) == 1)
@@ -174,7 +191,7 @@ ABCSMC.default <- function(npart, tols, priors, func, data, mc.cores = 1, ...) {
         ptm <- proc.time()
         
         ## run generation
-        if(!require(parallel)) {
+        if(!parallel) {
             temp <- lapply(1:npart, runProp,
                 t = t, priors = priors, 
                 prevWeights = tempWeights, prevPars = tempPars, 

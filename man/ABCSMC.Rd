@@ -8,9 +8,10 @@
 \usage{
 ABCSMC(x, ...)
 
-\method{ABCSMC}{ABCSMC}(x, tols, mc.cores = 1)
+\method{ABCSMC}{ABCSMC}(x, tols, parallel = F, mc.cores = NA)
 
-\method{ABCSMC}{default}(npart, tols, priors, func, data, mc.cores = 1, ...)
+\method{ABCSMC}{default}(npart, tols, priors, func, data, parallel = F,
+  mc.cores = NA, ...)
 }
 \arguments{
 \item{x}{An \code{ABCSMC} object.}
@@ -18,6 +19,8 @@ ABCSMC(x, ...)
 \item{tols}{A \code{matrix} of tolerances, with the number of rows defining
 the number of generations required, and the number of columns
 defining the number of summary statistics / data points to match to.}
+
+\item{parallel}{A \code{logical} determining whether to use parallel processing or not.}
 
 \item{mc.cores}{Number of cores to use if using parallel processing.}
 

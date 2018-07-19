@@ -1,5 +1,5 @@
 ## function to simulate outputs
-runRef <- function(i, priors, func) {
+runRef <- function(i, priors, func, func_args) {
     
     ## set up vector
     pars <- rep(NA, nrow(priors))
@@ -10,7 +10,8 @@ runRef <- function(i, priors, func) {
     }
     
     ## simulate from model
-    out <- func(pars)
+    fargs <- c(func_args, list(pars = pars))
+    out <- do.call("func", fargs)
     
     ## return output
     list(pars = pars, out = out)

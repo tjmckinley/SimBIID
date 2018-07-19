@@ -17,9 +17,10 @@ and the corresponding \code{p1} and \code{p2} entries relate to the hyperparamet
 (lower and upper bounds in the uniform case; mean and standard deviation in the 
 normal case; and shape and rate in the gamma case).}
 
-\item{func}{A function takes a single argument \code{pars}. The function runs the simulator returns a 
-\code{vector} of simulated summary measures or a missing value (\code{NA}) if there is an 
-error in the simulator.}
+\item{func}{Function that runs the simulator. The first argument must be \code{pars}. The function
+must return a \code{vector} of simulated summary measures, or a missing value (\code{NA})
+if there is an error. The output from the function must be a vector with length equal 
+to \code{nrow(data)} and with entries in the same order as the rows of \code{data}.}
 
 \item{data}{A \code{data.frame} with a single row and columns containing the observed summary statistics
 to match to.}

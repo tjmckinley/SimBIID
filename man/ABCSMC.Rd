@@ -16,6 +16,8 @@ ABCSMC(x, ...)
 \arguments{
 \item{x}{An \code{ABCSMC} object.}
 
+\item{...}{Further arguments to pass to \code{func}. (Not used if extending runs.)}
+
 \item{tols}{A \code{matrix} of tolerances, with the number of rows defining
 the number of generations required, and the number of columns
 defining the number of summary statistics / data points to match to.}
@@ -34,11 +36,12 @@ and the corresponding \code{p1} and \code{p2} entries relate to the hyperparamet
 (lower and upper bounds in the uniform case; mean and standard deviation in the 
 normal case; and shape and rate in the gamma case).}
 
-\item{func}{A function takes three arguments \code{pars}, \code{data} and \code{tols}. The function runs the
-simulator and checks whether the simulation matches the \code{data} according to \code{tols}. If it
-does not then the function must return an \code{NA}, else it returns a \code{vector} of simulated 
-summary measures. The output from the function must be a vector with length equal to 
-\code{nrow(data)} and with entries in the same order as the rows of \code{data}.}
+\item{func}{Function that runs the simulator and checks whether the simulation matches the data. 
+The first three arguments must be \code{pars}, \code{data} and \code{tols}. If the
+simulations do not match the data then the function must return an \code{NA}, 
+else it returns a \code{vector} of simulated summary measures. The output from the 
+function must be a vector with length equal to \code{nrow(data)} and with entries 
+in the same order as the rows of \code{data}.}
 
 \item{data}{A \code{data.frame} with a single row and columns containing the observed summary statistics
 to match to.}
@@ -63,7 +66,8 @@ An \code{ABCSMC} object, essentially a \code{list} containing:
 \item{\code{tols}:}{ a copy of the \code{tols} input;}
 \item{\code{priors}:}{ a copy of the \code{priors} input;}
 \item{\code{data}:}{ a copy of the \code{data} input;}
-\item{\code{func}:}{ a copy of the \code{func} input.}
+\item{\code{func}:}{ a copy of the \code{func} input}
+\item{\code{addargs}:}{ a copy of the \code{...} inputs.}
 }
 }
 \description{

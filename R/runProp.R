@@ -1,5 +1,5 @@
 ## function to generate valid proposal
-runProp <- function(i, t, priors, prevWeights, prevPars, propCov, tols, data, func) {
+runProp <- function(i, t, priors, prevWeights, prevPars, propCov, tols, data, func, func_args) {
     accrate <- 0
     valid <- 0
     while(valid == 0) {
@@ -26,7 +26,8 @@ runProp <- function(i, t, priors, prevWeights, prevPars, propCov, tols, data, fu
         }
         if(chk == 0) {
             ## simulate from model
-            out <- func(pars, data, tols)
+            fargs <- c(func_args, list(pars = pars, data = data, tols = tols))
+            out <- do.call("func", fargs)
             if(!is.na(out[1])) {
                 valid <- 1
             }

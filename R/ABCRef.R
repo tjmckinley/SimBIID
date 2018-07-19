@@ -12,9 +12,10 @@
 #'                  and the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
 #'                  (lower and upper bounds in the uniform case; mean and standard deviation in the 
 #'                  normal case; and shape and rate in the gamma case).
-#' @param func      A function takes a single argument \code{pars}. The function runs the simulator returns a 
-#'                  \code{vector} of simulated summary measures or a missing value (\code{NA}) if there is an 
-#'                  error in the simulator.
+#' @param func      Function that runs the simulator. The first argument must be \code{pars}. The function
+#'                  must return a \code{vector} of simulated summary measures, or a missing value (\code{NA})
+#'                  if there is an error. The output from the function must be a vector with length equal 
+#'                  to \code{nrow(data)} and with entries in the same order as the rows of \code{data}.
 #' @param data      A \code{data.frame} with a single row and columns containing the observed summary statistics
 #'                  to match to.
 #' @param parallel  A \code{logical} determining whether to use parallel processing or not.
@@ -48,8 +49,8 @@ ABCRef <- function(npart, priors, func, data, parallel = F, mc.cores = NA, ...) 
     stopifnot(checkInput(data, "data.frame", nrow = 1))
     stopifnot(all(sapply(data, is.numeric)))
     fargs <- formals(func)
-    stopifnot(length(fargs) == 1)
-    stopifnot(names(fargs) == "pars")
+    stopifnot(length(fargs) >= 1)
+    stopifnot(names(fargs)[1] == "pars")
     stopifnot(npart > 1)
     
     ## check priors
@@ -77,7 +78,16 @@ ABCRef <- function(npart, priors, func, data, parallel = F, mc.cores = NA, ...) 
         stopifnot(all(temp$p2 > 0))
     }
     priors$ddist <- paste0("d", priors$dist)
-    priors$dist <- paste0("r", priors$dist)    
+    priors$dist <- paste0("r", priors$dist)   
+    
+    ## extract arguments for "func"
+    fargs <- fargs[is.na(match(names(fargs), "pars"))]
+    if(length(fargs) > 0) {
+        args <- list(...)
+        fargs <- match(names(fargs), names(args))
+        stopifnot(all(!is.na(fargs)))
+        fargs <- args[fargs]
+    }
     
     ## set timer
     ptm_ini <- proc.time()
@@ -88,9 +98,10 @@ ABCRef <- function(npart, priors, func, data, parallel = F, mc.cores = NA, ...) 
     
     ## run generation
     if(!parallel) {
-        temp <- lapply(1:npart, runRef, priors = priors, func = func)
+        temp <- lapply(1:npart, runRef, priors = priors, func = func, func_args = fargs)
     } else  {
-        temp <- mclapply(1:npart, runRef, priors = priors, func = func, mc.cores = mc.cores)
+        temp <- mclapply(1:npart, runRef, priors = priors, func = func, func_args = fargs, 
+                         mc.cores = mc.cores)
     }
     
     ## extract relative components

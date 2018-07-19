@@ -16,15 +16,17 @@
 #'                  and the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
 #'                  (lower and upper bounds in the uniform case; mean and standard deviation in the 
 #'                  normal case; and shape and rate in the gamma case).
-#' @param func      A function takes three arguments \code{pars}, \code{data} and \code{tols}. The function runs the
-#'                  simulator and checks whether the simulation matches the \code{data} according to \code{tols}. If it
-#'                  does not then the function must return an \code{NA}, else it returns a \code{vector} of simulated 
-#'                  summary measures. The output from the function must be a vector with length equal to 
-#'                  \code{nrow(data)} and with entries in the same order as the rows of \code{data}.
+#' @param func      Function that runs the simulator and checks whether the simulation matches the data. 
+#'                  The first three arguments must be \code{pars}, \code{data} and \code{tols}. If the
+#'                  simulations do not match the data then the function must return an \code{NA}, 
+#'                  else it returns a \code{vector} of simulated summary measures. The output from the 
+#'                  function must be a vector with length equal to \code{nrow(data)} and with entries 
+#'                  in the same order as the rows of \code{data}.
 #' @param data      A \code{data.frame} with a single row and columns containing the observed summary statistics
 #'                  to match to.
 #' @param parallel  A \code{logical} determining whether to use parallel processing or not.
 #' @param mc.cores  Number of cores to use if using parallel processing.
+#' @param ...       Further arguments to pass to \code{func}. (Not used if extending runs.)
 #'
 #' @return An \code{ABCSMC} object, essentially a \code{list} containing:
 #' \itemize{
@@ -45,7 +47,8 @@
 #' \item{\code{tols}:}{ a copy of the \code{tols} input;}
 #' \item{\code{priors}:}{ a copy of the \code{priors} input;}
 #' \item{\code{data}:}{ a copy of the \code{data} input;}
-#' \item{\code{func}:}{ a copy of the \code{func} input.}
+#' \item{\code{func}:}{ a copy of the \code{func} input}
+#' \item{\code{addargs}:}{ a copy of the \code{...} inputs.}
 #' }
 #' @rdname ABCSMC
 
@@ -69,13 +72,23 @@ ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
         stop("New tolerances not less than original tolerances")
     }
     
+    ## collect arguments
+    tempargs <- list(
+        npart = nrow(x$pars[[1]]), 
+        tols = tols, 
+        priors = x$priors, 
+        func = x$func, 
+        data = x$data, 
+        parallel = parallel,
+        mc.cores = mc.cores, 
+        prevPars = x$pars[[length(x$pars)]], 
+        prevWeights = x$weights[[length(x$weights)]],
+        genstart = nrow(x$tols) + 1
+    )
+    tempargs <- c(tempargs, x$addargs)
+    
     ## run ABC-SMC
-    temp <- ABCSMC.default(nrow(x$pars[[1]]), tols, x$priors, x$func, x$data, 
-                           parallel = parallel,
-                           mc.cores = mc.cores, 
-                           prevPars = x$pars[[length(x$pars)]], 
-                           prevWeights = x$weights[[length(x$weights)]],
-                           genstart = nrow(x$tols) + 1)
+    temp <- do.call("ABCSMC.default", tempargs)
     
     ## combine with original runs
     x$pars <- c(x$pars, temp$pars)
@@ -118,8 +131,8 @@ ABCSMC.default <- function(npart, tols, priors, func, data, parallel = F, mc.cor
     stopifnot(all(sapply(data, is.numeric)))
     stopifnot(ncol(data) == ncol(tols))
     fargs <- formals(func)
-    stopifnot(length(fargs) == 3)
-    stopifnot(all(match(names(fargs), c("pars", "data", "tols")) - 1:3 == 0))
+    stopifnot(length(fargs) >= 3)
+    stopifnot(all(match(names(fargs)[1:3], c("pars", "data", "tols")) - 1:3 == 0))
     stopifnot(all(apply(tols, 2, function(x) {
         all(diff(x) < 0)
     })))
@@ -164,6 +177,14 @@ ABCSMC.default <- function(npart, tols, priors, func, data, parallel = F, mc.cor
     ## extract ellipsis arguments
     args <- list(...)
     
+    ## extract arguments for "func"
+    fargs <- fargs[is.na(match(names(fargs), c("pars", "data", "tols")))]
+    if(length(fargs) > 0) {
+        fargs <- match(names(fargs), names(args))
+        stopifnot(all(!is.na(fargs)))
+        fargs <- args[fargs]
+    }
+    
     if(exists("prevPars", where = args)) {
         stopifnot(exists("prevWeights", where = args))
         stopifnot(exists("genstart", where = args))
@@ -175,6 +196,10 @@ ABCSMC.default <- function(npart, tols, priors, func, data, parallel = F, mc.cor
         propCov <- cov(pars[[1]]) * 2
         init <- 2
         genstart <- args$genstart - 2
+        ## remove additional arguments
+        args <- args[-match("prevPars", names(args))]
+        args <- args[-match("prevWeights", names(args))]
+        args <- args[-match("genstart", names(args))]
     } else {
         init <- 1
         genstart <- 0
@@ -199,12 +224,13 @@ ABCSMC.default <- function(npart, tols, priors, func, data, parallel = F, mc.cor
             temp <- lapply(1:npart, runProp,
                 t = t, priors = priors, 
                 prevWeights = tempWeights, prevPars = tempPars, 
-                propCov = propCov, tols = tols[t, ], data = data[1, ], func = func)
+                propCov = propCov, tols = tols[t, ], data = data[1, ], func = func, func_args = fargs)
         } else  {
             temp <- mclapply(1:npart, runProp,
                 t = t, priors = priors, 
                 prevWeights = tempWeights, prevPars = tempPars, 
-                propCov = propCov, tols = tols[t, ], data = data[1, ], func = func, mc.cores = mc.cores)
+                propCov = propCov, tols = tols[t, ], data = data[1, ], func = func, func_args = fargs, 
+                mc.cores = mc.cores)
         }
         
         ## extract relative components
@@ -245,7 +271,7 @@ ABCSMC.default <- function(npart, tols, priors, func, data, parallel = F, mc.cor
     
     ## output results
     output <- list(pars = pars, output = out, weights = weights, accrate = accrate,
-                   tols = tols, priors = orig_priors, data = data, func = func)
+                   tols = tols, priors = orig_priors, data = data, func = func, addargs = args)
     class(output) <- "ABCSMC"
     output
 }

@@ -26,7 +26,7 @@ defining the number of summary statistics / data points to match to.}
 
 \item{npart}{The number of particles (must be a positive integer).}
 
-\item{priors}{A \code{data.frame} containing columns \code{parname}, \code{dist}, \code{p1} and 
+\item{priors}{A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 
 \code{p2}, with number of rows equal to the number of parameters. The column
 \code{parname} simply gives names to each parameter for plotting and summarising.
 Each entry in the \code{dist} column must contain one of \code{c("unif", "norm", "gamma")}, 

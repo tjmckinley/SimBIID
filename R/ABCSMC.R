@@ -9,7 +9,7 @@
 #' @param tols 		A \code{matrix} of tolerances, with the number of rows defining
 #'                  the number of generations required, and the number of columns
 #'                  defining the number of summary statistics / data points to match to.
-#' @param priors    A \code{data.frame} containing columns \code{parname}, \code{dist}, \code{p1} and 
+#' @param priors    A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 
 #'                  \code{p2}, with number of rows equal to the number of parameters. The column
 #'                  \code{parname} simply gives names to each parameter for plotting and summarising.
 #'                  Each entry in the \code{dist} column must contain one of \code{c("unif", "norm", "gamma")}, 

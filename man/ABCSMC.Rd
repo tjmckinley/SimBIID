@@ -40,9 +40,8 @@ does not then the function must return an \code{NA}, else it returns a \code{vec
 summary measures. The output from the function must be a vector with length equal to 
 \code{nrow(data)} and with entries in the same order as the rows of \code{data}.}
 
-\item{data}{A \code{data.frame} with two columns containing the observed summary statistics to match to. 
-The first column must be called \code{outnames} and contain the output names, and the
-second column must be called \code{values} and contain the observations.}
+\item{data}{A \code{data.frame} with a single row and columns containing the observed summary statistics
+to match to.}
 }
 \value{
 An \code{ABCSMC} object, essentially a \code{list} containing:
@@ -54,7 +53,7 @@ An \code{ABCSMC} object, essentially a \code{list} containing:
 \item{\code{output}:}{ a \code{list} of \code{matrix} objects containing the simulated
                      summary statistics. Each element of the list corresponds to a
                      generation of ABC-SMC, with each matrix being of dimension 
-                     \code{npart} x \code{length(data)};}
+                     \code{npart} x \code{ncol(data)};}
 \item{\code{weights}:}{ a \code{list} of \code{vector} objects containing the particle
                      weights. Each element of the list corresponds to a
                      generation of ABC-SMC, with each vector being of length

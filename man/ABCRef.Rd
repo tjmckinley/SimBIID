@@ -21,9 +21,8 @@ normal case; and shape and rate in the gamma case).}
 \code{vector} of simulated summary measures or a missing value (\code{NA}) if there is an 
 error in the simulator.}
 
-\item{data}{A \code{data.frame} with two columns containing the observed summary statistics. 
-The first column must be called \code{outnames} and contain the output names, and the
-second column must be called \code{values} and contain the observations.}
+\item{data}{A \code{data.frame} with a single row and columns containing the observed summary statistics
+to match to.}
 
 \item{parallel}{A \code{logical} determining whether to use parallel processing or not.}
 

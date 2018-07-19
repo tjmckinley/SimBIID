@@ -15,9 +15,8 @@
 #' @param func      A function takes a single argument \code{pars}. The function runs the simulator returns a 
 #'                  \code{vector} of simulated summary measures or a missing value (\code{NA}) if there is an 
 #'                  error in the simulator.
-#' @param data      A \code{data.frame} with two columns containing the observed summary statistics. 
-#'                  The first column must be called \code{outnames} and contain the output names, and the
-#'                  second column must be called \code{values} and contain the observations.
+#' @param data      A \code{data.frame} with a single row and columns containing the observed summary statistics
+#'                  to match to.
 #' @param parallel  A \code{logical} determining whether to use parallel processing or not.
 #' @param mc.cores  Number of cores to use if using parallel processing.
 #'
@@ -46,11 +45,8 @@ ABCRef <- function(npart, priors, func, data, parallel = F, mc.cores = NA, ...) 
     stopifnot(checkInput(npart, "numeric", 1, int = T))
     stopifnot(checkInput(priors, "data.frame", ncol = 4))
     stopifnot(checkInput(func, "function", 1))
-    stopifnot(checkInput(data, "data.frame"))
-    stopifnot(all(sort(match(colnames(data), c("outnames", "values"))) - 1:2 == 0))
-    data <- select(data, outnames, values)
-    stopifnot(checkInput(data$outnames, "character"))
-    stopifnot(checkInput(data$values, "numeric"))
+    stopifnot(checkInput(data, "data.frame", nrow = 1))
+    stopifnot(all(sapply(data, is.numeric)))
     fargs <- formals(func)
     stopifnot(length(fargs) == 1)
     stopifnot(names(fargs) == "pars")
@@ -131,8 +127,8 @@ ABCRef <- function(npart, priors, func, data, parallel = F, mc.cores = NA, ...) 
     
     ## set names
     colnames(pars) <- priors$parnames
-    stopifnot(ncol(out) == nrow(data))
-    colnames(out) <- data$outnames
+    stopifnot(ncol(out) == ncol(data))
+    colnames(out) <- colnames(data)
     
     ## stop timer
     ptm1 <- proc.time() - ptm_ini

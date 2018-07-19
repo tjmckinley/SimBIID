@@ -17,10 +17,11 @@
 #'                  (lower and upper bounds in the uniform case; mean and standard deviation in the 
 #'                  normal case; and shape and rate in the gamma case).
 #'                  two columns containing the lower and upper bounds respectively.
-#' @param func      A function taking a single argument \code{pars} that runs the simulator
-#'                  and returns the simulated summary measures against which to compare. The output from
-#'                  the function must be a vector with length equal to \code{nrow(data)} and with entries
-#'                  in the same order as the rows of \code{data}.
+#' @param func      A function takes three arguments \code{pars}, \code{data} and \code{tols}. The function runs the
+#'                  simulator and checks whether the simulation matches the \code{data} according to \code{tols}. If it
+#'                  does not then the function must return an \code{NA}, else it returns a \code{vector} of simulated 
+#'                  summary measures. The output from the function must be a vector with length equal to 
+#'                  \code{nrow(data)} and with entries in the same order as the rows of \code{data}.
 #' @param data      A \code{data.frame} with two columns containing the observed summary statistics to match to. 
 #'                  The first column must be called \code{outnames} and contain the output names, and the
 #'                  second column must be called \code{values} and contain the observations.
@@ -122,8 +123,8 @@ ABCSMC.default <- function(npart, tols, priors, func, data, parallel = F, mc.cor
     stopifnot(checkInput(data$values, "numeric"))
     stopifnot(nrow(data) == ncol(tols))
     fargs <- formals(func)
-    stopifnot(length(fargs) == 1)
-    stopifnot(names(fargs) == "pars")
+    stopifnot(length(fargs) == 3)
+    stopifnot(all(match(names(fargs), c("pars", "data", "tols")) - 1:3 == 0))
     stopifnot(all(apply(tols, 2, function(x) {
         all(diff(x) < 0)
     })))

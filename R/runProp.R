@@ -26,13 +26,9 @@ runProp <- function(i, t, priors, prevWeights, prevPars, propCov, tols, data, fu
         }
         if(chk == 0) {
             ## simulate from model
-            out <- func(pars)
-            
-            ## check matching
-            if(all(!is.na(out))) {
-                if(all(abs(out - data) < tols)) {
-                    valid <- 1
-                }
+            out <- func(pars, data, tols)
+            if(!is.na(out[1])) {
+                valid <- 1
             }
         }
         

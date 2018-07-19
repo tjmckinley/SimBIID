@@ -16,7 +16,6 @@
 #'                  and the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
 #'                  (lower and upper bounds in the uniform case; mean and standard deviation in the 
 #'                  normal case; and shape and rate in the gamma case).
-#'                  two columns containing the lower and upper bounds respectively.
 #' @param func      A function takes three arguments \code{pars}, \code{data} and \code{tols}. The function runs the
 #'                  simulator and checks whether the simulation matches the \code{data} according to \code{tols}. If it
 #'                  does not then the function must return an \code{NA}, else it returns a \code{vector} of simulated 

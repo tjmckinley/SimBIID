@@ -36,9 +36,13 @@ normal case; and shape and rate in the gamma case).
 two columns containing the lower and upper bounds respectively.}
 
 \item{func}{A function taking a single argument \code{pars} that runs the simulator
-and returns the simulated summary measures against which to compare.}
+and returns the simulated summary measures against which to compare. The output from
+the function must be a vector with length equal to \code{nrow(data)} and with entries
+in the same order as the rows of \code{data}.}
 
-\item{data}{A \code{vector} containing the observed summary statistics to match to.}
+\item{data}{A \code{data.frame} with two columns containing the observed summary statistics to match to. 
+The first column must be called \code{outnames} and contain the output names, and the
+second column must be called \code{values} and contain the observations.}
 }
 \value{
 An \code{ABCSMC} object, essentially a \code{list} containing:

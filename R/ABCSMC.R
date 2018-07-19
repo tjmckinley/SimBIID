@@ -18,8 +18,12 @@
 #'                  normal case; and shape and rate in the gamma case).
 #'                  two columns containing the lower and upper bounds respectively.
 #' @param func      A function taking a single argument \code{pars} that runs the simulator
-#'                  and returns the simulated summary measures against which to compare.
-#' @param data      A \code{vector} containing the observed summary statistics to match to.
+#'                  and returns the simulated summary measures against which to compare. The output from
+#'                  the function must be a vector with length equal to \code{nrow(data)} and with entries
+#'                  in the same order as the rows of \code{data}.
+#' @param data      A \code{data.frame} with two columns containing the observed summary statistics to match to. 
+#'                  The first column must be called \code{outnames} and contain the output names, and the
+#'                  second column must be called \code{values} and contain the observations.
 #' @param parallel  A \code{logical} determining whether to use parallel processing or not.
 #' @param mc.cores  Number of cores to use if using parallel processing.
 #'
@@ -59,7 +63,7 @@ ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
     stopifnot(class(x) == "ABCSMC")
     
     ## extract tolerances and check against new tolerances
-    stopifnot(ncol(tols) == length(x$data))
+    stopifnot(ncol(tols) == nrow(x$data))
     if(sum(apply(rbind(x$tols[nrow(x$tols), ], tols), 2, function(x) {
         sum(x[-1] >= x[1])
     })) > 0) {
@@ -111,8 +115,12 @@ ABCSMC.default <- function(npart, tols, priors, func, data, parallel = F, mc.cor
     stopifnot(checkInput(tols, c("numeric", "matrix")))
     stopifnot(checkInput(priors, "data.frame", ncol = 4))
     stopifnot(checkInput(func, "function", 1))
-    stopifnot(checkInput(data, c("vector", "numeric")))
-    stopifnot(length(data) == ncol(tols))
+    stopifnot(checkInput(data, "data.frame"))
+    stopifnot(all(sort(match(colnames(data), c("outnames", "values"))) - 1:2 == 0))
+    data <- select(data, outnames, values)
+    stopifnot(checkInput(data$outnames, "character"))
+    stopifnot(checkInput(data$values, "numeric"))
+    stopifnot(nrow(data) == ncol(tols))
     fargs <- formals(func)
     stopifnot(length(fargs) == 1)
     stopifnot(names(fargs) == "pars")
@@ -195,12 +203,12 @@ ABCSMC.default <- function(npart, tols, priors, func, data, parallel = F, mc.cor
             temp <- lapply(1:npart, runProp,
                 t = t, priors = priors, 
                 prevWeights = tempWeights, prevPars = tempPars, 
-                propCov = propCov, tols = tols[t, ], data = data, func = func)
+                propCov = propCov, tols = tols[t, ], data = data$values, func = func)
         } else  {
             temp <- mclapply(1:npart, runProp,
                 t = t, priors = priors, 
                 prevWeights = tempWeights, prevPars = tempPars, 
-                propCov = propCov, tols = tols[t, ], data = data, func = func, mc.cores = mc.cores)
+                propCov = propCov, tols = tols[t, ], data = data$values, func = func, mc.cores = mc.cores)
         }
         
         ## extract relative components
@@ -214,11 +222,7 @@ ABCSMC.default <- function(npart, tols, priors, func, data, parallel = F, mc.cor
         
         ## set names
         colnames(pars[[t]]) <- priors$parnames
-        if(is.null(names(data)[1])) {
-            colnames(out[[t]]) <- paste0("output ", 1:length(data))
-        } else {
-            colnames(out[[t]]) <- names(data)
-        }
+        colnames(out[[t]]) <- data$outnames
         
         ## set proposal covariance
         propCov <- cov(pars[[t]]) * 2

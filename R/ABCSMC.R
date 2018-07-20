@@ -224,12 +224,12 @@ ABCSMC.default <- function(x, tols, priors, func, data, parallel = F, mc.cores =
             temp <- lapply(1:npart, runProp,
                 t = t, priors = priors, 
                 prevWeights = tempWeights, prevPars = tempPars, 
-                propCov = propCov, tols = tols[t, ], data = data[1, ], func = func, func_args = fargs)
+                propCov = propCov, tols = tols[t, ], data = as.numeric(data[1, ]), func = func, func_args = fargs)
         } else  {
             temp <- mclapply(1:npart, runProp,
                 t = t, priors = priors, 
                 prevWeights = tempWeights, prevPars = tempPars, 
-                propCov = propCov, tols = tols[t, ], data = data[1, ], func = func, func_args = fargs, 
+                propCov = propCov, tols = tols[t, ], data = as.numeric(data[1, ]), func = func, func_args = fargs, 
                 mc.cores = mc.cores)
         }
         

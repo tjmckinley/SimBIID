@@ -10,11 +10,11 @@ ABCSMC(x, ...)
 
 \method{ABCSMC}{ABCSMC}(x, tols, parallel = F, mc.cores = NA)
 
-\method{ABCSMC}{default}(npart, tols, priors, func, data, parallel = F,
+\method{ABCSMC}{default}(x, tols, priors, func, data, parallel = F,
   mc.cores = NA, ...)
 }
 \arguments{
-\item{x}{An \code{ABCSMC} object.}
+\item{x}{An \code{ABCSMC} object or the number of particles (must be a positive integer).}
 
 \item{...}{Further arguments to pass to \code{func}. (Not used if extending runs.)}
 
@@ -25,8 +25,6 @@ defining the number of summary statistics / data points to match to.}
 \item{parallel}{A \code{logical} determining whether to use parallel processing or not.}
 
 \item{mc.cores}{Number of cores to use if using parallel processing.}
-
-\item{npart}{The number of particles (must be a positive integer).}
 
 \item{priors}{A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 
 \code{p2}, with number of rows equal to the number of parameters. The column

@@ -4,8 +4,7 @@
 #'
 #' @export
 #'
-#' @param x         An \code{ABCSMC} object.
-#' @param npart     The number of particles (must be a positive integer).
+#' @param x         An \code{ABCSMC} object or the number of particles (must be a positive integer).
 #' @param tols 		A \code{matrix} of tolerances, with the number of rows defining
 #'                  the number of generations required, and the number of columns
 #'                  defining the number of summary statistics / data points to match to.
@@ -74,7 +73,7 @@ ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
     
     ## collect arguments
     tempargs <- list(
-        npart = nrow(x$pars[[1]]), 
+        x = nrow(x$pars[[1]]), 
         tols = tols, 
         priors = x$priors, 
         func = x$func, 
@@ -104,9 +103,10 @@ ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
 #' @rdname ABCSMC
 #' @export
 
-ABCSMC.default <- function(npart, tols, priors, func, data, parallel = F, mc.cores = NA, ...) {
+ABCSMC.default <- function(x, tols, priors, func, data, parallel = F, mc.cores = NA, ...) {
     
     ## check inputs
+    npart <- x
     stopifnot(checkInput(parallel, c("vector", "logical"), 1))
     if(parallel) {
         if(!require(parallel)) {

@@ -5,9 +5,9 @@
 #' @export
 #'
 #' @param x         An \code{ABCSMC} object or the number of particles (must be a positive integer).
-#' @param tols 		A \code{matrix} of tolerances, with the number of rows defining
-#'                  the number of generations required, and the number of columns
-#'                  defining the number of summary statistics / data points to match to.
+#' @param tols 		A \code{data.frame} of tolerances, with the number of rows defining
+#'                  the number of generations required, and columns defining the summary statistics
+#'                  to match to. The columns must match to those in `data`.
 #' @param priors    A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 
 #'                  \code{p2}, with number of rows equal to the number of parameters. The column
 #'                  \code{parname} simply gives names to each parameter for plotting and summarising.
@@ -22,7 +22,7 @@
 #'                  function must be a vector with length equal to \code{nrow(data)} and with entries 
 #'                  in the same order as the rows of \code{data}.
 #' @param data      A \code{data.frame} with a single row and columns containing the observed summary statistics
-#'                  to match to.
+#'                  to match to. Columns must match to `tols`.
 #' @param parallel  A \code{logical} determining whether to use parallel processing or not.
 #' @param mc.cores  Number of cores to use if using parallel processing.
 #' @param ...       Further arguments to pass to \code{func}. (Not used if extending runs.)
@@ -65,6 +65,7 @@ ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
     
     ## extract tolerances and check against new tolerances
     stopifnot(ncol(tols) == ncol(x$data))
+    stopifnot(all(match(colnames(tols), colnames(data)) - 1:ncol(data) == 0))
     if(sum(apply(rbind(x$tols[nrow(x$tols), ], tols), 2, function(x) {
         sum(x[-1] >= x[1])
     })) > 0) {
@@ -124,12 +125,14 @@ ABCSMC.default <- function(x, tols, priors, func, data, parallel = F, mc.cores =
         cat(paste0("Number of cores: ", mc.cores, "\n"))
     }
     stopifnot(checkInput(npart, "numeric", 1, int = T))
-    stopifnot(checkInput(tols, c("numeric", "matrix")))
+    stopifnot(checkInput(tols, "data.frame"))
+    stopifnot(all(sapply(tols, is.numeric)))
     stopifnot(checkInput(priors, "data.frame", ncol = 4))
     stopifnot(checkInput(func, "function", 1))
     stopifnot(checkInput(data, "data.frame", nrow = 1))
     stopifnot(all(sapply(data, is.numeric)))
     stopifnot(ncol(data) == ncol(tols))
+    stopifnot(all(match(colnames(data), colnames(tols)) - 1:ncol(data) == 0))
     fargs <- formals(func)
     stopifnot(length(fargs) >= 3)
     stopifnot(all(match(names(fargs)[1:3], c("pars", "data", "tols")) - 1:3 == 0))
@@ -205,6 +208,10 @@ ABCSMC.default <- function(x, tols, priors, func, data, parallel = F, mc.cores =
         genstart <- 0
     }
     
+    ## save tols
+    orig_tols <- tols
+    tols <- as.matrix(tols)
+    
     ## run sequential algorithm
     for(t in init:nrow(tols)) {  
         ## set up arguments
@@ -265,13 +272,13 @@ ABCSMC.default <- function(x, tols, priors, func, data, parallel = F, mc.cores =
     if(init > 1) {
         pars <- pars[-1]
         out <- out[-1]
-        tols <- tols[-1, ]
+        orig_tols <- orig_tols[-1, , drop = F]
         weights <- weights[-1]
     }
     
     ## output results
     output <- list(pars = pars, output = out, weights = weights, accrate = accrate,
-                   tols = tols, priors = orig_priors, data = data, func = func, addargs = args)
+                   tols = orig_tols, priors = orig_priors, data = data, func = func, addargs = args)
     class(output) <- "ABCSMC"
     output
 }

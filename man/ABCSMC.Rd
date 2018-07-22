@@ -18,9 +18,9 @@ ABCSMC(x, ...)
 
 \item{...}{Further arguments to pass to \code{func}. (Not used if extending runs.)}
 
-\item{tols}{A \code{matrix} of tolerances, with the number of rows defining
-the number of generations required, and the number of columns
-defining the number of summary statistics / data points to match to.}
+\item{tols}{A \code{data.frame} of tolerances, with the number of rows defining
+the number of generations required, and columns defining the summary statistics
+to match to. The columns must match to those in `data`.}
 
 \item{parallel}{A \code{logical} determining whether to use parallel processing or not.}
 
@@ -42,7 +42,7 @@ function must be a vector with length equal to \code{nrow(data)} and with entrie
 in the same order as the rows of \code{data}.}
 
 \item{data}{A \code{data.frame} with a single row and columns containing the observed summary statistics
-to match to.}
+to match to. Columns must match to `tols`.}
 }
 \value{
 An \code{ABCSMC} object, essentially a \code{list} containing:

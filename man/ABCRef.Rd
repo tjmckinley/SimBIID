@@ -28,6 +28,8 @@ to match to.}
 \item{parallel}{A \code{logical} determining whether to use parallel processing or not.}
 
 \item{mc.cores}{Number of cores to use if using parallel processing.}
+
+\item{...}{Extra arguments to be passed to \code{func}.}
 }
 \value{
 An \code{data.frame} object with \code{npart} rows, where the first \code{p} columns correspond to 

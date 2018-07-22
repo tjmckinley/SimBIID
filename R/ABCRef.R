@@ -20,6 +20,7 @@
 #'                  to match to.
 #' @param parallel  A \code{logical} determining whether to use parallel processing or not.
 #' @param mc.cores  Number of cores to use if using parallel processing.
+#' @param ...       Extra arguments to be passed to \code{func}.
 #'
 #' @return An \code{data.frame} object with \code{npart} rows, where the first \code{p} columns correspond to 
 #'         the proposed parameters, and the remaining columns correspond to the simulated outputs.

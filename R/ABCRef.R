@@ -16,8 +16,8 @@
 #'                  must return a \code{vector} of simulated summary measures, or a missing value (\code{NA})
 #'                  if there is an error. The output from the function must be a vector with length equal 
 #'                  to \code{nrow(data)} and with entries in the same order as the rows of \code{data}.
-#' @param data      A \code{data.frame} with a single row and columns containing the observed summary statistics
-#'                  to match to.
+#' @param data      A \code{data.frame} with a single row and columns containing the observed summary
+#'                  statistics in order to extract output names.
 #' @param parallel  A \code{logical} determining whether to use parallel processing or not.
 #' @param mc.cores  Number of cores to use if using parallel processing.
 #' @param ...       Extra arguments to be passed to \code{func}.

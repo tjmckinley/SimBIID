@@ -22,8 +22,8 @@ must return a \code{vector} of simulated summary measures, or a missing value (\
 if there is an error. The output from the function must be a vector with length equal 
 to \code{nrow(data)} and with entries in the same order as the rows of \code{data}.}
 
-\item{data}{A \code{data.frame} with a single row and columns containing the observed summary statistics
-to match to.}
+\item{data}{A \code{data.frame} with a single row and columns containing the observed summary
+statistics in order to extract output names.}
 
 \item{parallel}{A \code{logical} determining whether to use parallel processing or not.}
 

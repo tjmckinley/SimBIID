@@ -7,13 +7,14 @@
 using namespace Rcpp;
 
 // PMCMC_cpp
-List PMCMC_cpp(NumericMatrix dataset, NumericMatrix priors, NumericVector iniPars, NumericMatrix propVar_R, int niter, int npart, double scale, int tol, int nprintsum, int nmultskip, int nupdate, int fixpars, int adapt, int nclass, SEXP func_);
-RcppExport SEXP _ABCSMC_PMCMC_cpp(SEXP datasetSEXP, SEXP priorsSEXP, SEXP iniParsSEXP, SEXP propVar_RSEXP, SEXP niterSEXP, SEXP npartSEXP, SEXP scaleSEXP, SEXP tolSEXP, SEXP nprintsumSEXP, SEXP nmultskipSEXP, SEXP nupdateSEXP, SEXP fixparsSEXP, SEXP adaptSEXP, SEXP nclassSEXP, SEXP func_SEXP) {
+List PMCMC_cpp(NumericMatrix dataset, NumericMatrix priors, CharacterVector parnames, NumericVector iniPars, NumericMatrix propVar_R, int niter, int npart, double scale, int tol, int nprintsum, int nmultskip, int nupdate, int fixpars, int adapt, int nclass, SEXP func_);
+RcppExport SEXP _ABCSMC_PMCMC_cpp(SEXP datasetSEXP, SEXP priorsSEXP, SEXP parnamesSEXP, SEXP iniParsSEXP, SEXP propVar_RSEXP, SEXP niterSEXP, SEXP npartSEXP, SEXP scaleSEXP, SEXP tolSEXP, SEXP nprintsumSEXP, SEXP nmultskipSEXP, SEXP nupdateSEXP, SEXP fixparsSEXP, SEXP adaptSEXP, SEXP nclassSEXP, SEXP func_SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericMatrix >::type dataset(datasetSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type priors(priorsSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type parnames(parnamesSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type iniPars(iniParsSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type propVar_R(propVar_RSEXP);
     Rcpp::traits::input_parameter< int >::type niter(niterSEXP);
@@ -27,13 +28,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type adapt(adaptSEXP);
     Rcpp::traits::input_parameter< int >::type nclass(nclassSEXP);
     Rcpp::traits::input_parameter< SEXP >::type func_(func_SEXP);
-    rcpp_result_gen = Rcpp::wrap(PMCMC_cpp(dataset, priors, iniPars, propVar_R, niter, npart, scale, tol, nprintsum, nmultskip, nupdate, fixpars, adapt, nclass, func_));
+    rcpp_result_gen = Rcpp::wrap(PMCMC_cpp(dataset, priors, parnames, iniPars, propVar_R, niter, npart, scale, tol, nprintsum, nmultskip, nupdate, fixpars, adapt, nclass, func_));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_ABCSMC_PMCMC_cpp", (DL_FUNC) &_ABCSMC_PMCMC_cpp, 15},
+    {"_ABCSMC_PMCMC_cpp", (DL_FUNC) &_ABCSMC_PMCMC_cpp, 16},
     {NULL, NULL, 0}
 };
 

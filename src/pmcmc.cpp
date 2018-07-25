@@ -1,8 +1,8 @@
 #include "functions.hpp"
 
 // a Metropolis-Hastings PMCMC algorithm for fitting time series models
-List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, NumericVector iniPars, 
-    NumericMatrix propVar_R,
+List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector parnames, 
+    NumericVector iniPars, NumericMatrix propVar_R,
     int niter, int npart, double scale, int tol, int nprintsum, int nmultskip, 
     int nupdate, int fixpars, int adapt, int nclass, SEXP func_)
 {
@@ -10,6 +10,7 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, NumericVector iniPa
     // 'iniPars' is a vector of initial values for the unknown parameters
     // 'priors' is an (npars x 2) matrix containing the shape and scale
     //    hyperparameters for the prior distributions
+    // 'parnames' is vector of parameter names
     // 'propVar_R' is initial covariance matrix (on log or logistic scale) for parameters
     // 'niter' is the number of iterations over which to run the chain
     // 'npart' is number of particles to use for particle filter
@@ -52,13 +53,13 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, NumericVector iniPa
     Rprintf("Priors:\n");
     for(i = 0; i < priors.nrow(); i++) {
         if(priors(i, 0) == 1) {
-            Rprintf("pars[%d] ~ U(", i);
+            Rcpp::Rcout << parnames(i) << " ~ U(";
         }
         else {
             if(priors(i, 0) == 2) {
-                Rprintf("pars[%d] ~ N(", i);
+            Rcpp::Rcout << parnames(i) << " ~ N(";
             } else {
-                Rprintf("pars[%d] ~ G(", i);
+            Rcpp::Rcout << parnames(i) << " ~ G(";
             }
         }
         Rprintf("%f, %f)\n", priors(i, 1), priors(i, 2));
@@ -212,7 +213,8 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, NumericVector iniPa
     
     Rprintf("Initial parameter values:\n\n");
     for(i = 0; i < npars; i++) {
-        Rprintf("par[%d] = %f\n", i, pars(i));
+        Rcpp::Rcout << parnames(i) << " = " << pars(i);
+        Rprintf("\n");
     }
     Rprintf("\n");
     

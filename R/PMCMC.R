@@ -104,7 +104,6 @@ PMCMC <- function(dataset, priors, nclass, func, iniPars = NA,
         stopifnot(all(temp$p1 > 0))
         stopifnot(all(temp$p2 > 0))
     }
-    browser() 
     orig_priors <- priors
     priors$parnames <- NULL
     priors$dist <- match(priors$dist, c("unif", "norm", "gamma"))
@@ -154,7 +153,7 @@ PMCMC <- function(dataset, priors, nclass, func, iniPars = NA,
     stopifnot(adaptmixprop > 0 & adaptmixprop < 1 & nupdate > 0)
     
     ## run function
-    output <- PMCMC_cpp(as.matrix(dataset), priors, iniPars, propVar, niter, npart, 
+    output <- PMCMC_cpp(as.matrix(dataset), priors, orig_priors$parnames, iniPars, propVar, niter, npart, 
                     adaptmixprop, tol, nprintsum, nmultskip, nupdate, as.numeric(fixpars), 
                     as.numeric(adapt), nclass, func)
     
@@ -168,7 +167,7 @@ PMCMC <- function(dataset, priors, nclass, func, iniPars = NA,
     }
     
     ## convert output into correct format
-    colnames(output[[1]]) <- orig_priors$parnames
+    colnames(output[[1]]) <- c(orig_priors$parnames, "logPost", "nsims", "nsimsProp")
     output[[1]] <- as.mcmc(output[[1]])
     
     ## finalise output and set names

@@ -38,7 +38,7 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
     Rprintf("Number of iterations: %d\n", niter);
     Rprintf("Number of particles: %d\n", npart);
     if(fixpars == 0) {
-        Rprintf("Mixing proportion for proposal: %f\n", scale);
+        Rprintf("Mixing proportion for proposal: %.2f\n", scale);
         if(adapt == 1) {
             Rprintf("Start adaptive proposal at iteration: %d\n", nupdate);
         }
@@ -62,7 +62,7 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
             Rcpp::Rcout << parnames(i) << " ~ G(";
             }
         }
-        Rprintf("%f, %f)\n", priors(i, 1), priors(i, 2));
+        Rprintf("%.2f, %.2f)\n", priors(i, 1), priors(i, 2));
     }
     Rprintf("\n");
     

@@ -6,7 +6,13 @@
 #' @export
 #'
 #' @param dataset 		Data frame containing time series count data, of form (time, counts*).
-#' @param priors        COME BACK TO THIS
+#' @param priors        A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 
+    #'                  \code{p2}, with number of rows equal to the number of parameters. The column
+    #'                  \code{parname} simply gives names to each parameter for plotting and summarising.
+    #'                  Each entry in the \code{dist} column must contain one of \code{c("unif", "norm", "gamma")}, 
+    #'                  and the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
+    #'                  (lower and upper bounds in the uniform case; mean and standard deviation in the 
+    #'                  normal case; and shape and rate in the gamma case).
 #' @param nclass        The number of classes in the infectious disease model.
 #' @param func          SEXP pointer to simulation function.
 #' @param iniPars       Vector of initial parameter values. If left unspecified, then these are 
@@ -52,7 +58,7 @@
 #'  \item{time}{the time taken to run the routine (in seconds);}
 #'  \item{\code{propVar}}{the proposal covariance for the parameter updates;}
 #'  \item{\code{dataset}}{data frame containing time series count data data, of form (group, count*);}
-#'  \item{\code{priors}}{COME BACK TO THIS.}
+#'  \item{\code{priors}:}{ a copy of the \code{priors} input.}
 #' }
 #'
 
@@ -73,8 +79,36 @@ PMCMC <- function(dataset, priors, nclass, func, iniPars = NA,
         stopifnot(checkInput(dataset[, j, drop = T], "numeric", int = T))
     }   
     
-    ## check priors and model types
-    stopifnot(checkInput(priors, c("numeric", "matrix"), ncol = 2))
+    ## check priors 
+    stopifnot(checkInput(priors, "data.frame", ncol = 4))
+    stopifnot(all(sort(match(colnames(priors), c("parnames", "dist", "p1", "p2"))) - 1:4 == 0))
+    priors <- select(priors, parnames, dist, p1, p2)
+    stopifnot(checkInput(priors$parnames, "character"))
+    stopifnot(checkInput(priors$dist, "character"))
+    stopifnot(checkInput(priors$p1, "numeric"))
+    stopifnot(checkInput(priors$p2, "numeric"))
+    stopifnot(all(priors$dist %in% c("unif", "norm", "gamma")))
+    temp <- priors[priors$dist == "unif", , drop = F]
+    if(nrow(temp) > 0) {
+        ## check uniform bounds correct
+        stopifnot(all(apply(temp[, 3:4, drop = F], 1, diff) > 0))
+    }
+    temp <- priors[priors$dist == "norm", , drop = F]
+    if(nrow(temp) > 0) {
+        ## check normal hyperparameters correct
+        stopifnot(all(temp$p2 > 0))
+    }
+    temp <- priors[priors$dist == "gamma", , drop = F]
+    if(nrow(temp) > 0) {
+        ## check gamma bounds correct
+        stopifnot(all(temp$p1 > 0))
+        stopifnot(all(temp$p2 > 0))
+    }
+    browser() 
+    orig_priors <- priors
+    priors$parnames <- NULL
+    priors$dist <- match(priors$dist, c("unif", "norm", "gamma"))
+    priors <- as.matrix(priors)
     
     ## check function
     stopifnot(class(func) == "XPtr")
@@ -119,9 +153,6 @@ PMCMC <- function(dataset, priors, nclass, func, iniPars = NA,
     stopifnot(checkInput(nupdate, c("numeric", "vector"), 1, int = T))
     stopifnot(adaptmixprop > 0 & adaptmixprop < 1 & nupdate > 0)
     
-    ## correctly characterise model
-    stopifnot(all(priors[, 1] < priors[, 2]))
-    
     ## run function
     output <- PMCMC_cpp(as.matrix(dataset), priors, iniPars, propVar, niter, npart, 
                     adaptmixprop, tol, nprintsum, nmultskip, nupdate, as.numeric(fixpars), 
@@ -136,13 +167,12 @@ PMCMC <- function(dataset, priors, nclass, func, iniPars = NA,
         return(output)
     }
     
-    cat("NEED TO SET COLUMN NAMES FOR PARAMETERS FROM PRIORS")
-    
     ## convert output into correct format
+    colnames(output[[1]]) <- orig_priors$parnames
     output[[1]] <- as.mcmc(output[[1]])
     
     ## finalise output and set names
-    output <- c(output[1], tol = list(tol), output[-1], list(dataset), list(priors))
+    output <- c(output[1], tol = list(tol), output[-1], list(dataset), list(orig_priors))
     names(output) <- c("pars", "tol", "skiprate", "accrate", 
         "nmultskip", "npart", "time", "propVar", "dataset", "priors")
         

@@ -48,13 +48,20 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, NumericVector iniPa
     int nmultskipini = nmultskip;
     nmultskip *= npart;
     
-    Rprintf("\nNumber of parameters: %d\n", npars);
-    Rprintf("Bounds for uniform priors:\n");
+    Rprintf("\nNumber of parameters: %d\n\n", npars);
+    Rprintf("Priors:\n");
     for(i = 0; i < priors.nrow(); i++) {
-        for(j = 0; j < priors.ncol(); j++) {
-            Rprintf("%f ", priors(i, j));
+        if(priors(i, 0) == 1) {
+            Rprintf("pars[%d] ~ U(", i);
         }
-        Rprintf("\n");
+        else {
+            if(priors(i, 0) == 2) {
+                Rprintf("pars[%d] ~ N(", i);
+            } else {
+                Rprintf("pars[%d] ~ G(", i);
+            }
+        }
+        Rprintf("%f, %f)\n", priors(i, 1), priors(i, 2));
     }
     Rprintf("\n");
     
@@ -82,11 +89,25 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, NumericVector iniPa
     arma::vec pars(npars), parsProp(npars);
     for(i = 0; i < npars; i++) {
         if(NumericVector::is_na(iniPars[i])){
-            pars(i) = R::runif(priors(i, 0), priors(i, 1));
+            if(priors(i, 0) == 1) {
+                pars(i) = R::runif(priors(i, 1), priors(i, 2));
+            } else {
+                if(priors(i, 0) == 2) {
+                    pars(i) = R::rnorm(priors(i, 1), priors(i, 2));
+                } else {
+                    pars(i) = R::rgamma(priors(i, 1), priors(i, 2));
+                }
+            }   
         } else {
             pars(i) = iniPars[i];
         }
-        if(pars(i) < priors(i, 0) || pars(i) > priors(i, 1)) stop("Some initial values are not bounded correctly");
+        if(priors(i, 0) == 1) {
+            if(pars(i) < priors(i, 1) || pars(i) > priors(i, 2)) stop("Some initial values are not bounded correctly");
+        } else {
+            if(priors(i, 0) == 3) {
+                if(pars(i) < 0.0) stop("Some initial values are not bounded correctly");
+            }
+        }
     }
     parsProp.zeros();
     
@@ -152,11 +173,25 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, NumericVector iniPa
             } else {
                 for(i = 0; i < npars; i++) {
                     if(NumericVector::is_na(iniPars[i])){
-                        pars(i) = R::runif(priors(i, 0), priors(i, 1));
+                        if(priors(i, 0) == 1) {
+                            pars(i) = R::runif(priors(i, 1), priors(i, 2));
+                        } else {
+                            if(priors(i, 0) == 2) {
+                                pars(i) = R::rnorm(priors(i, 1), priors(i, 2));
+                            } else {
+                                pars(i) = R::rgamma(priors(i, 1), priors(i, 2));
+                            }
+                        }   
                     } else {
                         pars(i) = iniPars[i];
                     }
-                    if(pars(i) < priors(i, 0) || pars(i) > priors(i, 1)) stop("Some initial values are not bounded correctly");
+                    if(priors(i, 0) == 1) {
+                        if(pars(i) < priors(i, 1) || pars(i) > priors(i, 2)) stop("Some initial values are not bounded correctly");
+                    } else {
+                        if(priors(i, 0) == 3) {
+                            if(pars(i) < 0.0) stop("Some initial values are not bounded correctly");
+                        }
+                    }
                 }
             }
             //increment counter
@@ -183,8 +218,16 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, NumericVector iniPa
     
     // calculate log-likelihood – log-prior
     accCurr = LL;
-    for(j = 0; j < npars; j++) { 
-        accCurr += R::dunif(pars(j), priors(j, 0), priors(j, 1), 1);
+    for(j = 0; j < npars; j++) {
+        if(priors(j, 0) == 1) {
+            accCurr += R::dunif(pars(j), priors(j, 1), priors(j, 2), 1);
+        } else {
+            if(priors(j, 0) == 2) {
+                accCurr += R::dnorm(pars(j), priors(j, 1), priors(j, 2), 1);
+            } else {
+                accCurr += R::dgamma(pars(j), priors(j, 1), priors(j, 2), 1);
+            }
+        }  
     }
     
     //initialise timer
@@ -213,14 +256,28 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, NumericVector iniPa
         // check validity
         k = 0;
         for(j = 0; j < npars; j++) {
-            k += (parsProp(j) <= priors(j, 0) || parsProp(j) >= priors(j, 1) ? 1:0);
+            if(priors(j, 0) == 1) {
+                k += (parsProp(j) <= priors(j, 1) || parsProp(j) >= priors(j, 2) ? 1:0);
+            } else {
+                if(priors(j, 0) == 3) {
+                    k += (parsProp(j) <= 0.0 ? 1:0);
+                }
+            }  
         }
         // if valid then proceed with simulation
         if(k == 0) {
             // set prior information
             accProp = 0.0;
             for(j = 0; j < npars; j++) { 
-                accProp += R::dunif(parsProp(j), priors(j, 0), priors(j, 1), 1);
+                if(priors(j, 0) == 1) {
+                    accProp += R::dunif(parsProp(j), priors(j, 1), priors(j, 2), 1);
+                } else {
+                    if(priors(j, 0) == 2) {
+                        accProp += R::dnorm(parsProp(j), priors(j, 1), priors(j, 2), 1);
+                    } else {
+                        accProp += R::dgamma(parsProp(j), priors(j, 1), priors(j, 2), 1);
+                    }
+                }  
             }
             
             // run particle filter

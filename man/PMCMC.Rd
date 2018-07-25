@@ -11,7 +11,13 @@ PMCMC(dataset, priors, nclass, func, iniPars = NA, tol = 0, fixpars = F,
 \arguments{
 \item{dataset}{Data frame containing time series count data, of form (time, counts*).}
 
-\item{priors}{COME BACK TO THIS}
+\item{priors}{A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 
+\code{p2}, with number of rows equal to the number of parameters. The column
+\code{parname} simply gives names to each parameter for plotting and summarising.
+Each entry in the \code{dist} column must contain one of \code{c("unif", "norm", "gamma")}, 
+and the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
+(lower and upper bounds in the uniform case; mean and standard deviation in the 
+normal case; and shape and rate in the gamma case).}
 
 \item{nclass}{The number of classes in the infectious disease model.}
 
@@ -66,7 +72,7 @@ If \code{fixpars = F}, the routine returns a \code{PMCMC} object, essentially a
  \item{time}{the time taken to run the routine (in seconds);}
  \item{\code{propVar}}{the proposal covariance for the parameter updates;}
  \item{\code{dataset}}{data frame containing time series count data data, of form (group, count*);}
- \item{\code{priors}}{COME BACK TO THIS.}
+ \item{\code{priors}:}{ a copy of the \code{priors} input.}
 }
 }
 \description{

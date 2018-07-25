@@ -1,9 +1,10 @@
 #' Sequential Monte Carlo based ABC
 #'
-#' Package implements the ABC-SMC algorithm of Toni et al. (2009)
+#' Package implements various inference routines
 #'
 #' Package provides some simple code to run the ABCSMC algorithm of Toni et al. (2009)
-#' and plot the outputs.
+#' and the Alive Particle Filter based particle MCMC algorithm (Jasra et al., 2013;
+#' Drovandi et al., 2016). Also provides functions to plot the outputs.
 #'
 #' @docType package
 #' @name ABCSMC-package
@@ -14,5 +15,11 @@
 #' @import tidyr
 #' @import mvtnorm
 #' @import RColorBrewer
+#' @import tmvtnorm 
+#' @import coda 
+#' @import Rcpp 
+#' @import RcppArmadillo 
+#' @import RcppXPtrUtils
+#' @useDynLib ABCSMC
 NULL
 

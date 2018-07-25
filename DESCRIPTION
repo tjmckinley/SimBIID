@@ -7,14 +7,23 @@ Author: TJ McKinley
 Maintainer: TJ McKinley <t.mckinley@exeter.ac.uk>
 Description: Implements ABC-SMC algorithm of Toni et al. (2009)
 License: GPL (>= 2)
+Depends:
+    coda,
+    tmvtnorm
 Imports:
     dplyr,
     purrr,
     ggplot2,
     tidyr,
     mvtnorm,
-    RColorBrewer
+    RColorBrewer,
+    Rcpp,
+    RcppArmadillo,
+    RcppXPtrUtils
 Suggests:
     parallel,
     GGally
+LinkingTo: 
+    Rcpp,
+    RcppArmadillo
 RoxygenNote: 6.0.1

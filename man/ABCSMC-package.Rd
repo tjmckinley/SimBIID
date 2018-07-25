@@ -5,11 +5,12 @@
 \alias{ABCSMC-package}
 \title{Sequential Monte Carlo based ABC}
 \description{
-Package implements the ABC-SMC algorithm of Toni et al. (2009)
+Package implements various inference routines
 }
 \details{
 Package provides some simple code to run the ABCSMC algorithm of Toni et al. (2009)
-and plot the outputs.
+and the Alive Particle Filter based particle MCMC algorithm (Jasra et al., 2013;
+Drovandi et al., 2016). Also provides functions to plot the outputs.
 }
 \author{
 TJ McKinley <t.mckinley@exeter.ac.uk>

@@ -15,7 +15,6 @@
 #' @import tidyr
 #' @import mvtnorm
 #' @import RColorBrewer
-#' @import tmvtnorm 
 #' @import coda 
 #' @import Rcpp 
 #' @import RcppArmadillo 

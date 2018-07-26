@@ -22,7 +22,6 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
     // 'fixpars' is indicator determining whether to fix the parameters
     //      (useful for optimising variance)
     // 'adapt' determines whether to use adaptive proposal
-    // 'adaptscale' is initial scaling value for the adaptive proposal for the parameters
     // 'nclass' is number of classes
     // 'func_' is pointer to simulation function
     

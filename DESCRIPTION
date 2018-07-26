@@ -7,9 +7,6 @@ Author: TJ McKinley
 Maintainer: TJ McKinley <t.mckinley@exeter.ac.uk>
 Description: Implements ABC-SMC algorithm of Toni et al. (2009)
 License: GPL (>= 2)
-Depends:
-    coda,
-    tmvtnorm
 Imports:
     dplyr,
     purrr,
@@ -19,7 +16,8 @@ Imports:
     RColorBrewer,
     Rcpp,
     RcppArmadillo,
-    RcppXPtrUtils
+    RcppXPtrUtils,
+    coda
 Suggests:
     parallel,
     GGally

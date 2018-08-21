@@ -51,6 +51,6 @@ double AlivePartFilter (int N, arma::vec pars, NumericMatrix dataset,
 List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector parnames, 
     NumericVector iniPars, NumericMatrix propVar_R,
     int niter, int npart, double scale, int tol, int nprintsum, int nmultskip, 
-    int nupdate, int fixpars, int adapt, int nclass, SEXP func_);
+    int nupdate, int fixpars, int adapt, IntegerVector iniStates, SEXP func_);
 
 #endif // __FUNCTIONS__

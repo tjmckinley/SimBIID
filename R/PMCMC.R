@@ -13,7 +13,7 @@
     #'                  and the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
     #'                  (lower and upper bounds in the uniform case; mean and standard deviation in the 
     #'                  normal case; and shape and rate in the gamma case).
-#' @param nclass        The number of classes in the infectious disease model.
+#' @param iniStates     A numerical vector of initial states for the infectious disease model.
 #' @param func          SEXP pointer to simulation function.
 #' @param iniPars       Vector of initial parameter values. If left unspecified, then these are 
 #'                      sampled from the prior distributions.
@@ -50,7 +50,7 @@
 #' \itemize{
 #'  \item{\code{pars}}{an \code{mcmc} object containing posterior samples for the parameters;}
 #'  \item{\code{tol}}{tolerance for the NTG birds;}
-#'  \item{\code{nclass}}{the number of classes in the infectious disease model;}
+#'  \item{\code{iniStates}}{a vector of initial states for the infectious disease model;}
 #'  \item{\code{skiprate}}{the cumulative skip rate;}
 #'  \item{accrate}{the cumulative acceptance rate;}
 #'  \item{nmultskip}{the chosen value of \code{nmultskip};}
@@ -62,13 +62,13 @@
 #' }
 #'
 
-PMCMC <- function(dataset, priors, nclass, func, iniPars = NA, 
+PMCMC <- function(dataset, priors, iniStates, func, iniPars = NA, 
     tol = 0, fixpars = F, 
     niter = 1000, npart = 100, nprintsum = 1000, nmultskip = 1000, 
     adapt = T, propVar = NA, adaptmixprop = 0.05, nupdate = 100) {
     
     ## check inputs are present
-    stopifnot(!missing(dataset) & !missing(priors) & !missing(nclass) & !missing(func))
+    stopifnot(!missing(dataset) & !missing(priors) & !missing(iniStates) & !missing(func))
     
     ## check data set
     stopifnot(checkInput(dataset, "data.frame"))
@@ -120,6 +120,7 @@ PMCMC <- function(dataset, priors, nclass, func, iniPars = NA,
     } else {
         iniPars <- rep(NA, nrow(priors))
     }
+    stopifnot(checkInput(iniStates, c("numeric", "vector"), int = T))
     
     ## check proposal variances
     if(is.na(propVar[1])) {
@@ -155,7 +156,7 @@ PMCMC <- function(dataset, priors, nclass, func, iniPars = NA,
     ## run function
     output <- PMCMC_cpp(as.matrix(dataset), priors, orig_priors$parnames, iniPars, propVar, niter, npart, 
                     adaptmixprop, tol, nprintsum, nmultskip, nupdate, as.numeric(fixpars), 
-                    as.numeric(adapt), nclass, func)
+                    as.numeric(adapt), iniStates, func)
     
     ## check to see if code has stopped afer initialisation
     if(length(output[[1]]) == 1) {
@@ -171,8 +172,8 @@ PMCMC <- function(dataset, priors, nclass, func, iniPars = NA,
     output[[1]] <- as.mcmc(output[[1]])
     
     ## finalise output and set names
-    output <- c(output[1], tol = list(tol), output[-1], list(dataset), list(orig_priors))
-    names(output) <- c("pars", "tol", "skiprate", "accrate", 
+    output <- c(output[1], tol = list(tol), iniStates = iniStates, output[-1], list(dataset), list(orig_priors))
+    names(output) <- c("pars", "tol", "iniStates", "skiprate", "accrate", 
         "nmultskip", "npart", "time", "propVar", "dataset", "priors")
         
     ## export class and object

@@ -26,7 +26,7 @@ double AlivePartFilter (int N, arma::vec pars, NumericMatrix dataset,
     
     // setup output
     double LL = 0.0;
-    IntegerVector out(state.size() + 1);
+    IntegerVector out(state.ncol() + 1);
     
     // extract function pointer
     funcPtr func = *XPtr<funcPtr>(func_);
@@ -50,11 +50,6 @@ double AlivePartFilter (int N, arma::vec pars, NumericMatrix dataset,
                 }
                 // simulate forward
                 if(t == 0) {
-                    // reset states
-                    state(k, 0) = 762;
-                    state(k, 1) = 1;
-                    state(k, 2) = 0;
-                    state(k, 3) = 0;
                     r = k;
                 } else {
                     // resample a particle from the previous time step
@@ -64,7 +59,7 @@ double AlivePartFilter (int N, arma::vec pars, NumericMatrix dataset,
                         dataset(t, 0), dataset(t + 1, 0), tol, state(r, _), 
                         dataset(t + 1, 1));
                 matched = out[0];
-                stateNew(k, _) = out[Range(1, state.size())];
+                stateNew(k, _) = out[Range(1, state.ncol())];
                 // update counter
                 nts++;
                 (*cumnt)++;

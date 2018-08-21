@@ -4,9 +4,10 @@
 \alias{PMCMC}
 \title{Runs particle MCMC algorithm}
 \usage{
-PMCMC(dataset, priors, nclass, func, iniPars = NA, tol = 0, fixpars = F,
-  niter = 1000, npart = 100, nprintsum = 1000, nmultskip = 1000,
-  adapt = T, propVar = NA, adaptmixprop = 0.05, nupdate = 100)
+PMCMC(dataset, priors, iniStates, func, iniPars = NA, tol = 0,
+  fixpars = F, niter = 1000, npart = 100, nprintsum = 1000,
+  nmultskip = 1000, adapt = T, propVar = NA, adaptmixprop = 0.05,
+  nupdate = 100)
 }
 \arguments{
 \item{dataset}{Data frame containing time series count data, of form (time, counts*).}
@@ -19,7 +20,7 @@ and the corresponding \code{p1} and \code{p2} entries relate to the hyperparamet
 (lower and upper bounds in the uniform case; mean and standard deviation in the 
 normal case; and shape and rate in the gamma case).}
 
-\item{nclass}{The number of classes in the infectious disease model.}
+\item{iniStates}{A numerical vector of initial states for the infectious disease model.}
 
 \item{func}{SEXP pointer to simulation function.}
 
@@ -64,7 +65,7 @@ If \code{fixpars = F}, the routine returns a \code{PMCMC} object, essentially a
 \itemize{
  \item{\code{pars}}{an \code{mcmc} object containing posterior samples for the parameters;}
  \item{\code{tol}}{tolerance for the NTG birds;}
- \item{\code{nclass}}{the number of classes in the infectious disease model;}
+ \item{\code{iniStates}}{a vector of initial states for the infectious disease model;}
  \item{\code{skiprate}}{the cumulative skip rate;}
  \item{accrate}{the cumulative acceptance rate;}
  \item{nmultskip}{the chosen value of \code{nmultskip};}

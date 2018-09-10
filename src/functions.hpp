@@ -11,8 +11,8 @@
 using namespace Rcpp;
 
 // set up code to pass custom cpp function
-typedef SEXP (*funcPtr)(NumericVector pars, double tstart, double tstop, int tol,
-           IntegerVector state, int counts);
+typedef SEXP (*funcPtr)(NumericVector gdata, double tstart, double tstop, int tol,
+           IntegerVector u, int counts);
 
 // wrapper function to run custom Rcpp function           
 template <typename T> 

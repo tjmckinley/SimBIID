@@ -19,6 +19,7 @@
 #' @import Rcpp 
 #' @import RcppArmadillo 
 #' @import RcppXPtrUtils
+#' @import SimInf
 #' @useDynLib ABCSMC
 NULL
 

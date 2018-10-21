@@ -26,7 +26,7 @@
 #'
 #' @return An object of class \code{XPtr} that points to the compiled function.
 
-SimInf_mparse_Rcpp <- function(
+mparse_Rcpp <- function(
     transitions = NULL, 
     compartments = NULL,
     gdata = NULL
@@ -65,9 +65,8 @@ SimInf_mparse_Rcpp <- function(
     }
 
     ## Parse transitions
-    ldata_names <- NULL
     transitions <- SimInf:::parse_transitions(
-        transitions, compartments, ldata_names, gdata_names
+        transitions, compartments, NULL, gdata_names, NULL
     )
 
     ## write Rcpp code to file

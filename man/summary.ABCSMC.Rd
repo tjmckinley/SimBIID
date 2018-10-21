@@ -4,7 +4,7 @@
 \alias{summary.ABCSMC}
 \title{Summarises \code{ABCSMC} objects}
 \usage{
-\method{summary}{ABCSMC}(object, gen = NA, transfunc = NA)
+summary.ABCSMC(object, gen = NA, transfunc = NA)
 }
 \arguments{
 \item{object}{An \code{ABCSMC} object.}

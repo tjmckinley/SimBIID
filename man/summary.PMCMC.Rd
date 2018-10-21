@@ -4,7 +4,7 @@
 \alias{summary.PMCMC}
 \title{Summarises \code{PMCMC} objects}
 \usage{
-\method{summary}{PMCMC}(object, transfunc = NA)
+summary.PMCMC(object, transfunc = NA)
 }
 \arguments{
 \item{object}{A \code{PMCMC} object.}

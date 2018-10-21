@@ -67,7 +67,11 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
     }
     Rprintf("\n");
     
-    Rprintf("Fixed tolerance for ABC: %d\n", tols);
+    Rprintf("Fixed tolerances for ABC:\n");
+    for(i = 0; i < tols.size(); i++) {
+        Rprintf("state[%d] tol = %d\n", whichind[i], tols[i]);
+    }
+    Rprintf("\n");
     int nclass = iniState.length();
     Rprintf("Number of classes: %d\n\n", nclass);
     Rprintf("Initial states:\n");

@@ -73,3 +73,8 @@ mparse_Rcpp <- function(
     Rcpp_code
 }
 
+## print function for parsedRcpp object
+#' @export
+print.parsedRcpp <- function(x, ...) {
+    writeLines(x)
+}

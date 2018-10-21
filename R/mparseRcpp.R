@@ -22,7 +22,7 @@
 #' @return An object of class \code{parsedRcpp} that contains code to compile
 #'         into an \code{XPtr} object.
 
-mparse_Rcpp <- function(
+mparseRcpp <- function(
     transitions = NULL, 
     compartments = NULL,
     pars = NULL

@@ -9,7 +9,7 @@
 #'
 #' @return An object of class \code{XPtr} that points to the compiled function.
 
-mparse_Rcpp <- function(
+compileRcpp <- function(
     parsed = NULL
 ) {
     if(missing(parsed)) {
@@ -20,7 +20,7 @@ mparse_Rcpp <- function(
     }
     ## write to temporary file
     filename <- tempfile()
-    writeLines(Rcpp_code, filename)
+    writeLines(parsed, filename)
     
     ## compile into external pointer
     source(filename)

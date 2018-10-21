@@ -14,7 +14,7 @@
     #'                  (lower and upper bounds in the uniform case; mean and standard deviation in the 
     #'                  normal case; and shape and rate in the gamma case).
 #' @param iniStates     A numerical vector of initial states for the infectious disease model.
-#' @param func          SEXP pointer to simulation function.
+#' @param func          \code{XPtr} to simulation function.
 #' @param iniPars       Vector of initial parameter values. If left unspecified, then these are 
 #'                      sampled from the prior distributions.
 #' @param tol           Tolerance for matching data during ABC.

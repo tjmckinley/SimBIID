@@ -22,7 +22,7 @@ normal case; and shape and rate in the gamma case).}
 
 \item{iniStates}{A numerical vector of initial states for the infectious disease model.}
 
-\item{func}{SEXP pointer to simulation function.}
+\item{func}{\code{XPtr} to simulation function.}
 
 \item{iniPars}{Vector of initial parameter values. If left unspecified, then these are 
 sampled from the prior distributions.}

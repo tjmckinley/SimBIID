@@ -4,9 +4,9 @@
 \alias{mparse_Rcpp}
 \title{Compile parsed Rcpp model}
 \usage{
-mparse_Rcpp(transitions = NULL, compartments = NULL, gdata = NULL)
+mparse_Rcpp(transitions = NULL, compartments = NULL, pars = NULL)
 
-mparse_Rcpp(transitions = NULL, compartments = NULL, gdata = NULL)
+mparse_Rcpp(transitions = NULL, compartments = NULL, pars = NULL)
 }
 \arguments{
 \item{parsed:}{An object of class \code{parsedRcpp}.}
@@ -21,12 +21,7 @@ k2*I -> R")} expresses a SIR model.}
 \item{compartments:}{contains the names of the involved compartments, for
 example, \code{compartments = c("S", "I", "R")}.}
 
-\item{gdata:}{optional data that are common to all nodes in the model. Can
-be specified either as a named numeric vector or as as a
-one-row data.frame. The names are used to identify the
-parameters in the transitions. The global data vector is
-passed as an argument to the transition rate functions and
-the post time step function.}
+\item{pars:}{named vector of parameters.}
 }
 \value{
 An object of class \code{XPtr} that points to the compiled function.

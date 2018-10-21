@@ -17,12 +17,7 @@
 #' @param compartments: contains the names of the involved compartments, for
 #'          example, \code{compartments = c("S", "I", "R")}.
 #'
-#' @param gdata: optional data that are common to all nodes in the model. Can
-#'          be specified either as a named numeric vector or as as a
-#'          one-row data.frame. The names are used to identify the
-#'          parameters in the transitions. The global data vector is
-#'          passed as an argument to the transition rate functions and
-#'          the post time step function.
+#' @param pars: named vector of parameters.
 #'
 #' @return An object of class \code{parsedRcpp} that contains code to compile
 #'         into an \code{XPtr} object.
@@ -30,7 +25,7 @@
 mparse_Rcpp <- function(
     transitions = NULL, 
     compartments = NULL,
-    gdata = NULL
+    pars = NULL
 ) {
     ## Check transitions
     if (!is.atomic(transitions) || !is.character(transitions) || any(nchar(transitions) == 0)) {
@@ -43,35 +38,37 @@ mparse_Rcpp <- function(
         stop("'compartments' must be specified in a character vector.")
     }
 
-    ## Check gdata
-    gdata_names <- NULL
-    if (!is.null(gdata)) {
-        if (is.data.frame(gdata)) {
-            gdata_names <- colnames(gdata)
+    ## Check pars
+    pars_names <- NULL
+    if (!is.null(pars)) {
+        if (is.data.frame(pars)) {
+            pars_names <- colnames(pars)
         } else {
-            if (is.atomic(gdata) && is.numeric(gdata)) {
-                gdata_names <- names(gdata)
+            if (is.atomic(pars) && is.numeric(pars)) {
+                pars_names <- names(pars)
             } else {
-                stop("'gdata' must either be a 'data.frame' or a 'numeric' vector.")
+                stop("'pars' must either be a 'data.frame' or a 'numeric' vector.")
             }
         }
 
-        if (is.null(gdata_names) || any(duplicated(gdata_names)) || any(nchar(gdata_names) == 0)) {
-            stop("'gdata' must have non-duplicated parameter names.")
+        if (is.null(pars_names) || any(duplicated(pars_names)) || any(nchar(pars_names) == 0)) {
+            stop("'pars' must have non-duplicated parameter names.")
         }
     }
 
-    if (any(duplicated(c(compartments, gdata_names)))) {
-        stop("'gdata' and 'compartments' have names in common.")
+    if (any(duplicated(c(compartments, pars_names)))) {
+        stop("'pars' and 'compartments' have names in common.")
     }
 
     ## Parse transitions
     transitions <- SimInf:::parse_transitions(
-        transitions, compartments, NULL, gdata_names, NULL
+        transitions, compartments, NULL, pars_names, NULL
     )
 
     ## write Rcpp code to file
     Rcpp_code <- Rcpp_mparse(transitions)
+    ## replace "gdata" with "pars"
+    Rcpp_code <- gsub("gdata", "pars", Rcpp_code)
     class(Rcpp_code) <- "parsedRcpp"
     Rcpp_code
 }

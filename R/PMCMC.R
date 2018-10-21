@@ -7,17 +7,31 @@
 #'
 #' @param dataset 		Data frame containing time series count data, of form (time, counts*).
 #' @param priors        A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 
-    #'                  \code{p2}, with number of rows equal to the number of parameters. The column
-    #'                  \code{parname} simply gives names to each parameter for plotting and summarising.
-    #'                  Each entry in the \code{dist} column must contain one of \code{c("unif", "norm", "gamma")}, 
-    #'                  and the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
-    #'                  (lower and upper bounds in the uniform case; mean and standard deviation in the 
-    #'                  normal case; and shape and rate in the gamma case).
+#'                      \code{p2}, with number of rows equal to the number of parameters. The column
+#'                      \code{parname} simply gives names to each parameter for plotting and summarising.
+#'                      Each entry in the \code{dist} column must contain one of \code{c("unif", "norm", "gamma")}, 
+#'                      and the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
+#'                      (lower and upper bounds in the uniform case; mean and standard deviation in the 
+#'                      normal case; and shape and rate in the gamma case).
 #' @param iniStates     A numerical vector of initial states for the infectious disease model.
-#' @param func          \code{XPtr} to simulation function.
+#' @param func          \code{XPtr} to simulation function. This function must take the following arguments
+#'                      in order: 
+#'                      \itemize{
+#'                      \item{\code{NumericVector gdata}:}{ a vector of parameters;}
+#'                      \item{\code{double tstart}:}{ the start time;}
+#'                      \item{\code{double tstop}:}{ the end time;}
+#'                      \item{\code{IntegerVector u}:}{ a vector of states;}
+#'                      \item{\code{IntegerVector tols}:}{ a vector of tolerances;}
+#'                      \item{\code{IntegerVector counts}:}{ a vector of observed states;}
+#'                      \item{\code{IntegerVector whichind}:}{ a vector the same length as \code{counts}, 
+#'                      indicating which elements of \code{u} correspond to which elements of \code{counts}.
+#'                      Must index from 0 NOT 1.}}
 #' @param iniPars       Vector of initial parameter values. If left unspecified, then these are 
 #'                      sampled from the prior distributions.
-#' @param tol           Tolerance for matching data during ABC.
+#' @param tols          Tolerances for matching data during ABC.
+#' @param whichind      Vector of which elements of \code{iniStates} match to columns \code{2:ncol(dataset)}
+#'                      of `dataset`. If left as \code{NULL} then defaults to elements \code{1:length(iniStates)}
+#'                      or returns an error.
 #' @param fixpars       A logical determining whether to fix the input parameters (useful for 
 #'                      determining the variance of the marginal likelihood estimates).
 #' @param niter         An integer specifying the number of iterations to run the MCMC.
@@ -49,7 +63,8 @@
 #'          \code{list} containing:
 #' \itemize{
 #'  \item{\code{pars}}{an \code{mcmc} object containing posterior samples for the parameters;}
-#'  \item{\code{tol}}{tolerance for the NTG birds;}
+#'  \item{\code{tols}}{tolerances;}
+#'  \item{\code{whichind}}{matching indicators;}
 #'  \item{\code{iniStates}}{a vector of initial states for the infectious disease model;}
 #'  \item{\code{skiprate}}{the cumulative skip rate;}
 #'  \item{accrate}{the cumulative acceptance rate;}
@@ -63,7 +78,7 @@
 #'
 
 PMCMC <- function(dataset, priors, iniStates, func, iniPars = NA, 
-    tol = 0, fixpars = F, 
+    tols = rep(0, ncol(dataset) - 1), whichind = NULL, fixpars = F, 
     niter = 1000, npart = 100, nprintsum = 1000, nmultskip = 1000, 
     adapt = T, propVar = NA, adaptmixprop = 0.05, nupdate = 100) {
     
@@ -111,8 +126,8 @@ PMCMC <- function(dataset, priors, iniStates, func, iniPars = NA,
     
     ## check function
     stopifnot(class(func) == "XPtr")
-    checkXPtr(func, "SEXP", c("NumericVector", "double", "double", "int",
-           "IntegerVector", "int"))
+    checkXPtr(func, "SEXP", c("NumericVector", "double", "double", "IntegerVector",
+           "IntegerVector", "IntegerVector", "IntegerVector"))
     
     ## check initial conditions
     if(!any(is.na(iniPars))) {
@@ -133,8 +148,19 @@ PMCMC <- function(dataset, priors, iniStates, func, iniPars = NA,
     }
     
     ## check tolerance argument
-    stopifnot(checkInput(tol, c("numeric", "vector"), 1))
-    stopifnot(tol >= 0)
+    stopifnot(checkInput(tols, c("numeric", "vector"), ncol(dataset) - 1))
+    stopifnot(all(tols >= 0))
+    
+    ## check whichind
+    if(!is.null(whichind)) {
+        stopifnot(checkInput(whichind, c("numeric", "vector"), ncol(dataset) - 1, int = T))
+        stopifnot(all(whichind %in% 1:length(iniStates)))
+        stopifnot(all(!duplicated(whichind)))
+        whichind <- whichind - 1
+    } else {
+        whichind <- 1:length(iniStates) - 1
+        stopifnot((ncol(dataset) - 1) == length(iniStates))
+    }
     
     ## check runtime arguments
     stopifnot(checkInput(fixpars, c("logical", "vector"), 1))
@@ -155,7 +181,7 @@ PMCMC <- function(dataset, priors, iniStates, func, iniPars = NA,
     
     ## run function
     output <- PMCMC_cpp(as.matrix(dataset), priors, orig_priors$parnames, iniPars, propVar, niter, npart, 
-                    adaptmixprop, tol, nprintsum, nmultskip, nupdate, as.numeric(fixpars), 
+                    adaptmixprop, tols, whichind, nprintsum, nmultskip, nupdate, as.numeric(fixpars), 
                     as.numeric(adapt), iniStates, func)
     
     ## check to see if code has stopped afer initialisation
@@ -172,8 +198,8 @@ PMCMC <- function(dataset, priors, iniStates, func, iniPars = NA,
     output[[1]] <- as.mcmc(output[[1]])
     
     ## finalise output and set names
-    output <- c(output[1], tol = list(tol), iniStates = iniStates, output[-1], list(dataset), list(orig_priors))
-    names(output) <- c("pars", "tol", "iniStates", "skiprate", "accrate", 
+    output <- c(output[1], tols = list(tols), whichind = whichind + 1, iniStates = iniStates, output[-1], list(dataset), list(orig_priors))
+    names(output) <- c("pars", "tols", "whichind", "iniStates", "skiprate", "accrate", 
         "nmultskip", "npart", "time", "propVar", "dataset", "priors")
         
     ## export class and object

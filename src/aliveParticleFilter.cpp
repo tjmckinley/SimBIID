@@ -1,16 +1,17 @@
 #include "functions.hpp"
 
 // alive particle filter
-double AlivePartFilter (int N, arma::vec pars, NumericMatrix dataset,
-                        int tol, IntegerMatrix state, IntegerMatrix stateNew,
+double AlivePartFilter (int N, arma::vec pars, IntegerMatrix state, IntegerMatrix stateNew,
+                        IntegerVector tols, NumericMatrix dataset, IntegerVector whichind,
                         int *cumnt, int nmultskip, SEXP func_)
 {
     // N is number of particles
     // pars is vector of parameters
-    // tol defines how close points have to match
     // state and stateNew are integer vectors
+    // tols defines how close points have to match
+    // dataset is vector of counts to match to
+    // whichind is vector of indexes matching states to dataset
     // cumnt is cumulative number of simulations (to set upper bound for skipping)
-    // nts is vector recording individual-level simulation counts
     // nmultskip skips simulations
     // func_ is simulation function
     
@@ -31,10 +32,18 @@ double AlivePartFilter (int N, arma::vec pars, NumericMatrix dataset,
     // extract function pointer
     funcPtr func = *XPtr<funcPtr>(func_);
     
+    // setup data
+    IntegerVector counts(dataset.ncol() - 1);
+    
     // loop over time series
     for(t = 0; t < (dataset.nrow() - 1); t++){
         // set counter
         nts = 0;
+        
+        // set data
+        for(k = 0; k < counts.size(); k++) {
+            counts[k] = dataset(t + 1, k + 1);
+        }
         
         // loop over particles
         k = 0;
@@ -56,8 +65,8 @@ double AlivePartFilter (int N, arma::vec pars, NumericMatrix dataset,
                     r = (int) floor(R::runif(0.0, 1.0) * N);
                 }
                 out = core_processing<funcPtr>(func, as<NumericVector>(wrap(pars)), 
-                        dataset(t, 0), dataset(t + 1, 0), tol, state(r, _), 
-                        dataset(t + 1, 1));
+                        dataset(t, 0), dataset(t + 1, 0), state(r, _), tols,
+                        counts, whichind);
                 matched = out[0];
                 stateNew(k, _) = out[Range(1, state.ncol())];
                 // update counter

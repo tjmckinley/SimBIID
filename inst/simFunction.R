@@ -1,4 +1,6 @@
-Rcpp_ptr <- RcppXPtrUtils::cppXPtr('SEXP simFunction(NumericVector gdata, double tstart, double tstop, int tol, IntegerVector u, int counts) {  
+Rcpp_ptr <- RcppXPtrUtils::cppXPtr('SEXP simFunction(NumericVector gdata, double tstart, double tstop, 
+    IntegerVector tol, IntegerVector u, IntegerVector counts, IntegerVector which) { 
+
     // initialise variables
     double tstar = 0.0, u_tmp = 0.0, totrate = 0.0;
     int i, j;
@@ -31,10 +33,13 @@ Rcpp_ptr <- RcppXPtrUtils::cppXPtr('SEXP simFunction(NumericVector gdata, double
     }
     IntegerVector out(u.size() + 1);
     // check whether simulation matches data
-    if(fabs(uNew[2] - counts) <= tol) {
-        out[0] = 1;
-    } else {
-        out[0] = 0;
+    out[0] = 1;
+    for(j = 0; j < counts.size(); j++) {
+        if(fabs(uNew[which] - counts) <= tol) {
+            out[0] *= 1;
+        } else {
+            out[0] *= 0;
+        }
     }
     out[Range(1, u.size())] = uNew;
     return out;

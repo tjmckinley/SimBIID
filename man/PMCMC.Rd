@@ -4,10 +4,10 @@
 \alias{PMCMC}
 \title{Runs particle MCMC algorithm}
 \usage{
-PMCMC(dataset, priors, iniStates, func, iniPars = NA, tol = 0,
-  fixpars = F, niter = 1000, npart = 100, nprintsum = 1000,
-  nmultskip = 1000, adapt = T, propVar = NA, adaptmixprop = 0.05,
-  nupdate = 100)
+PMCMC(dataset, priors, iniStates, func, iniPars = NA, tols = rep(0,
+  ncol(dataset) - 1), whichind = NULL, fixpars = F, niter = 1000,
+  npart = 100, nprintsum = 1000, nmultskip = 1000, adapt = T,
+  propVar = NA, adaptmixprop = 0.05, nupdate = 100)
 }
 \arguments{
 \item{dataset}{Data frame containing time series count data, of form (time, counts*).}
@@ -22,12 +22,27 @@ normal case; and shape and rate in the gamma case).}
 
 \item{iniStates}{A numerical vector of initial states for the infectious disease model.}
 
-\item{func}{\code{XPtr} to simulation function.}
+\item{func}{\code{XPtr} to simulation function. This function must take the following arguments
+in order: 
+\itemize{
+\item{\code{NumericVector gdata}:}{ a vector of parameters;}
+\item{\code{double tstart}:}{ the start time;}
+\item{\code{double tstop}:}{ the end time;}
+\item{\code{IntegerVector u}:}{ a vector of states;}
+\item{\code{IntegerVector tols}:}{ a vector of tolerances;}
+\item{\code{IntegerVector counts}:}{ a vector of observed states;}
+\item{\code{IntegerVector whichind}:}{ a vector the same length as \code{counts}, 
+indicating which elements of \code{u} correspond to which elements of \code{counts}.
+Must index from 0 NOT 1.}}}
 
 \item{iniPars}{Vector of initial parameter values. If left unspecified, then these are 
 sampled from the prior distributions.}
 
-\item{tol}{Tolerance for matching data during ABC.}
+\item{tols}{Tolerances for matching data during ABC.}
+
+\item{whichind}{Vector of which elements of \code{iniStates} match to columns \code{2:ncol(dataset)}
+of `dataset`. If left as \code{NULL} then defaults to elements \code{1:length(iniStates)}
+or returns an error.}
 
 \item{fixpars}{A logical determining whether to fix the input parameters (useful for 
 determining the variance of the marginal likelihood estimates).}
@@ -64,7 +79,8 @@ If \code{fixpars = F}, the routine returns a \code{PMCMC} object, essentially a
          \code{list} containing:
 \itemize{
  \item{\code{pars}}{an \code{mcmc} object containing posterior samples for the parameters;}
- \item{\code{tol}}{tolerance for the NTG birds;}
+ \item{\code{tols}}{tolerances;}
+ \item{\code{whichind}}{matching indicators;}
  \item{\code{iniStates}}{a vector of initial states for the infectious disease model;}
  \item{\code{skiprate}}{the cumulative skip rate;}
  \item{accrate}{the cumulative acceptance rate;}

@@ -3,7 +3,8 @@
 // a Metropolis-Hastings PMCMC algorithm for fitting time series models
 List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector parnames, 
     NumericVector iniPars, NumericMatrix propVar_R,
-    int niter, int npart, double scale, int tol, int nprintsum, int nmultskip, 
+    int niter, int npart, double scale, IntegerVector tols, IntegerVector whichind, 
+    int nprintsum, int nmultskip, 
     int nupdate, int fixpars, int adapt, IntegerVector iniState, SEXP func_)
 {
     // 'dataset_R' is vector of removal times
@@ -15,7 +16,8 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
     // 'niter' is the number of iterations over which to run the chain
     // 'npart' is number of particles to use for particle filter
     // 'scale' is mixing proportion for adaptive MCMC
-    // 'tol' defines how close points have to match
+    // 'tols' defines how close points have to match
+    // 'whichind' matches states to dataset
     // 'nprintsum' determines how often summaries are printed to the screen
     // 'nmultskip' determines when to skip out of simulations
     // 'nupdate' determines when to start adaptive proposal
@@ -65,7 +67,7 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
     }
     Rprintf("\n");
     
-    Rprintf("Fixed tolerance for ABC: %d\n", tol);
+    Rprintf("Fixed tolerance for ABC: %d\n", tols);
     int nclass = iniState.length();
     Rprintf("Number of classes: %d\n\n", nclass);
     Rprintf("Initial states:\n");
@@ -133,7 +135,8 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
                     state(j, l) = iniState(l);
                 }
             }
-            LL = AlivePartFilter(npart, pars, dataset, tol, state, stateNew, &cumnt, nmultskip, func_);
+            LL = AlivePartFilter(npart, pars, state, stateNew, tols, dataset, whichind, 
+                                 &cumnt, nmultskip, func_);
             output(k, 0) = LL;
         }
         List outlist (2);
@@ -182,7 +185,8 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
                 state(j, l) = iniState(l);
             }
         }
-        LL = AlivePartFilter(npart, pars, dataset, tol, state, stateNew, &cumnt, nmultskip, func_);
+        LL = AlivePartFilter(npart, pars, state, stateNew, tols, dataset, whichind, 
+                             &cumnt, nmultskip, func_);
         if(R_finite(LL) == 0) {
             // if initial values are provided, then reject
             if(all(!is_na(iniPars))) {
@@ -305,7 +309,8 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
                 }
             }
             // run particle filter
-            LL = AlivePartFilter(npart, parsProp, dataset, tol, state, stateNew, &cumntProp, nmultskip, func_);
+            LL = AlivePartFilter(npart, parsProp, state, stateNew, tols, dataset, whichind, 
+                                 &cumntProp, nmultskip, func_);
             
             //accept-reject proposal
             if(R_finite(LL) != 0) {

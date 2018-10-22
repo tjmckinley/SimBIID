@@ -24,7 +24,7 @@
 #'                 that can be used for stopping criteria.
 #' 
 #' @param stopCrit: A \code{character} vector including additional stopping criteria for rejecting
-#'                  simulations early. These will be inserted within \code{if(CRIT){return 0;}} statements
+#'                  simulations early. These will be inserted within \code{if(CRIT){out[0] = 0; return out;}} statements
 #'                  within the underlying Rcpp code, which a return value of 0 corresponds to rejecting
 #'                  the simulation. Variables in \code{CRIT} must match either those in \code{compartments}
 #'                  and/or \code{addVars}.
@@ -92,7 +92,8 @@ mparseRcpp <- function(
         tn1 <- paste(rep(" ", 16), collapse = "")
         stopCrit <- lapply(stopCrit, function(x, tn, tn1) {
             x <- paste0(tn, "if(", x, "){")
-            x <- c(x, paste0(tn1, "return 0;"))
+            x <- c(x, paste0(tn1, "out[0] = 0;"))
+            x <- c(x, paste0(tn1, "return out;"))
             x <- c(x, paste0(tn, "}"))
         }, tn = tn, tn1 = tn1)
         stopCrit <- do.call("c", stopCrit)

@@ -25,7 +25,7 @@ values specify the values of the variable. These can be used to specify variable
 that can be used for stopping criteria.}
 
 \item{stopCrit:}{A \code{character} vector including additional stopping criteria for rejecting
-simulations early. These will be inserted within \code{if(CRIT){return 0;}} statements
+simulations early. These will be inserted within \code{if(CRIT){out[0] = 0; return out;}} statements
 within the underlying Rcpp code, which a return value of 0 corresponds to rejecting
 the simulation. Variables in \code{CRIT} must match either those in \code{compartments}
 and/or \code{addVars}.}

@@ -79,7 +79,7 @@ Rcpp_mparse <- function(transitions, addVars, stopCrit) {
     Rcpp_code <- c(Rcpp_code[1:currline], upStates, upRates, Rcpp_code[(currline + 1):length(Rcpp_code)])
     currline <- currline + length(upStates) + length(upRates) + 12
     if(!is.null(stopCrit)) {
-        Rcpp_code <- c(Rcpp_code[1:currline], stopCrit, Rcpp_code[(currline + 1):length(Rcpp_code)])
+        Rcpp_code <- c(Rcpp_code[1:currline], "", stopCrit, Rcpp_code[(currline + 1):length(Rcpp_code)])
     }
     Rcpp_code
 }

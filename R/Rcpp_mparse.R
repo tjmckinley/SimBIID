@@ -3,22 +3,31 @@
 Rcpp_mparse <- function(transitions, addVars, stopCrit) {
     Rcpp_code <- readLines(system.file("", "simFunction.R", package = "ABCSMC"))
     
+    ## extract rate markers
+    ratelines <- grep("RATELINES", Rcpp_code)
+    stopifnot(length(ratelines) == 4)
+    
     ## add additional variables to parser
     if(!is.null(addVars)) {
-        currline <- 6
-        Rcpp_code <- c(Rcpp_code[1:currline], addVars, Rcpp_code[(currline + 1):length(Rcpp_code)])
+        currline <- ratelines[1]
+        Rcpp_code <- c(Rcpp_code[1:(currline - 1)], addVars, Rcpp_code[(currline + 1):length(Rcpp_code)])
+        ratelines <- ratelines[-1] + length(addVars) - 1
+    } else {
+        Rcpp_code <- Rcpp_code[-c(ratelines[1], ratelines[1] + 1)]
+        ratelines <- ratelines[-1] - 2
     }
     
     ## number of transitions
     nrates <- length(transitions)
-    currline <- 9 + length(addVars)
+    currline <- ratelines[1]
     lines <- paste0("    NumericVector rates(", nrates, ");")
-    lines <- c(lines, paste0("    NumericVector cumrates(", nrates, ");"), "    ")
-    Rcpp_code <- c(Rcpp_code[1:currline], lines, Rcpp_code[(currline + 1):length(Rcpp_code)])
-    currline <- currline + length(lines)
+    lines <- c(lines, paste0("    NumericVector cumrates(", nrates, ");"))
+    Rcpp_code <- c(Rcpp_code[1:(currline - 1)], lines, Rcpp_code[(currline + 1):length(Rcpp_code)])
+    currline <- currline + length(lines) - 1
+    ratelines <- ratelines[-1] + length(lines) - 1
     
     ## update rates
-    upRates <- "    // update rates"
+    upRates <- c("", "    // update rates")
     for(i in 1:length(transitions)) {
         temp <- transitions[[i]]$propensity
         temp <- paste0("    rates[", i - 1, "] = ", temp, ";")
@@ -28,8 +37,9 @@ Rcpp_mparse <- function(transitions, addVars, stopCrit) {
     upRates <- c(upRates, paste0("    for(j = 1; j < ", nrates, "; j++) {"))
     upRates <- c(upRates, "        cumrates[j] = cumrates[j - 1] + rates[j];")
     upRates <- c(upRates, "    }")
+    upRates <- c(upRates, "    totrate = sum(rates);")
     Rcpp_code <- c(Rcpp_code[1:currline], upRates, Rcpp_code[(currline + 1):length(Rcpp_code)])
-    currline <- currline + length(upRates)
+    ratelines <- ratelines + length(upRates)
     
     ## update states
     upStates <- character()
@@ -75,11 +85,15 @@ Rcpp_mparse <- function(transitions, addVars, stopCrit) {
     upRates <- sapply(as.list(upRates), function(x) {
         paste0("        ", x)
     })
-    currline <- 18 + currline - 9
-    Rcpp_code <- c(Rcpp_code[1:currline], upStates, upRates, Rcpp_code[(currline + 1):length(Rcpp_code)])
-    currline <- currline + length(upStates) + length(upRates) + 12
+    currline <- ratelines[1]
+    ratelines <- ratelines[-1]
+    Rcpp_code <- c(Rcpp_code[1:(currline - 1)], upStates, upRates, Rcpp_code[(currline + 1):length(Rcpp_code)])
+    ratelines <- ratelines + length(upStates) + length(upRates) - 1
     if(!is.null(stopCrit)) {
-        Rcpp_code <- c(Rcpp_code[1:currline], "", stopCrit, Rcpp_code[(currline + 1):length(Rcpp_code)])
+        currline <- ratelines
+        Rcpp_code <- c(Rcpp_code[1:(currline - 1)], "", stopCrit, Rcpp_code[(currline + 1):length(Rcpp_code)])
+    } else {
+        Rcpp_code <- Rcpp_code[-ratelines]
     }
     Rcpp_code
 }

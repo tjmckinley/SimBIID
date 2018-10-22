@@ -3,12 +3,16 @@ Rcpp_ptr <- RcppXPtrUtils::cppXPtr('SEXP simFunction(NumericVector gdata, double
     // initialise variables
     double tstar = 0.0, u_tmp = 0.0, totrate = 0.0;
     int i, j;
+
+    RATELINES0
     
     // initialise time and rates of the system
     double t = tstart;
     IntegerVector uNew = u;
-    
-    totrate = sum(rates); 
+    RATELINES1 
+
+    // set up output vector
+    IntegerVector out(u.size() + 1);
     
     // sample next event time
     if(totrate > 0) {
@@ -16,8 +20,7 @@ Rcpp_ptr <- RcppXPtrUtils::cppXPtr('SEXP simFunction(NumericVector gdata, double
         while(tstar < tstop){
             // sample event type
             u_tmp = R::runif(0.0, totrate);
-            
-            totrate = sum(rates); 
+            RATELINES2 
             
             // update time
             t = tstar;
@@ -28,9 +31,9 @@ Rcpp_ptr <- RcppXPtrUtils::cppXPtr('SEXP simFunction(NumericVector gdata, double
             } else {
                 tstar = tstop;
             }
+            RATELINES3
         }
     }
-    IntegerVector out(u.size() + 1);
     // check whether simulation matches data
     out[0] = 1;
     for(j = 0; j < counts.size(); j++) {

@@ -82,7 +82,7 @@ mparseRcpp <- function(
         addVars <- apply(addVars, 1, function(x, tn){
             paste0(tn, "double ", x[1], " = ", x[2], ";")
         }, tn = tn)
-        addVars <- c(paste0(tn, "// initialise additional variables"), addVars, "")
+        addVars <- c(paste0(tn, "// initialise additional variables"), addVars)
     }
     
     ## check stopCrit

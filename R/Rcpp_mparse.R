@@ -59,7 +59,7 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, runFromR) {
     
     ## update output size
     if(is.null(matchCrit)){
-        outsize <- paste0(paste(rep(" ", 4), collapse = ""), "NumericVector out(u.size() + 1);")
+        outsize <- paste0(paste(rep(" ", 4), collapse = ""), "NumericVector out(u.size() + 2);")
     } else {
         outsize <- paste0(paste(rep(" ", 4), collapse = ""), "IntegerVector out(u.size() + 1);")
     }
@@ -125,7 +125,9 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, runFromR) {
     }
     if(is.null(matchCrit)) {
         matchCrit <- paste(rep(" ", 4), collapse = "")
-        matchCrit <- paste0(matchCrit, "out[0] = t;\n", matchCrit, "out[Range(1, u.size())] = as<NumericVector>(uNew);")
+        matchCrit <- paste0(matchCrit, "out[0] = 1;\n",
+                            matchCrit, "out[1] = t;\n",
+                            matchCrit, "out[Range(2, u.size())] = as<NumericVector>(u);")
     }
     currline <- ratelines[1]
     Rcpp_code <- c(Rcpp_code[1:(currline - 1)], matchCrit, Rcpp_code[(currline + 1):length(Rcpp_code)])

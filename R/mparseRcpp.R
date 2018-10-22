@@ -95,7 +95,7 @@ mparseRcpp <- function(
             paste0(tn1, "out[0] *= 0;"),
             paste0(tn, "}"),
             "}",
-            "out[Range(1, u.size())] = uNew;"
+            "out[Range(1, u.size())] = u;"
         )
         matchCrit <- paste0(tn, matchCrit)
     } else {

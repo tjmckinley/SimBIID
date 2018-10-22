@@ -6,7 +6,6 @@
     
     // initialise time and rates of the system
     double t = tstart;
-    IntegerVector uNew = u;
     RATELINES1 
 
     // set up output vector

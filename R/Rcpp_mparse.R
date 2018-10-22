@@ -1,11 +1,18 @@
 ## Cpp code: Generate Rcpp code for mparse
 ## (based on idea in SimInf_mparse in SimInf package)
-Rcpp_mparse <- function(transitions, addVars, stopCrit) {
+Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit) {
     Rcpp_code <- readLines(system.file("", "simFunction.R", package = "ABCSMC"))
     
+    ## set matching critera
+    if(!is.null(matchCrit)) {
+        Rcpp_code[1] <- "Rcpp_ptr <- RcppXPtrUtils::cppXPtr('SEXP simFunction(NumericVector gdata, double tstart, double tstop, IntegerVector u, IntegerVector tols, IntegerVector counts, IntegerVector whichind) { "
+    } else {
+        Rcpp_code[1] <- "Rcpp_ptr <- RcppXPtrUtils::cppXPtr('SEXP simFunction(NumericVector gdata, double tstart, double tstop, IntegerVector u) { "
+    }    
+    
     ## extract rate markers
-    ratelines <- grep("RATELINES", Rcpp_code)
-    stopifnot(length(ratelines) == 4)
+    ratelines <- sort(c(grep("RATELINES", Rcpp_code), grep("MATCHCRIT", Rcpp_code)))
+    stopifnot(length(ratelines) == 6)
     
     ## add additional variables to parser
     if(!is.null(addVars)) {
@@ -40,6 +47,16 @@ Rcpp_mparse <- function(transitions, addVars, stopCrit) {
     upRates <- c(upRates, "    totrate = sum(rates);")
     Rcpp_code <- c(Rcpp_code[1:currline], upRates, Rcpp_code[(currline + 1):length(Rcpp_code)])
     ratelines <- ratelines + length(upRates)
+    
+    ## update output size
+    if(is.null(matchCrit)){
+        outsize <- paste0(paste(rep(" ", 4), collapse = ""), "IntegerVector out(u.size());")
+    } else {
+        outsize <- paste0(paste(rep(" ", 4), collapse = ""), "IntegerVector out(u.size() + 1);")
+    }
+    currline <- ratelines[1]
+    Rcpp_code <- c(Rcpp_code[1:(currline - 1)], outsize, Rcpp_code[(currline + 1):length(Rcpp_code)])
+    ratelines <- ratelines[-1]
     
     ## update states
     upStates <- character()
@@ -90,11 +107,19 @@ Rcpp_mparse <- function(transitions, addVars, stopCrit) {
     Rcpp_code <- c(Rcpp_code[1:(currline - 1)], upStates, upRates, Rcpp_code[(currline + 1):length(Rcpp_code)])
     ratelines <- ratelines + length(upStates) + length(upRates) - 1
     if(!is.null(stopCrit)) {
-        currline <- ratelines
+        currline <- ratelines[1]
         Rcpp_code <- c(Rcpp_code[1:(currline - 1)], "", stopCrit, Rcpp_code[(currline + 1):length(Rcpp_code)])
+        ratelines <- ratelines[-1] + length(stopCrit)
     } else {
-        Rcpp_code <- Rcpp_code[-ratelines]
+        Rcpp_code <- Rcpp_code[-ratelines[1]]
+        ratelines <- ratelines[-1] - 1
     }
+    if(is.null(matchCrit)) {
+        matchCrit <- paste(rep(" ", 4), collapse = "")
+        matchCrit <- paste0(matchCrit, "out = uNew;")
+    }
+    currline <- ratelines[1]
+    Rcpp_code <- c(Rcpp_code[1:(currline - 1)], matchCrit, Rcpp_code[(currline + 1):length(Rcpp_code)])
     Rcpp_code
 }
 

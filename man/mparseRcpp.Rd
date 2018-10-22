@@ -5,7 +5,7 @@
 \title{Parse custom model using \code{SimInf} style markup}
 \usage{
 mparseRcpp(transitions = NULL, compartments = NULL, pars = NULL,
-  addVars = NULL, stopCrit = NULL)
+  matchCrit = F, addVars = NULL, stopCrit = NULL)
 }
 \arguments{
 \item{transitions:}{character vector containing transitions on the form \code{"X ->
@@ -19,6 +19,8 @@ k2*I -> R")} expresses a SIR model.}
 example, \code{compartments = c("S", "I", "R")}.}
 
 \item{pars:}{named vector of parameters.}
+
+\item{matchCrit:}{\code{logical} determining whether to implement match criteria or not.}
 
 \item{addVars:}{a named vector where the names specify the additional variables and the
 values specify the values of the variable. These can be used to specify variables 

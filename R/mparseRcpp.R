@@ -19,6 +19,8 @@
 #'
 #' @param pars: named vector of parameters.
 #' 
+#' @param matchCrit: \code{logical} determining whether to implement match criteria or not.
+#' 
 #' @param addVars: a named vector where the names specify the additional variables and the
 #'                 values specify the values of the variable. These can be used to specify variables 
 #'                 that can be used for stopping criteria.
@@ -36,6 +38,7 @@ mparseRcpp <- function(
     transitions = NULL, 
     compartments = NULL,
     pars = NULL,
+    matchCrit = F,
     addVars = NULL,
     stopCrit = NULL
 ) {
@@ -73,6 +76,28 @@ mparseRcpp <- function(
         stop("'pars' and 'compartments' have names in common.")
     }
     
+    ## check matchCrit
+    stopifnot(checkInput(matchCrit, "logical", 1))
+    if(matchCrit) {
+        tn <- paste(rep(" ", 4), collapse = "")
+        tn1 <- paste(rep(" ", 8), collapse = "")
+        matchCrit <- c(
+            "// check whether simulation matches data",
+            "out[0] = 1;",
+            "for(j = 0; j < counts.size(); j++) {",
+            paste0(tn, "if(fabs(uNew[whichind[j]] - counts[j]) <= tols[j]) {"),
+            paste0(tn1, "out[0] *= 1;"),
+            paste0(tn, "} else {"),
+            paste0(tn1, "out[0] *= 0;"),
+            paste0(tn, "}"),
+            "}",
+            "out[Range(1, u.size())] = uNew;"
+        )
+        matchCrit <- paste0(tn, matchCrit)
+    } else {
+        matchCrit <- NULL
+    }
+    
     ## check addVars
     if(!is.null(addVars)) {
         stopifnot(checkInput(addVars, c("vector", "numeric")))
@@ -106,7 +131,7 @@ mparseRcpp <- function(
     )
 
     ## write Rcpp code to file
-    Rcpp_code <- Rcpp_mparse(transitions, addVars, stopCrit)
+    Rcpp_code <- Rcpp_mparse(transitions, matchCrit, addVars, stopCrit)
     ## replace "gdata" with "pars"
     Rcpp_code <- gsub("gdata", "pars", Rcpp_code)
     class(Rcpp_code) <- "parsedRcpp"

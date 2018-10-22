@@ -20,14 +20,11 @@ example, \code{compartments = c("S", "I", "R")}.}
 
 \item{pars:}{named vector of parameters.}
 
-\item{addVars:}{\code{data.frame} with columns: 
-\itemize{
-    \item{\code{varnames}:}{ variable names;}
-    \item{\code{inivalue}:}{ initial value for variable.}
-}
-This is used to specify variables that can be used for stopping criteria.}
+\item{addVars:}{a named vector where the names specify the additional variables and the
+values specify the values of the variable. These can be used to specify variables 
+that can be used for stopping criteria.}
 
-\item{stopCrit:}{A \code{character} \code{vector} including additional stopping criteria for rejecting
+\item{stopCrit:}{A \code{character} vector including additional stopping criteria for rejecting
 simulations early. These will be inserted within \code{if(CRIT){return 0;}} statements
 within the underlying Rcpp code, which a return value of 0 corresponds to rejecting
 the simulation. Variables in \code{CRIT} must match either those in \code{compartments}

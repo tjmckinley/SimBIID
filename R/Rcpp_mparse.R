@@ -3,11 +3,17 @@
 Rcpp_mparse <- function(transitions, addVars, stopCrit) {
     Rcpp_code <- readLines(system.file("", "simFunction.R", package = "ABCSMC"))
     
+    ## add additional variables to parser
+    if(!is.null(addVars)) {
+        currline <- 6
+        Rcpp_code <- c(Rcpp_code[1:currline], addVars, Rcpp_code[(currline + 1):length(Rcpp_code)])
+    }
+    
     ## number of transitions
     nrates <- length(transitions)
+    currline <- 9 + length(addVars)
     lines <- paste0("    NumericVector rates(", nrates, ");")
     lines <- c(lines, paste0("    NumericVector cumrates(", nrates, ");"), "    ")
-    currline <- 9
     Rcpp_code <- c(Rcpp_code[1:currline], lines, Rcpp_code[(currline + 1):length(Rcpp_code)])
     currline <- currline + length(lines)
     

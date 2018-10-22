@@ -19,14 +19,11 @@
 #'
 #' @param pars: named vector of parameters.
 #' 
-#' @param addVars: \code{data.frame} with columns: 
-#'                 \itemize{
-#'                     \item{\code{varnames}:}{ variable names;}
-#'                     \item{\code{inivalue}:}{ initial value for variable.}
-#'                 }
-#'                 This is used to specify variables that can be used for stopping criteria.
+#' @param addVars: a named vector where the names specify the additional variables and the
+#'                 values specify the values of the variable. These can be used to specify variables 
+#'                 that can be used for stopping criteria.
 #' 
-#' @param stopCrit: A \code{character} \code{vector} including additional stopping criteria for rejecting
+#' @param stopCrit: A \code{character} vector including additional stopping criteria for rejecting
 #'                  simulations early. These will be inserted within \code{if(CRIT){return 0;}} statements
 #'                  within the underlying Rcpp code, which a return value of 0 corresponds to rejecting
 #'                  the simulation. Variables in \code{CRIT} must match either those in \code{compartments}
@@ -78,10 +75,14 @@ mparseRcpp <- function(
     
     ## check addVars
     if(!is.null(addVars)) {
-        stopifnot(checkInput(addVars, "data.frame", ncol = 2))
-        stopifnot(all(!is.na(names(addVars) %in% c("varnames", "inivalue"))))
-        stopifnot(checkInput(addVars[, 1], "character"))
-        stopifnot(checkInput(addVars[, 2], "character"))
+        stopifnot(checkInput(addVars, c("vector", "numeric")))
+        stopifnot(!is.null(names(addVars)))
+        addVars <- matrix(as.character(c(names(addVars), addVars)), ncol = 2)
+        tn <- paste(rep(" ", 4), collapse = "")
+        addVars <- apply(addVars, 1, function(x, tn){
+            paste0(tn, "double ", x[1], " = ", x[2], ";")
+        }, tn = tn)
+        addVars <- c(paste0(tn, "// initialise additional variables"), addVars, "")
     }
     
     ## check stopCrit

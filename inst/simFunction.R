@@ -4,7 +4,7 @@ Rcpp_ptr <- RcppXPtrUtils::cppXPtr('SEXP simFunction(NumericVector gdata, double
     double tstar = 0.0, u_tmp = 0.0, totrate = 0.0;
     int i, j;
     
-    // initialise time and upRates of the system
+    // initialise time and rates of the system
     double t = tstart;
     IntegerVector uNew = u;
     

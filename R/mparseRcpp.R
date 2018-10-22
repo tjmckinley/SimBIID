@@ -30,6 +30,9 @@
 #'                  within the underlying Rcpp code, which a return value of 0 corresponds to rejecting
 #'                  the simulation. Variables in \code{CRIT} must match either those in \code{compartments}
 #'                  and/or \code{addVars}.
+#'                  
+#' @param runFromR: \code{logical} determining whether code is to be compiled to run directly in R,
+#'                  or whether to be compiled as an \code{XPtr} object for use in Rcpp.
 #'
 #' @return An object of class \code{parsedRcpp} that contains code to compile
 #'         into an \code{XPtr} object.
@@ -40,7 +43,8 @@ mparseRcpp <- function(
     pars = NULL,
     matchCrit = F,
     addVars = NULL,
-    stopCrit = NULL
+    stopCrit = NULL,
+    runFromR = T
 ) {
     ## Check transitions
     if (!is.atomic(transitions) || !is.character(transitions) || any(nchar(transitions) == 0)) {
@@ -124,6 +128,9 @@ mparseRcpp <- function(
         stopCrit <- do.call("c", stopCrit)
         stopCrit <- c(paste0(tn, "// early stopping criteria"), stopCrit)
     }
+    
+    ## check run from R
+    stopifnot(checkInput(runFromR, "logical", 1))
 
     ## Parse transitions
     transitions <- SimInf:::parse_transitions(
@@ -131,7 +138,7 @@ mparseRcpp <- function(
     )
 
     ## write Rcpp code to file
-    Rcpp_code <- Rcpp_mparse(transitions, matchCrit, addVars, stopCrit)
+    Rcpp_code <- Rcpp_mparse(transitions, matchCrit, addVars, stopCrit, runFromR)
     ## replace "gdata" with "pars"
     Rcpp_code <- gsub("gdata", "pars", Rcpp_code)
     class(Rcpp_code) <- "parsedRcpp"

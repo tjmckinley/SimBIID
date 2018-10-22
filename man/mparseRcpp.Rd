@@ -5,7 +5,7 @@
 \title{Parse custom model using \code{SimInf} style markup}
 \usage{
 mparseRcpp(transitions = NULL, compartments = NULL, pars = NULL,
-  matchCrit = F, addVars = NULL, stopCrit = NULL)
+  matchCrit = F, addVars = NULL, stopCrit = NULL, runFromR = T)
 }
 \arguments{
 \item{transitions:}{character vector containing transitions on the form \code{"X ->
@@ -31,6 +31,9 @@ simulations early. These will be inserted within \code{if(CRIT){out[0] = 0; retu
 within the underlying Rcpp code, which a return value of 0 corresponds to rejecting
 the simulation. Variables in \code{CRIT} must match either those in \code{compartments}
 and/or \code{addVars}.}
+
+\item{runFromR:}{\code{logical} determining whether code is to be compiled to run directly in R,
+or whether to be compiled as an \code{XPtr} object for use in Rcpp.}
 }
 \value{
 An object of class \code{parsedRcpp} that contains code to compile

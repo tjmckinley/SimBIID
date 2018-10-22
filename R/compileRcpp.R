@@ -1,13 +1,15 @@
 #' @title Compile parsed Rcpp model
 #'
 #' @description Compiles an object of class \code{parsedRcpp} into an
-#'              \code{XPtr} object for use in \code{ABCSMC} functions.
+#'              \code{XPtr} object for use in Rcpp functions, or an
+#'              object of class \code{function} for calling directly from R.
 #'
 #' @export
 #'
 #' @param parsed: An object of class \code{parsedRcpp}.
 #'
-#' @return An object of class \code{XPtr} that points to the compiled function.
+#' @return An object of class \code{XPtr} that points to the compiled function, or
+#'         an R \code{function} object for calling directly from R.
 
 compileRcpp <- function(
     parsed = NULL
@@ -26,6 +28,6 @@ compileRcpp <- function(
     source(filename)
     
     ## return pointer
-    Rcpp_ptr
+    Rcpp_object
 }
 

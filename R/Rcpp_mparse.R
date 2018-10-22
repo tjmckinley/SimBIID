@@ -37,13 +37,17 @@ Rcpp_mparse <- function(transitions) {
         }
         ## update negative states
         temp <- which(transitions[[i]]$S < 0)
-        stopifnot(length(temp) <= 1)
+        if(length(temp) > 1){
+            stop("Cannot update more than one state for each transition")
+        }
         if(length(temp) > 0) {
             upStates <- c(upStates, paste0(tempSpace, "u[", temp - 1, "]--;"))
         }
         ## update positive states
         temp <- which(transitions[[i]]$S > 0)
-        stopifnot(length(temp) <= 1)
+        if(length(temp) > 1){
+            stop("Cannot update more than one state for each transition")
+        }
         if(length(temp) > 0) {
             upStates <- c(upStates, paste0(tempSpace, "u[", temp - 1, "]++;"))
         }

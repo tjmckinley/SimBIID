@@ -1,6 +1,6 @@
 ## Cpp code: Generate Rcpp code for mparse
 ## (based on idea in SimInf_mparse in SimInf package)
-Rcpp_mparse <- function(transitions) {
+Rcpp_mparse <- function(transitions, addVars, stopCrit) {
     Rcpp_code <- readLines(system.file("", "simFunction.R", package = "ABCSMC"))
     
     ## number of transitions
@@ -71,6 +71,10 @@ Rcpp_mparse <- function(transitions) {
     })
     currline <- 18 + currline - 9
     Rcpp_code <- c(Rcpp_code[1:currline], upStates, upRates, Rcpp_code[(currline + 1):length(Rcpp_code)])
+    currline <- currline + length(upStates) + length(upRates) + 12
+    if(!is.null(stopCrit)) {
+        Rcpp_code <- c(Rcpp_code[1:currline], stopCrit, Rcpp_code[(currline + 1):length(Rcpp_code)])
+    }
     Rcpp_code
 }
 

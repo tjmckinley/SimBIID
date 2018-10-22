@@ -4,7 +4,8 @@
 \alias{mparseRcpp}
 \title{Parse custom model using \code{SimInf} style markup}
 \usage{
-mparseRcpp(transitions = NULL, compartments = NULL, pars = NULL)
+mparseRcpp(transitions = NULL, compartments = NULL, pars = NULL,
+  addVars = NULL, stopCrit = NULL)
 }
 \arguments{
 \item{transitions:}{character vector containing transitions on the form \code{"X ->
@@ -18,6 +19,19 @@ k2*I -> R")} expresses a SIR model.}
 example, \code{compartments = c("S", "I", "R")}.}
 
 \item{pars:}{named vector of parameters.}
+
+\item{addVars:}{\code{data.frame} with columns: 
+\itemize{
+    \item{\code{varnames}:}{ variable names;}
+    \item{\code{inivalue}:}{ initial value for variable.}
+}
+This is used to specify variables that can be used for stopping criteria.}
+
+\item{stopCrit:}{A \code{character} \code{vector} including additional stopping criteria for rejecting
+simulations early. These will be inserted within \code{if(CRIT){return 0;}} statements
+within the underlying Rcpp code, which a return value of 0 corresponds to rejecting
+the simulation. Variables in \code{CRIT} must match either those in \code{compartments}
+and/or \code{addVars}.}
 }
 \value{
 An object of class \code{parsedRcpp} that contains code to compile

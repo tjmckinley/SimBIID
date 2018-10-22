@@ -18,6 +18,19 @@
 #'          example, \code{compartments = c("S", "I", "R")}.
 #'
 #' @param pars: named vector of parameters.
+#' 
+#' @param addVars: \code{data.frame} with columns: 
+#'                 \itemize{
+#'                     \item{\code{varnames}:}{ variable names;}
+#'                     \item{\code{inivalue}:}{ initial value for variable.}
+#'                 }
+#'                 This is used to specify variables that can be used for stopping criteria.
+#' 
+#' @param stopCrit: A \code{character} \code{vector} including additional stopping criteria for rejecting
+#'                  simulations early. These will be inserted within \code{if(CRIT){return 0;}} statements
+#'                  within the underlying Rcpp code, which a return value of 0 corresponds to rejecting
+#'                  the simulation. Variables in \code{CRIT} must match either those in \code{compartments}
+#'                  and/or \code{addVars}.
 #'
 #' @return An object of class \code{parsedRcpp} that contains code to compile
 #'         into an \code{XPtr} object.
@@ -25,7 +38,9 @@
 mparseRcpp <- function(
     transitions = NULL, 
     compartments = NULL,
-    pars = NULL
+    pars = NULL,
+    addVars = NULL,
+    stopCrit = NULL
 ) {
     ## Check transitions
     if (!is.atomic(transitions) || !is.character(transitions) || any(nchar(transitions) == 0)) {
@@ -56,8 +71,31 @@ mparseRcpp <- function(
         }
     }
 
+    ## check element names
     if (any(duplicated(c(compartments, pars_names)))) {
         stop("'pars' and 'compartments' have names in common.")
+    }
+    
+    ## check addVars
+    if(!is.null(addVars)) {
+        stopifnot(checkInput(addVars, "data.frame", ncol = 2))
+        stopifnot(all(!is.na(names(addVars) %in% c("varnames", "inivalue"))))
+        stopifnot(checkInput(addVars[, 1], "character"))
+        stopifnot(checkInput(addVars[, 2], "character"))
+    }
+    
+    ## check stopCrit
+    if(!is.null(stopCrit)) {
+        stopifnot(checkInput(stopCrit, "character"))
+        tn <- paste(rep(" ", 12), collapse = "")
+        tn1 <- paste(rep(" ", 16), collapse = "")
+        stopCrit <- lapply(stopCrit, function(x, tn, tn1) {
+            x <- paste0(tn, "if(", x, "){")
+            x <- c(x, paste0(tn1, "return 0;"))
+            x <- c(x, paste0(tn, "}"))
+        }, tn = tn, tn1 = tn1)
+        stopCrit <- do.call("c", stopCrit)
+        stopCrit <- c(paste0(tn, "// early stopping criteria"), stopCrit)
     }
 
     ## Parse transitions
@@ -66,7 +104,7 @@ mparseRcpp <- function(
     )
 
     ## write Rcpp code to file
-    Rcpp_code <- Rcpp_mparse(transitions)
+    Rcpp_code <- Rcpp_mparse(transitions, addVars, stopCrit)
     ## replace "gdata" with "pars"
     Rcpp_code <- gsub("gdata", "pars", Rcpp_code)
     class(Rcpp_code) <- "parsedRcpp"

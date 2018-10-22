@@ -18,24 +18,20 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, runFromR) {
     
     ## set matching critera
     if(!is.null(matchCrit)) {
-        Rcpp_code[1] <- paste0(compType, "simFunction(NumericVector gdata, double tstart, double tstop, IntegerVector u, IntegerVector tols, IntegerVector counts, IntegerVector whichind) { ")
+        Rcpp_code[1] <- paste0(compType, "simFunction(NumericVector gdata, double tstart, double tstop, IntegerVector u, IntegerVector tols, IntegerVector counts, IntegerVector whichind")
     } else {
-        Rcpp_code[1] <- paste0(compType, "simFunction(NumericVector gdata, double tstart, double tstop, IntegerVector u) { ")
-    }    
-    
-    ## extract rate markers
-    ratelines <- sort(c(grep("RATELINES", Rcpp_code), grep("MATCHCRIT", Rcpp_code)))
-    stopifnot(length(ratelines) == 6)
+        Rcpp_code[1] <- paste0(compType, "simFunction(NumericVector gdata, double tstart, double tstop, IntegerVector u")
+    }
     
     ## add additional variables to parser
     if(!is.null(addVars)) {
-        currline <- ratelines[1]
-        Rcpp_code <- c(Rcpp_code[1:(currline - 1)], addVars, Rcpp_code[(currline + 1):length(Rcpp_code)])
-        ratelines <- ratelines[-1] + length(addVars) - 1
-    } else {
-        Rcpp_code <- Rcpp_code[-c(ratelines[1], ratelines[1] + 1)]
-        ratelines <- ratelines[-1] - 2
+        Rcpp_code[1] <- paste(Rcpp_code[1], addVars)
     }
+    Rcpp_code[1] <- paste0(Rcpp_code[1], ") { ")
+    
+    ## extract rate markers
+    ratelines <- sort(c(grep("RATELINES", Rcpp_code), grep("MATCHCRIT", Rcpp_code)))
+    stopifnot(length(ratelines) == 5)
     
     ## number of transitions
     nrates <- length(transitions)

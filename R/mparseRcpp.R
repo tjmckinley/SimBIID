@@ -104,14 +104,9 @@ mparseRcpp <- function(
     
     ## check addVars
     if(!is.null(addVars)) {
-        stopifnot(checkInput(addVars, c("vector", "numeric")))
-        stopifnot(!is.null(names(addVars)))
-        addVars <- matrix(as.character(c(names(addVars), addVars)), ncol = 2)
-        tn <- paste(rep(" ", 4), collapse = "")
-        addVars <- apply(addVars, 1, function(x, tn){
-            paste0(tn, "double ", x[1], " = ", x[2], ";")
-        }, tn = tn)
-        addVars <- c(paste0(tn, "// initialise additional variables"), addVars)
+        stopifnot(checkInput(addVars, "character"))
+        addVars <- paste(paste0("double ", addVars), collapse = ", ")
+        addVars <- paste0(", ", addVars)
     }
     
     ## check stopCrit

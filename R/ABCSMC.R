@@ -140,7 +140,7 @@ ABCSMC.default <- function(x, tols, priors, func, data, parallel = F, mc.cores =
         all(diff(x) < 0)
     })))
     stopifnot(npart > 1)
-    stopifnot(all(tols > 0))
+    stopifnot(all(tols >= 0))
     
     ## check priors
     stopifnot(all(sort(match(colnames(priors), c("parnames", "dist", "p1", "p2"))) - 1:4 == 0))

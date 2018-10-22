@@ -1,7 +1,7 @@
 
 
     // initialise variables
-    double tstar = 0.0, u_tmp = 0.0, totrate = 0.0;
+    double tstar = 0.0, u_tmp = 0.0, totrate = 0.0, cumrate = 0.0;
     int i, j;
     
     // initialise time and rates of the system

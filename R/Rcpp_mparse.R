@@ -37,7 +37,6 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, runFromR) {
     nrates <- length(transitions)
     currline <- ratelines[1]
     lines <- paste0("    NumericVector rates(", nrates, ");")
-    lines <- c(lines, paste0("    NumericVector cumrates(", nrates, ");"))
     Rcpp_code <- c(Rcpp_code[1:(currline - 1)], lines, Rcpp_code[(currline + 1):length(Rcpp_code)])
     currline <- currline + length(lines) - 1
     ratelines <- ratelines[-1] + length(lines) - 1
@@ -49,10 +48,6 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, runFromR) {
         temp <- paste0("    rates[", i - 1, "] = ", temp, ";")
         upRates <- c(upRates, temp)
     }
-    upRates <- c(upRates, "    cumrates[0] = rates[0];")
-    upRates <- c(upRates, paste0("    for(j = 1; j < ", nrates, "; j++) {"))
-    upRates <- c(upRates, "        cumrates[j] = cumrates[j - 1] + rates[j];")
-    upRates <- c(upRates, "    }")
     upRates <- c(upRates, "    totrate = sum(rates);")
     Rcpp_code <- c(Rcpp_code[1:currline], upRates, Rcpp_code[(currline + 1):length(Rcpp_code)])
     ratelines <- ratelines + length(upRates)
@@ -68,12 +63,15 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, runFromR) {
     ratelines <- ratelines[-1]
     
     ## update states
-    upStates <- character()
     tempnSpace <- 12
     tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
+    upStates <- paste0(tempSpace, "cumrate = rates[0];")
     for(i in 1:length(transitions)) {
         if(i < length(transitions)) {
-            upStates <- c(upStates, paste0(tempSpace, "if(u_tmp < cumrates[", i - 1, "]) {"))
+            if(i > 1) {
+                upStates <- c(upStates, paste0(tempSpace, "cumrate += rates[", i - 1, "];"))
+            }
+            upStates <- c(upStates, paste0(tempSpace, "if(u_tmp < cumrate) {"))
             tempnSpace <- tempnSpace + 4
             tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
         }

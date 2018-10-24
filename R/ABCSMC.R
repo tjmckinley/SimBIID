@@ -61,11 +61,17 @@ ABCSMC <- function(x, ...) {
 ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
     
     ## check inputs
-    stopifnot(class(x) == "ABCSMC")
+    if(class(x) != "ABCSMC"){
+        stop("'x' not ABCSMC object")
+    }
     
     ## extract tolerances and check against new tolerances
-    stopifnot(ncol(tols) == ncol(x$data))
-    stopifnot(all(match(colnames(tols), colnames(data)) - 1:ncol(data) == 0))
+    if(ncol(tols) != ncol(x$data)){
+        stop("ncol(tols) != ncol(x$data)")
+    }
+    if(!all(match(colnames(tols), colnames(x$data)) - 1:ncol(x$data) == 0)){
+        stop("colnames(tols) does not match colnames(data)")
+    }
     if(sum(apply(rbind(x$tols[nrow(x$tols), ], tols), 2, function(x) {
         sum(x[-1] >= x[1])
     })) > 0) {
@@ -108,7 +114,7 @@ ABCSMC.default <- function(x, tols, priors, func, data, parallel = F, mc.cores =
     
     ## check inputs
     npart <- x
-    stopifnot(checkInput(parallel, c("vector", "logical"), 1))
+    checkInput(parallel, c("vector", "logical"), 1)
     if(parallel) {
         if(!require(parallel)) {
             stop("Must have 'parallel' package installed to use parallelisation")
@@ -116,7 +122,7 @@ ABCSMC.default <- function(x, tols, priors, func, data, parallel = F, mc.cores =
         nc <- detectCores()
         nc <- ifelse(is.na(nc), 1, nc)
         if(!is.na(mc.cores[1])) {
-            stopifnot(checkInput(mc.cores, "numeric", 1, int = T))
+            checkInput(mc.cores, "numeric", 1, int = T)
             mc.cores <- min(nc, mc.cores)
         } else {
             mc.cores <- nc
@@ -124,47 +130,68 @@ ABCSMC.default <- function(x, tols, priors, func, data, parallel = F, mc.cores =
         parallel <- (mc.cores > 1)
         cat(paste0("Number of cores: ", mc.cores, "\n"))
     }
-    stopifnot(checkInput(npart, "numeric", 1, int = T))
-    stopifnot(checkInput(tols, "data.frame"))
-    stopifnot(all(sapply(tols, is.numeric)))
-    stopifnot(checkInput(priors, "data.frame", ncol = 4))
-    stopifnot(checkInput(func, "function", 1))
-    stopifnot(checkInput(data, "data.frame", nrow = 1))
-    stopifnot(all(sapply(data, is.numeric)))
-    stopifnot(ncol(data) == ncol(tols))
-    stopifnot(all(match(colnames(data), colnames(tols)) - 1:ncol(data) == 0))
+    checkInput(npart, "numeric", 1, int = T, gt = 1)
+    checkInput(tols, "data.frame", gte = 0)
+    if(!all(sapply(tols, is.numeric))) {
+        stop("'tols' must be numeric")
+    }
+    checkInput(priors, "data.frame", ncol = 4)
+    checkInput(func, "function", 1)
+    checkInput(data, "data.frame", nrow = 1)
+    if(!all(sapply(data, is.numeric))) {
+        stop("'data' must be numeric")
+    }
+    if(ncol(data) != ncol(tols)){
+        stop("Number of columns of 'data' and 'tols' must match")
+    }
+    if(!all(match(colnames(data), colnames(tols)) - 1:ncol(data) == 0)){
+        stop("colnames(tols) !- colnames(data)")
+    }
     fargs <- formals(func)
-    stopifnot(length(fargs) >= 3)
-    stopifnot(all(match(names(fargs)[1:3], c("pars", "data", "tols")) - 1:3 == 0))
-    stopifnot(all(apply(tols, 2, function(x) {
+    if(length(fargs) < 3){
+        stop("Number of arguments of 'func' must be at least 3")
+    }
+    if(!all(match(names(fargs)[1:3], c("pars", "data", "tols")) - 1:3 == 0)){
+        stop("First three arguments of 'func' must be: 'pars', 'data' and 'tols'")
+    }
+    if(!all(apply(tols, 2, function(x) {
         all(diff(x) < 0)
-    })))
-    stopifnot(npart > 1)
-    stopifnot(all(tols >= 0))
+    }))){
+        stop("'tols' cannot increase")
+    }
     
     ## check priors
-    stopifnot(all(sort(match(colnames(priors), c("parnames", "dist", "p1", "p2"))) - 1:4 == 0))
+    if(!all(sort(match(colnames(priors), c("parnames", "dist", "p1", "p2"))) - 1:4 == 0)){
+        stop("Column names of 'priors' must be: 'parnames', 'dist', 'p1' and 'p2'")
+    }
     priors <- select(priors, parnames, dist, p1, p2)
-    stopifnot(checkInput(priors$parnames, "character"))
-    stopifnot(checkInput(priors$dist, "character"))
-    stopifnot(checkInput(priors$p1, "numeric"))
-    stopifnot(checkInput(priors$p2, "numeric"))
-    stopifnot(all(priors$dist %in% c("unif", "norm", "gamma")))
+    checkInput(priors$parnames, "character")
+    checkInput(priors$dist, "character")
+    checkInput(priors$p1, "numeric")
+    checkInput(priors$p2, "numeric")
+    if(!all(priors$dist %in% c("unif", "norm", "gamma"))){
+        stop("'priors' must be of form: 'unif', 'norm' or 'gamma'")
+    }
     temp <- priors[priors$dist == "unif", , drop = F]
     if(nrow(temp) > 0) {
         ## check uniform bounds correct
-        stopifnot(all(apply(temp[, 3:4, drop = F], 1, diff) > 0))
+        if(!all(apply(temp[, 3:4, drop = F], 1, diff) > 0)){
+            stop("Priors: uniform bounds in wrong order")
+        }
     }
     temp <- priors[priors$dist == "norm", , drop = F]
     if(nrow(temp) > 0) {
         ## check normal hyperparameters correct
-        stopifnot(all(temp$p2 > 0))
+        if(!all(temp$p2 > 0)){
+            stop("Priors: normal variances must be > 0")
+        }
     }
     temp <- priors[priors$dist == "gamma", , drop = F]
     if(nrow(temp) > 0) {
         ## check gamma bounds correct
-        stopifnot(all(temp$p1 > 0))
-        stopifnot(all(temp$p2 > 0))
+        if(!all(temp$p1 > 0) | !all(temp$p2 > 0)){
+            stop("Priors: gamma hyperparameters must be > 0")
+        }
     }
     orig_priors <- priors
     priors$ddist <- paste0("d", priors$dist)
@@ -183,14 +210,21 @@ ABCSMC.default <- function(x, tols, priors, func, data, parallel = F, mc.cores =
     ## extract arguments for "func"
     fargs <- fargs[is.na(match(names(fargs), c("pars", "data", "tols")))]
     if(length(fargs) > 0) {
-        fargs <- match(names(fargs), names(args))
-        stopifnot(all(!is.na(fargs)))
-        fargs <- args[fargs]
+        fargs1 <- match(names(fargs), names(args))
+        if(!all(!is.na(fargs1))){
+            stop(paste0("Need to include: ", paste(fargs[is.na(fargs1)], collapse = ", "), 
+                        " arguments in function call"))
+        }
+        fargs <- args[fargs1]
     }
     
     if(exists("prevPars", where = args)) {
-        stopifnot(exists("prevWeights", where = args))
-        stopifnot(exists("genstart", where = args))
+        if(!exists("prevWeights", where = args)){
+            stop("'prevweights' does not exist")
+        }
+        if(!exists("genstart", where = args)){
+            stop("'genstart' doe not exist")
+        }
         ## set up dummy objects (removed at the end)
         pars[[1]] <- args$prevPars
         weights[[1]] <- args$prevWeights

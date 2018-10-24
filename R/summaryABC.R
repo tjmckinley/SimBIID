@@ -18,14 +18,16 @@
 summary.ABCSMC <- function(object, gen = NA, transfunc = NA) {
     
     ## check x is an ABCSMC object
-    stopifnot(class(object) == "ABCSMC")
+    if(class(object) != "ABCSMC"){
+        stop("'object' not of type ABCSMC")
+    }
     
     ## check gen is valid
-    stopifnot(length(gen) == 1)
+    if(length(gen) != 1){
+        stop("'gen' must be of length 1")
+    }
     gen <- ifelse(is.na(gen), length(object$pars), gen)
-    stopifnot(checkInput(gen, "numeric", 1, int = T))
-    stopifnot(gen > 0)
-    stopifnot(gen <= length(object$pars))
+    checkInput(gen, "numeric", 1, int = T, gt = 0, lte = length(object$pars))
     
     ## extract relevant parts of the object
     weights <- object$weights[[gen]]
@@ -33,12 +35,14 @@ summary.ABCSMC <- function(object, gen = NA, transfunc = NA) {
     pars <- as.data.frame(pars)
     
     ## check transformations
-    stopifnot(length(transfunc) == 1)
+    if(length(transfunc) != 1){
+        stop("'transfunc' must be of length 1")
+    }
     if(is.function(transfunc)) {
     
         ## check function arguments
         fargs <- formals(transfunc)
-        stopifnot(all(names(fargs) %in% colnames(pars)))
+        checkInput(names(fargs), inSet = colnames(pars))
         
         ## perform transformations if required
         temppars <- pars[, match(names(fargs), colnames(pars))]
@@ -46,7 +50,7 @@ summary.ABCSMC <- function(object, gen = NA, transfunc = NA) {
         temppars <- as.list(temppars)
         names(temppars) <- names(fargs)
         temp <- do.call("transfunc", temppars)
-        stopifnot(checkInput(temp, "data.frame", nrow = nrow(pars)))
+        checkInput(temp, "data.frame", nrow = nrow(pars))
         
         ## bind to current posterior samples
         pars <- cbind(pars, temp)

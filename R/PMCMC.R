@@ -83,41 +83,63 @@ PMCMC <- function(dataset, priors, iniStates, func, iniPars = NA,
     adapt = T, propVar = NA, adaptmixprop = 0.05, nupdate = 100) {
     
     ## check inputs are present
-    stopifnot(!missing(dataset) & !missing(priors) & !missing(iniStates) & !missing(func))
+    if(missing(dataset)){
+        stop("'dataset' argument missing")
+    }
+    if(missing(priors)){
+        stop("'priors' argument missing")
+    }
+    if(missing(iniStates)){
+        stop("'iniStates' argument missing")
+    }
+    if(missing(func)){
+        stop("'func' argument missing")
+    } 
     
     ## check data set
-    stopifnot(checkInput(dataset, "data.frame"))
-    stopifnot(colnames(dataset)[1] == "time")
-    stopifnot(ncol(dataset) > 1)
-    stopifnot(checkInput(dataset$time, "numeric"))
+    checkInput(dataset, "data.frame")
+    if(colnames(dataset)[1] != "time"){
+        stop("First column of 'dataset' must be 'time'")
+    }
+    if(ncol(dataset) < 1) {
+        stop("Must have at least one count column in 'dataset'")
+    }
+    checkInput(dataset$time, "numeric")
     for(j in 2:ncol(dataset)) {
-        stopifnot(checkInput(dataset[, j, drop = T], "numeric", int = T))
+        checkInput(dataset[, j, drop = T], "numeric", int = T)
     }   
     
     ## check priors 
-    stopifnot(checkInput(priors, "data.frame", ncol = 4))
-    stopifnot(all(sort(match(colnames(priors), c("parnames", "dist", "p1", "p2"))) - 1:4 == 0))
+    checkInput(priors, "data.frame", ncol = 4)
+    if(!all(sort(match(colnames(priors), c("parnames", "dist", "p1", "p2"))) - 1:4 == 0)){
+        stop("'priors' must have column names: 'parnames', 'dist', 'p1', 'p2'")
+    }
     priors <- select(priors, parnames, dist, p1, p2)
-    stopifnot(checkInput(priors$parnames, "character"))
-    stopifnot(checkInput(priors$dist, "character"))
-    stopifnot(checkInput(priors$p1, "numeric"))
-    stopifnot(checkInput(priors$p2, "numeric"))
-    stopifnot(all(priors$dist %in% c("unif", "norm", "gamma")))
+    checkInput(priors$parnames, "character")
+    checkInput(priors$dist, "character")
+    checkInput(priors$p1, "numeric")
+    checkInput(priors$p2, "numeric")
+    checkInput(priors$dist, inSet = c("unif", "norm", "gamma"))
     temp <- priors[priors$dist == "unif", , drop = F]
     if(nrow(temp) > 0) {
         ## check uniform bounds correct
-        stopifnot(all(apply(temp[, 3:4, drop = F], 1, diff) > 0))
+        if(!all(apply(temp[, 3:4, drop = F], 1, diff) > 0)) {
+            stop("Priors: 'uniform' bounds not in correct order")
+        }
     }
     temp <- priors[priors$dist == "norm", , drop = F]
     if(nrow(temp) > 0) {
         ## check normal hyperparameters correct
-        stopifnot(all(temp$p2 > 0))
+        if(!all(temp$p2 > 0)){
+            stop("Priors: 'normal' variance not positive")
+        }
     }
     temp <- priors[priors$dist == "gamma", , drop = F]
     if(nrow(temp) > 0) {
         ## check gamma bounds correct
-        stopifnot(all(temp$p1 > 0))
-        stopifnot(all(temp$p2 > 0))
+        if(!all(temp$p1 > 0) | !all(temp$p2 > 0)){
+            stop("Priors: 'gamma' hyperparameters not positive")
+        }
     }
     orig_priors <- priors
     priors$parnames <- NULL
@@ -125,17 +147,19 @@ PMCMC <- function(dataset, priors, iniStates, func, iniPars = NA,
     priors <- as.matrix(priors)
     
     ## check function
-    stopifnot(class(func) == "XPtr")
+    if(class(func) != "XPtr"){
+        stop("'XPtr' not a function")
+    }
     checkXPtr(func, "SEXP", c("NumericVector", "double", "double", "IntegerVector",
            "IntegerVector", "IntegerVector", "IntegerVector"))
     
     ## check initial conditions
     if(!any(is.na(iniPars))) {
-        stopifnot(checkInput(iniPars, c("numeric", "vector"), nrow(priors), naAllow = T))
+        checkInput(iniPars, c("numeric", "vector"), nrow(priors), naAllow = T)
     } else {
         iniPars <- rep(NA, nrow(priors))
     }
-    stopifnot(checkInput(iniStates, c("numeric", "vector"), int = T))
+    checkInput(iniStates, c("numeric", "vector"), int = T)
     
     ## check proposal variances
     if(is.na(propVar[1])) {
@@ -144,40 +168,43 @@ PMCMC <- function(dataset, priors, iniStates, func, iniPars = NA,
         propVar <- propVar * ((0.1 ^ 2) / nrow(propVar))
         propVar <- propVar / ((2.562 ^ 2) / nrow(propVar))
     } else {
-        stopifnot(checkInput(propVar, c("numeric", "matrix"), nrow = nrow(priors), ncol = nrow(priors)))
+        checkInput(propVar, c("numeric", "matrix"), nrow = nrow(priors), ncol = nrow(priors))
     }
     
     ## check tolerance argument
-    stopifnot(checkInput(tols, c("numeric", "vector"), ncol(dataset) - 1))
-    stopifnot(all(tols >= 0))
+    checkInput(tols, c("numeric", "vector"), ncol(dataset) - 1)
+    if(!all(tols >= 0)) {
+        stop("'tols' must be >= 0")
+    }
     
     ## check whichind
     if(!is.null(whichind)) {
-        stopifnot(checkInput(whichind, c("numeric", "vector"), ncol(dataset) - 1, int = T))
-        stopifnot(all(whichind %in% 1:length(iniStates)))
-        stopifnot(all(!duplicated(whichind)))
+        checkInput(
+            whichind, c("numeric", "vector"), ncol(dataset) - 1, 
+            int = T, inSet = 1:length(iniStates), uni = T
+        )
         whichind <- whichind - 1
     } else {
         whichind <- 1:length(iniStates) - 1
-        stopifnot((ncol(dataset) - 1) == length(iniStates))
+        if((ncol(dataset) - 1) == length(iniStates)){
+            stop("length of 'iniStates' does not match number of columns of 'dataset' (-1)")
+        }
     }
     
     ## check runtime arguments
-    stopifnot(checkInput(fixpars, c("logical", "vector"), 1))
+    checkInput(fixpars, c("logical", "vector"), 1)
     if(fixpars & any(is.na(iniPars))) {
         stop("Must input initial parameters if fixing parameters.")
     }
-    stopifnot(checkInput(niter, c("numeric", "vector"), 1, int = T))
-    stopifnot(checkInput(npart, c("numeric", "vector"), 1, int = T))
-    stopifnot(checkInput(nprintsum, c("numeric", "vector"), 1, int = T))
-    stopifnot(checkInput(nmultskip, c("numeric", "vector"), 1, int = T))
-    stopifnot(niter > 0 & npart > 0 & nprintsum > 0 & nmultskip > 1)
+    checkInput(niter, c("numeric", "vector"), 1, int = T, gt = 0)
+    checkInput(npart, c("numeric", "vector"), 1, int = T, gt = 0)
+    checkInput(nprintsum, c("numeric", "vector"), 1, int = T, gt = 0)
+    checkInput(nmultskip, c("numeric", "vector"), 1, int = T, gt = 1)
     
     ## check adaptive update and proposal covariance matrices
-    stopifnot(checkInput(adapt, c("logical", "vector"), 1))
-    stopifnot(checkInput(adaptmixprop, c("numeric", "vector"), 1))
-    stopifnot(checkInput(nupdate, c("numeric", "vector"), 1, int = T))
-    stopifnot(adaptmixprop > 0 & adaptmixprop < 1 & nupdate > 0)
+    checkInput(adapt, c("logical", "vector"), 1)
+    checkInput(adaptmixprop, c("numeric", "vector"), 1, gt = 0, lt = 1)
+    checkInput(nupdate, c("numeric", "vector"), 1, int = T, gt = 0)
     
     ## run function
     output <- PMCMC_cpp(as.matrix(dataset), priors, orig_priors$parnames, iniPars, propVar, niter, npart, 

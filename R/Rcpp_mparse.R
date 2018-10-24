@@ -40,7 +40,9 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
     
     ## extract rate markers
     ratelines <- sort(c(grep("RATELINES", Rcpp_code), grep("MATCHCRIT", Rcpp_code), grep("TSPAN", Rcpp_code)))
-    stopifnot(length(ratelines) == 7)
+    if(length(ratelines) != 7){
+        stop("Something wrong with simFunction code file")
+    }
     
     ## number of transitions
     nrates <- length(transitions)

@@ -13,7 +13,9 @@
 #' @export
 
 window.PMCMC <- function(x, ...) {
-    stopifnot(class(x) == "PMCMC")
+    if(class(x) != "PMCMC"){
+        stop("'x' is not a PMCMC object")
+    }
     
     #extract 'mcmc' object
     y <- x$pars

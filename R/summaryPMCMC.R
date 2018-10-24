@@ -15,8 +15,10 @@
 
 summary.PMCMC <- function(object, transfunc = NA) {
     
-    ## check x is an ABCSMC object
-    stopifnot(class(object) == "PMCMC")
+    ## check object is an ABCSMC object
+    if(class(object) != "PMCMC"){
+        stop("'object' is not a PMCMC object")
+    }
     
     pars <- as.matrix(object$pars)
     

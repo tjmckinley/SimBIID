@@ -94,7 +94,7 @@ mparseRcpp <- function(
     }
     
     ## check matchCrit
-    stopifnot(checkInput(matchCrit, "logical", 1))
+    checkInput(matchCrit, "logical", 1)
     if(matchCrit) {
         tn <- paste(rep(" ", 4), collapse = "")
         tn1 <- paste(rep(" ", 8), collapse = "")
@@ -117,14 +117,14 @@ mparseRcpp <- function(
     
     ## check addVars
     if(!is.null(addVars)) {
-        stopifnot(checkInput(addVars, "character"))
+        checkInput(addVars, "character")
         addVars <- paste(paste0("double ", addVars), collapse = ", ")
         addVars <- paste0(", ", addVars)
     }
     
     ## check stopCrit
     if(!is.null(stopCrit)) {
-        stopifnot(checkInput(stopCrit, "character"))
+        checkInput(stopCrit, "character")
         tn <- paste(rep(" ", 12), collapse = "")
         tn1 <- paste(rep(" ", 16), collapse = "")
         stopCrit <- lapply(stopCrit, function(x, tn, tn1) {
@@ -144,7 +144,7 @@ mparseRcpp <- function(
     }
     
     ## check tspan
-    stopifnot(checkInput(tspan, "logical", 1))
+    checkInput(tspan, "logical", 1)
     if(tspan) {
         if(!is.null(matchCrit)) {
             stop("'tspan' and 'matchCrit' can't be specified together")
@@ -154,7 +154,7 @@ mparseRcpp <- function(
     }
     
     ## check run from R
-    stopifnot(checkInput(runFromR, "logical", 1))
+    checkInput(runFromR, "logical", 1)
 
     ## Parse transitions
     transitions <- SimInf:::parse_transitions(

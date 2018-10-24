@@ -28,7 +28,7 @@
 ABCRef <- function(npart, priors, func, data, parallel = F, mc.cores = NA, ...) {
     
     ## check inputs
-    stopifnot(checkInput(parallel, c("vector", "logical"), 1))
+    checkInput(parallel, c("vector", "logical"), 1)
     if(parallel) {
         if(!require(parallel)) {
             stop("Must have 'parallel' package installed to use parallelisation")
@@ -36,7 +36,7 @@ ABCRef <- function(npart, priors, func, data, parallel = F, mc.cores = NA, ...) 
         nc <- detectCores()
         nc <- ifelse(is.na(nc), 1, nc)
         if(!is.na(mc.cores[1])) {
-            stopifnot(checkInput(mc.cores, "numeric", 1, int = T))
+            checkInput(mc.cores, "numeric", 1, int = T)
             mc.cores <- min(nc, mc.cores)
         } else {
             mc.cores <- nc
@@ -44,39 +44,52 @@ ABCRef <- function(npart, priors, func, data, parallel = F, mc.cores = NA, ...) 
         parallel <- (mc.cores > 1)
         cat(paste0("Number of cores: ", mc.cores, "\n"))
     }
-    stopifnot(checkInput(npart, "numeric", 1, int = T))
-    stopifnot(checkInput(priors, "data.frame", ncol = 4))
-    stopifnot(checkInput(func, "function", 1))
-    stopifnot(checkInput(data, "data.frame", nrow = 1))
-    stopifnot(all(sapply(data, is.numeric)))
+    checkInput(npart, "numeric", 1, int = T)
+    checkInput(priors, "data.frame", ncol = 4)
+    checkInput(func, "function", 1)
+    checkInput(data, "data.frame", nrow = 1)
+    if(!all(sapply(data, is.numeric))){
+        stop("'data' must be numeric")
+    }
     fargs <- formals(func)
-    stopifnot(length(fargs) >= 1)
-    stopifnot(names(fargs)[1] == "pars")
-    stopifnot(npart > 1)
+    if(length(fargs) < 1) {
+        stop("'func' must contain more than one argument")
+    }
+    if(names(fargs)[1] != "pars"){
+        stop("First argument to 'func' must be 'pars'")
+    }
+    checkInput(npart, gt = 1)
     
     ## check priors
-    stopifnot(all(sort(match(colnames(priors), c("parnames", "dist", "p1", "p2"))) - 1:4 == 0))
+    if(!all(sort(match(colnames(priors), c("parnames", "dist", "p1", "p2"))) - 1:4 == 0)){
+        stop("colnames(priors) must be: 'parnames', 'dist', 'p1' and 'p2'")
+    }
     priors <- select(priors, parnames, dist, p1, p2)
-    stopifnot(checkInput(priors$parnames, "character"))
-    stopifnot(checkInput(priors$dist, "character"))
-    stopifnot(checkInput(priors$p1, "numeric"))
-    stopifnot(checkInput(priors$p2, "numeric"))
-    stopifnot(all(priors$dist %in% c("unif", "norm", "gamma")))
+    checkInput(priors$parnames, "character")
+    checkInput(priors$dist, "character")
+    checkInput(priors$p1, "numeric")
+    checkInput(priors$p2, "numeric")
+    checkInput(priors$dist, inSet = c("unif", "norm", "gamma"))
     temp <- priors[priors$dist == "unif", , drop = F]
     if(nrow(temp) > 0) {
         ## check uniform bounds correct
-        stopifnot(all(apply(temp[, 3:4, drop = F], 1, diff) > 0))
+        if(!all(apply(temp[, 3:4, drop = F], 1, diff) > 0)){
+            stop("Priors: uniform bounds in incorrect order")
+        }
     }
     temp <- priors[priors$dist == "norm", , drop = F]
     if(nrow(temp) > 0) {
         ## check normal hyperparameters correct
-        stopifnot(all(temp$p2 > 0))
+        if(!all(temp$p2 > 0)){
+            stop("Priors: normal variance must be > 0")
+        }
     }
     temp <- priors[priors$dist == "gamma", , drop = F]
     if(nrow(temp) > 0) {
         ## check gamma bounds correct
-        stopifnot(all(temp$p1 > 0))
-        stopifnot(all(temp$p2 > 0))
+        if(!all(temp$p1 > 0) | !all(temp$p2 > 0)){
+            stop("Priors: gamma hyperparameters must be > 0")
+        }
     }
     priors$ddist <- paste0("d", priors$dist)
     priors$dist <- paste0("r", priors$dist)   
@@ -85,9 +98,12 @@ ABCRef <- function(npart, priors, func, data, parallel = F, mc.cores = NA, ...) 
     fargs <- fargs[is.na(match(names(fargs), "pars"))]
     if(length(fargs) > 0) {
         args <- list(...)
-        fargs <- match(names(fargs), names(args))
-        stopifnot(all(!is.na(fargs)))
-        fargs <- args[fargs]
+        fargs1 <- match(names(fargs), names(args))
+        if(!all(!is.na(fargs1))){
+            stop(paste0("Need to include: ", paste(fargs[is.na(fargs1)], collapse = ", "), 
+                        " arguments in function call"))
+        }
+        fargs <- args[fargs1]
     }
     
     ## set timer
@@ -139,7 +155,9 @@ ABCRef <- function(npart, priors, func, data, parallel = F, mc.cores = NA, ...) 
     
     ## set names
     colnames(pars) <- priors$parnames
-    stopifnot(ncol(out) == ncol(data))
+    if(ncol(out) != ncol(data)){
+        stop("ncol(out) != ncol(data)")
+    }
     colnames(out) <- colnames(data)
     
     ## stop timer

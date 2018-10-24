@@ -20,23 +20,23 @@
 plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, transfunc = NA) {
     
     ## check x
-    stopifnot(class(x) == "ABCSMC")
+    if(class(x) != "ABCSMC"){
+        stop("'x' is not a ABCSMC object")
+    }
     
     ## check type
     type <- type[1]
-    stopifnot(is.character(type))
-    stopifnot(type %in% c("post", "output"))
+    checkInput(type, "character", inSet = c("post", "output"))
     
     ## check gens
     if(is.na(gen[1])) {
         gen <- 1:length(x$pars)
     }
-    stopifnot(checkInput(gen, c("vector", "numeric"), int = T))
-    stopifnot(all(gen %in% 1:length(x$pars)))
+    checkInput(gen, c("vector", "numeric"), int = T, inSet = 1:length(x$pars))
     gen <- as.character(sort(gen))
     
     ## check joint
-    stopifnot(checkInput(joint, c("vector", "logical"), 1))
+    checkInput(joint, c("vector", "logical"), 1)
     if(joint) {
         if(!require(GGally)) {
             stop("'GGally' package required for joint distribution plots")
@@ -62,19 +62,21 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
                 mutate(Generation = factor(Generation, levels = gen))
                 
         ## check for transformations if required
-        stopifnot(length(transfunc) == 1)
+        if(length(transfunc) != 1){
+            stop("'transfunc' not of length 1")
+        }
         if(is.function(transfunc)) {
         
             ## check function arguments
             fargs <- formals(transfunc)
-            stopifnot(all(names(fargs) %in% colnames(p)))
+            checkInput(names(fargs), inSet = colnames(p))
             
             ## perform transformations if required
             temppars <- p[, match(names(fargs), colnames(p))]
             temppars <- as.list(temppars)
             names(temppars) <- names(fargs)
             temp <- do.call("transfunc", temppars)
-            stopifnot(checkInput(temp, "data.frame", nrow = nrow(p)))
+            checkInput(temp, "data.frame", nrow = nrow(p))
             
             ## bind to current posterior samples
             p <- cbind(p, temp)
@@ -127,7 +129,9 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
             filter(Generation %in% gen) %>%
             mutate(Generation = factor(Generation, levels = gen))
             
-        stopifnot(length(transfunc) == 1)
+        if(length(transfunc) != 1){
+            stop("'transfunc' not of length 1")
+        }
         if(is.function(transfunc)) {
             stop("'transfunc' can't be used for output plots")
         } else {

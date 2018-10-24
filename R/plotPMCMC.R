@@ -20,40 +20,41 @@
 plot.PMCMC <- function(x, type = c("post", "trace"), joint = F, transfunc = NA, ask = T) {
     
     ## check x
-    stopifnot(class(x) == "PMCMC")
+    if(class(x) != "PMCMC"){
+        stop("'x' not a PMCMC object")
+    }
     
     ## check type
     type <- type[1]
-    stopifnot(is.character(type))
-    stopifnot(type %in% c("post", "trace"))
+    checkInput(type, "character", inSet = c("post", "trace"))
     
     ## check joint
-    stopifnot(checkInput(joint, c("vector", "logical"), 1))
+    checkInput(joint, c("vector", "logical"), 1)
     if(joint) {
         if(!require(GGally)) {
             stop("'GGally' package required for joint distribution plots")
         }
     }
     ## check ask
-    stopifnot(checkInput(ask, c("vector", "logical"), 1))
+    checkInput(ask, c("vector", "logical"), 1)
     
     if(type == "post") { 
         p <- as.matrix(x$pars) %>% as.data.frame()
                 
         ## check for transformations if required
-        stopifnot(length(transfunc) == 1)
+        checkInput(transfunc, length = 1, naAllow = T)
         if(is.function(transfunc)) {
         
             ## check function arguments
             fargs <- formals(transfunc)
-            stopifnot(all(names(fargs) %in% colnames(p)))
+            checkInput(names(fargs), inSet = colnames(p))
             
             ## perform transformations if required
             temppars <- p[, match(names(fargs), colnames(p))]
             temppars <- as.list(temppars)
             names(temppars) <- names(fargs)
             temp <- do.call("transfunc", temppars)
-            stopifnot(checkInput(temp, "data.frame", nrow = nrow(p)))
+            checkInput(temp, "data.frame", nrow = nrow(p))
             
             ## bind to current posterior samples
             p <- cbind(p, temp)

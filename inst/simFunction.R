@@ -12,7 +12,7 @@
     MATCHCRIT0
     
     // sample next event time
-    if(totrate > 0) {
+    if(totrate > 0.0) {
         tstar = t + R::rexp(1.0 / totrate);
         while(tstar < tstop){
             // sample event type
@@ -23,10 +23,11 @@
             t = tstar;
             
             // sample next event time
-            if(totrate > 0) {
+            if(totrate > 0.0) {
                 tstar = t + R::rexp(1.0 / totrate);
             } else {
                 tstar = tstop;
+                t = tstop;
             }
             RATELINES3
         }

@@ -5,7 +5,7 @@
 \title{Parse custom model using \code{SimInf} style markup}
 \usage{
 mparseRcpp(transitions = NULL, compartments = NULL, pars = NULL,
-  matchCrit = F, addVars = NULL, stopCrit = NULL, tspan = NULL,
+  matchCrit = F, addVars = NULL, stopCrit = NULL, tspan = F,
   runFromR = T)
 }
 \arguments{
@@ -33,7 +33,7 @@ and/or \code{addVars}.}
 values specify the values of the variable. These can be used to specify variables 
 that can be used for stopping criteria.}
 
-\item{tspan:}{An numeric vector corresponding to times at which states are to be returned.}
+\item{tspan:}{A \code{logical} determining whether to return time series counts or not.}
 
 \item{runFromR:}{\code{logical} determining whether code is to be compiled to run directly in R,
 or whether to be compiled as an \code{XPtr} object for use in Rcpp.}

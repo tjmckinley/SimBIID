@@ -31,7 +31,7 @@
 #'                 values specify the values of the variable. These can be used to specify variables 
 #'                 that can be used for stopping criteria.
 #'                  
-#' @param tspan: An numeric vector corresponding to times at which states are to be returned.
+#' @param tspan: A \code{logical} determining whether to return time series counts or not.
 #'                  
 #' @param runFromR: \code{logical} determining whether code is to be compiled to run directly in R,
 #'                  or whether to be compiled as an \code{XPtr} object for use in Rcpp.
@@ -56,7 +56,7 @@ mparseRcpp <- function(
     matchCrit = F,
     addVars = NULL,
     stopCrit = NULL,
-    tspan = NULL,
+    tspan = F,
     runFromR = T
 ) {
     ## Check transitions
@@ -144,13 +144,13 @@ mparseRcpp <- function(
     }
     
     ## check tspan
-    if(!is.null(tspan)) {
-        stopifnot(checkInput(tspan, "numeric"))
-        stopifnot(all((sort(tspan) - tspan) == 0))
-        stopifnot(all(tspan > 0))
+    stopifnot(checkInput(tspan, "logical", 1))
+    if(tspan) {
         if(!is.null(matchCrit)) {
             stop("'tspan' and 'matchCrit' can't be specified together")
         }
+    } else {
+        tspan <- NULL
     }
     
     ## check run from R

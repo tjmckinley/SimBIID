@@ -34,8 +34,16 @@
 #' @param runFromR: \code{logical} determining whether code is to be compiled to run directly in R,
 #'                  or whether to be compiled as an \code{XPtr} object for use in Rcpp.
 #'
-#' @return An object of class \code{parsedRcpp} that contains code to compile
-#'         into an \code{XPtr} object.
+#' @return An object of class \code{parsedRcpp}, which is essentially a \code{list} 
+#'         containing elements:
+#'         \itemize{
+#'             \item{code:}{ parsed code to compile;}
+#'             \item{matchCrit:}{ copy of \code{matchCrit} argument;}
+#'             \item{stopCrit:}{ copy of \code{stopCrit} argument;}
+#'             \item{addVars:}{ copy of \code{addVars} argument.}
+#'         }
+#'         This can be compiled into an \code{XPtr} or \code{function} object
+#'         using \code{compileRcpp()}.
 
 mparseRcpp <- function(
     transitions = NULL, 
@@ -136,12 +144,20 @@ mparseRcpp <- function(
     Rcpp_code <- Rcpp_mparse(transitions, matchCrit, addVars, stopCrit, runFromR)
     ## replace "gdata" with "pars"
     Rcpp_code <- gsub("gdata", "pars", Rcpp_code)
-    class(Rcpp_code) <- "parsedRcpp"
-    Rcpp_code
+    
+    ## set up output list
+    output <- list(
+        code = Rcpp_code,
+        matchCrit = matchCrit,
+        stopCrit = stopCrit,
+        runFromR = runFromR
+    )
+    class(output) <- "parsedRcpp"
+    output
 }
 
 ## print function for parsedRcpp object
 #' @export
 print.parsedRcpp <- function(x, ...) {
-    writeLines(x)
+    writeLines(x$code)
 }

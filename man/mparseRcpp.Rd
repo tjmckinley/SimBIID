@@ -36,8 +36,16 @@ and/or \code{addVars}.}
 or whether to be compiled as an \code{XPtr} object for use in Rcpp.}
 }
 \value{
-An object of class \code{parsedRcpp} that contains code to compile
-        into an \code{XPtr} object.
+An object of class \code{parsedRcpp}, which is essentially a \code{list} 
+        containing elements:
+        \itemize{
+            \item{code:}{ parsed code to compile;}
+            \item{matchCrit:}{ copy of \code{matchCrit} argument;}
+            \item{stopCrit:}{ copy of \code{stopCrit} argument;}
+            \item{addVars:}{ copy of \code{addVars} argument.}
+        }
+        This can be compiled into an \code{XPtr} or \code{function} object
+        using \code{compileRcpp()}.
 }
 \description{
 Parse custom model using \code{SimInf} style markup and 

@@ -22,12 +22,12 @@ compileRcpp <- function(
     }
     ## write to temporary file
     filename <- tempfile()
-    writeLines(parsed, filename)
+    writeLines(parsed$code, filename)
     
-    ## compile into external pointer
+    ## compile into external pointer or function
     source(filename)
     
-    ## return pointer
+    ## return pointer or function
     Rcpp_object
 }
 

@@ -123,7 +123,7 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, runFromR) {
     }
     if(is.null(matchCrit)) {
         matchCrit <- paste(rep(" ", 4), collapse = "")
-        matchCrit <- paste0(matchCrit, "out[0] = 1;\n",
+        matchCrit <- paste0(matchCrit, "out[0] = (totrate == 0.0 ? 1:0);\n",
                             matchCrit, "out[1] = t;\n",
                             matchCrit, "out[Range(2, u.size())] = as<NumericVector>(u);")
     }

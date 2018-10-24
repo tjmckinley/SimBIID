@@ -28,6 +28,9 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
     } else {
         Rcpp_code[1] <- paste0(compType, "simFunction(NumericVector gdata, double tstart, double tstop, IntegerVector u")
     }
+    if(!is.null(tspan)){
+        Rcpp_code[1] <- paste0(Rcpp_code[1], ", NumericVector tspan")
+    }
     
     ## add additional variables to parser
     if(!is.null(addVars)) {
@@ -85,17 +88,17 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
         tempSpace <- paste0(rep(" ", tempnSpace + 4), collapse = "")
         checkTspan <- c(checkTspan, paste0(tempSpace, "if(tspan[i] <= tspan[i - 1]) {"))
         tempSpace <- paste0(rep(" ", tempnSpace + 8), collapse = "")
-        checkTspan <- c(checkTspan, paste0(tempSpace, "stop(\"'tspan' not ordered\");"))
+        checkTspan <- c(checkTspan, paste0(tempSpace, "stop(\"tspan not ordered\");"))
         tempSpace <- paste0(rep(" ", tempnSpace + 4), collapse = "")
         checkTspan <- c(checkTspan, paste0(tempSpace, "}"))
         checkTspan <- c(checkTspan, paste0(tempSpace, "if(tstart >= tspan[0]){"))
         tempSpace <- paste0(rep(" ", tempnSpace + 8), collapse = "")
-        checkTspan <- c(checkTspan, paste0(tempSpace, "stop(\"'tstart' >= tspan[0]\");"))
+        checkTspan <- c(checkTspan, paste0(tempSpace, "stop(\"tstart >= tspan[0]\");"))
         tempSpace <- paste0(rep(" ", tempnSpace + 4), collapse = "")
         checkTspan <- c(checkTspan, paste0(tempSpace, "}"))
         checkTspan <- c(checkTspan, paste0(tempSpace, "if(tstop < tspan[tspan.size() - 1]){"))
         tempSpace <- paste0(rep(" ", tempnSpace + 8), collapse = "")
-        checkTspan <- c(checkTspan, paste0(tempSpace, "stop(\"'tstop' < tspan[n]\");"))
+        checkTspan <- c(checkTspan, paste0(tempSpace, "stop(\"tstop < tspan[n]\");"))
         tempSpace <- paste0(rep(" ", tempnSpace + 4), collapse = "")
         checkTspan <- c(checkTspan, paste0(tempSpace, "}"))
         tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
@@ -106,7 +109,9 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
         tempSpace <- paste0(rep(" ", tempnSpace + 4), collapse = "")
         upTspan <- c(upTspan, paste0(tempSpace, "out(k, 0) = NA_REAL;"))
         upTspan <- c(upTspan, paste0(tempSpace, "out(k, 1) = tspan[k];"))
-        upTspan <- c(upTspan, paste0(tempSpace, "out(k, Range(2, u.size() + 1)) = as<NumericVector>(u);"))
+        upTspan <- c(upTspan, paste0(tempSpace, "for(i = 0; i < u.size(); i++) {"))
+        upTspan <- c(upTspan, paste0(tempSpace, "    out(k, i + 2) = (double) u[i];"))
+        upTspan <- c(upTspan, paste0(tempSpace, "}"))
         upTspan <- c(upTspan, paste0(tempSpace, "k++;"))
         tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
         upTspan <- c(upTspan, paste0(tempSpace, "}"))
@@ -216,7 +221,9 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
             matchCrit <- paste0(tempSpace, "// set output\n",
                                 tempSpace, "out(tspan.size(), 0) = (totrate == 0.0 ? 1:0);\n",
                                 tempSpace, "out(tspan.size(), 1) = t;\n",
-                                tempSpace, "out(tspan.size(), Range(2, u.size() + 1)) = as<NumericVector>(u);")
+                                tempSpace, "for(i = 0; i < u.size(); i++) {\n",
+                                tempSpace, tempSpace, "out(tspan.size(), i + 2) = (double) u[i];\n",
+                                tempSpace, "}")
         }
     }
     currline <- ratelines[1]

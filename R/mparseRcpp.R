@@ -31,6 +31,8 @@
 #'                  the simulation. Variables in \code{CRIT} must match either those in \code{compartments}
 #'                  and/or \code{addVars}.
 #'                  
+#' @param tspan: An numeric vector corresponding to times at which states are to be returned.
+#'                  
 #' @param runFromR: \code{logical} determining whether code is to be compiled to run directly in R,
 #'                  or whether to be compiled as an \code{XPtr} object for use in Rcpp.
 #'
@@ -40,7 +42,8 @@
 #'             \item{code:}{ parsed code to compile;}
 #'             \item{matchCrit:}{ copy of \code{matchCrit} argument;}
 #'             \item{stopCrit:}{ copy of \code{stopCrit} argument;}
-#'             \item{addVars:}{ copy of \code{addVars} argument.}
+#'             \item{addVars:}{ copy of \code{addVars} argument;}
+#'             \item{tspan:}{ copy of \code{tspan} argument.}
 #'         }
 #'         This can be compiled into an \code{XPtr} or \code{function} object
 #'         using \code{compileRcpp()}.
@@ -52,6 +55,7 @@ mparseRcpp <- function(
     matchCrit = F,
     addVars = NULL,
     stopCrit = NULL,
+    tspan = NULL,
     runFromR = T
 ) {
     ## Check transitions
@@ -138,6 +142,16 @@ mparseRcpp <- function(
         stopCrit <- c(paste0(tn, "// early stopping criteria"), stopCrit)
     }
     
+    ## check tspan
+    if(!is.null(tspan)) {
+        stopifnot(checkInput(tspan, "numeric"))
+        stopifnot(all((sort(tspan) - tspan) == 0))
+        stopifnot(all(tspan > 0))
+        if(!is.null(matchCrit)) {
+            stop("'tspan' and 'matchCrit' can't be specified together")
+        }
+    }
+    
     ## check run from R
     stopifnot(checkInput(runFromR, "logical", 1))
 
@@ -147,7 +161,7 @@ mparseRcpp <- function(
     )
 
     ## write Rcpp code to file
-    Rcpp_code <- Rcpp_mparse(transitions, matchCrit, addVars, stopCrit, runFromR)
+    Rcpp_code <- Rcpp_mparse(transitions, matchCrit, addVars, stopCrit, tspan, runFromR)
     ## replace "gdata" with "pars"
     Rcpp_code <- gsub("gdata", "pars", Rcpp_code)
     

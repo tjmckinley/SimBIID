@@ -5,7 +5,8 @@
 \title{Parse custom model using \code{SimInf} style markup}
 \usage{
 mparseRcpp(transitions = NULL, compartments = NULL, pars = NULL,
-  matchCrit = F, addVars = NULL, stopCrit = NULL, runFromR = T)
+  matchCrit = F, addVars = NULL, stopCrit = NULL, tspan = NULL,
+  runFromR = T)
 }
 \arguments{
 \item{transitions:}{character vector containing transitions on the form \code{"X ->
@@ -32,6 +33,8 @@ within the underlying Rcpp code, which a return value of 0 corresponds to reject
 the simulation. Variables in \code{CRIT} must match either those in \code{compartments}
 and/or \code{addVars}.}
 
+\item{tspan:}{An numeric vector corresponding to times at which states are to be returned.}
+
 \item{runFromR:}{\code{logical} determining whether code is to be compiled to run directly in R,
 or whether to be compiled as an \code{XPtr} object for use in Rcpp.}
 }
@@ -42,7 +45,8 @@ An object of class \code{parsedRcpp}, which is essentially a \code{list}
             \item{code:}{ parsed code to compile;}
             \item{matchCrit:}{ copy of \code{matchCrit} argument;}
             \item{stopCrit:}{ copy of \code{stopCrit} argument;}
-            \item{addVars:}{ copy of \code{addVars} argument.}
+            \item{addVars:}{ copy of \code{addVars} argument;}
+            \item{tspan:}{ copy of \code{tspan} argument.}
         }
         This can be compiled into an \code{XPtr} or \code{function} object
         using \code{compileRcpp()}.

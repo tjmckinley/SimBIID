@@ -1,6 +1,8 @@
 ## Cpp code: Generate Rcpp code for mparse
 ## (based on idea in SimInf_mparse in SimInf package)
-Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, runFromR) {
+Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFromR) {
+    
+    ## read source code
     Rcpp_code <- readLines(system.file("", "simFunction.R", package = "ABCSMC"))
     
     ## set compilation type
@@ -8,7 +10,11 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, runFromR) {
         compType <- "Rcpp_object <- Rcpp::cppFunction"
         ## set output type
         if(is.null(matchCrit)) {
-            compType <- paste0(compType, "('NumericVector ")
+            if(is.null(tspan)){
+                compType <- paste0(compType, "('NumericVector ")
+            } else {
+                compType <- paste0(compType, "('NumericMatrix ")
+            }
         } else {
             compType <- paste0(compType, "('IntegerVector ")
         }
@@ -30,8 +36,8 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, runFromR) {
     Rcpp_code[1] <- paste0(Rcpp_code[1], ") { ")
     
     ## extract rate markers
-    ratelines <- sort(c(grep("RATELINES", Rcpp_code), grep("MATCHCRIT", Rcpp_code)))
-    stopifnot(length(ratelines) == 5)
+    ratelines <- sort(c(grep("RATELINES", Rcpp_code), grep("MATCHCRIT", Rcpp_code), grep("TSPAN", Rcpp_code)))
+    stopifnot(length(ratelines) == 7)
     
     ## number of transitions
     nrates <- length(transitions)
@@ -54,13 +60,45 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, runFromR) {
     
     ## update output size
     if(is.null(matchCrit)){
-        outsize <- paste0(paste(rep(" ", 4), collapse = ""), "NumericVector out(u.size() + 2);")
+        ## initialise tspan outputs
+        if(!is.null(tspan)){
+            outsize <- paste0(paste(rep(" ", 4), collapse = ""), "NumericMatrix out(tspan.size() + 1, u.size() + 2);")
+        } else {
+            outsize <- paste0(paste(rep(" ", 4), collapse = ""), "NumericVector out(u.size() + 2);")
+        }
     } else {
         outsize <- paste0(paste(rep(" ", 4), collapse = ""), "IntegerVector out(u.size() + 1);")
     }
     currline <- ratelines[1]
     Rcpp_code <- c(Rcpp_code[1:(currline - 1)], outsize, Rcpp_code[(currline + 1):length(Rcpp_code)])
     ratelines <- ratelines[-1]
+    
+    ## update tspan
+    if(!is.null(tspan)) {
+        tempnSpace <- 4
+        tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
+        upTspan <- paste0(tempSpace, "while(tspan[k] < t && k < tspan.size()) {")
+        tempSpace <- paste0(rep(" ", tempnSpace + 4), collapse = "")
+        upTspan <- c(upTspan, paste0(tempSpace, "out(k, 0) = NA_REAL;"))
+        upTspan <- c(upTspan, paste0(tempSpace, "out(k, 1) = tspan[k];"))
+        upTspan <- c(upTspan, paste0(tempSpace, "out(k, Range(2, u.size() + 1)) = as<NumericVector>(u);"))
+        upTspan <- c(upTspan, paste0(tempSpace, "k++;"))
+        tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
+        upTspan <- c(upTspan, paste0(tempSpace, "}"))
+        
+        currline <- ratelines[1]
+        Rcpp_code <- c(
+            Rcpp_code[1:(currline - 1)], 
+            paste0(tempSpace, "// update tspan"), 
+            paste0(tempSpace, "k = 0;"), 
+            upTspan, 
+            Rcpp_code[(currline + 1):length(Rcpp_code)]
+        )
+        ratelines <- ratelines[-1] + length(upTspan) + 1
+    } else {
+        Rcpp_code <- Rcpp_code[-ratelines[1]]
+        ratelines <- ratelines[-1] - 1
+    }
     
     ## update states
     tempnSpace <- 12
@@ -113,6 +151,24 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, runFromR) {
     ratelines <- ratelines[-1]
     Rcpp_code <- c(Rcpp_code[1:(currline - 1)], upStates, upRates, Rcpp_code[(currline + 1):length(Rcpp_code)])
     ratelines <- ratelines + length(upStates) + length(upRates) - 1
+    
+    ## update tspan
+    if(!is.null(tspan)) {
+        currline <- ratelines[1]
+        upTspan <- paste(paste(rep(" ", 8), collapse = ""), upTspan)
+        Rcpp_code <- c(
+            Rcpp_code[1:(currline - 1)], 
+            paste0(paste(rep(" ", 12), collapse = ""), "// update tspan"),
+            upTspan, 
+            Rcpp_code[(currline + 1):length(Rcpp_code)]
+        )
+        ratelines <- ratelines[-1] + length(upTspan)
+    } else {
+        Rcpp_code <- Rcpp_code[-ratelines[1]]
+        ratelines <- ratelines[-1] - 1
+    }
+    
+    ## add stopping criteria
     if(!is.null(stopCrit)) {
         currline <- ratelines[1]
         Rcpp_code <- c(Rcpp_code[1:(currline - 1)], "", stopCrit, Rcpp_code[(currline + 1):length(Rcpp_code)])
@@ -122,13 +178,19 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, runFromR) {
         ratelines <- ratelines[-1] - 1
     }
     if(is.null(matchCrit)) {
-        matchCrit <- paste(rep(" ", 4), collapse = "")
-        matchCrit <- paste0(matchCrit, "out[0] = (totrate == 0.0 ? 1:0);\n",
-                            matchCrit, "out[1] = t;\n",
-                            matchCrit, "out[Range(2, u.size() + 1)] = as<NumericVector>(u);")
+        tempSpace <- paste(rep(" ", 4), collapse = "")
+        if(is.null(tspan)){
+            output <- paste0(tempSpace, "out[0] = (totrate == 0.0 ? 1:0);\n",
+                                tempSpace, "out[1] = t;\n",
+                                tempSpace, "out[Range(2, u.size() + 1)] = as<NumericVector>(u);")
+        } else {
+            output <- paste0(tempSpace, "out(tspan.size(), 0) = (totrate == 0.0 ? 1:0);\n",
+                                tempSpace, "out(tspan.size(), 1) = t;\n",
+                                tempSpace, "out(tspan.size(), Range(2, u.size() + 1)) = as<NumericVector>(u);")
+        }
     }
     currline <- ratelines[1]
-    Rcpp_code <- c(Rcpp_code[1:(currline - 1)], matchCrit, Rcpp_code[(currline + 1):length(Rcpp_code)])
+    Rcpp_code <- c(Rcpp_code[1:(currline - 1)], output, Rcpp_code[(currline + 1):length(Rcpp_code)])
     Rcpp_code
 }
 

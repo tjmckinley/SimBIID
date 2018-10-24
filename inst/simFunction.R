@@ -2,7 +2,7 @@
 
     // initialise variables
     double tstar = 0.0, u_tmp = 0.0, totrate = 0.0, cumrate = 0.0;
-    int i, j;
+    int i, j, k, l;
     
     // initialise time and rates of the system
     double t = tstart;
@@ -10,6 +10,8 @@
 
     // set up output vector
     MATCHCRIT0
+    
+    TSPAN0
     
     // sample next event time
     if(totrate > 0.0) {
@@ -29,6 +31,9 @@
                 tstar = tstop;
                 t = tstop;
             }
+            
+            TSPAN1
+            
             RATELINES3
         }
     }

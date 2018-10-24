@@ -125,6 +125,12 @@ mparseRcpp <- function(
         stopCrit <- lapply(stopCrit, function(x, tn, tn1) {
             x <- paste0(tn, "if(", x, "){")
             x <- c(x, paste0(tn1, "out[0] = 0;"))
+            if(is.null(matchCrit)) {
+                x <- c(x, paste0(tn1, "out[1] = t;"))
+                x <- c(x, paste0(tn1, "out[Range(2, u.size() + 1)] = u;"))
+            } else {
+                x <- c(x, paste0(tn1, "out[Range(1, u.size())] = u;"))
+            }
             x <- c(x, paste0(tn1, "return out;"))
             x <- c(x, paste0(tn, "}"))
         }, tn = tn, tn1 = tn1)

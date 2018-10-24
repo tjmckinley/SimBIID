@@ -102,7 +102,7 @@ mparseRcpp <- function(
             "// check whether simulation matches data",
             "out[0] = 1;",
             "for(j = 0; j < counts.size(); j++) {",
-            paste0(tn, "if(fabs(uNew[whichind[j]] - counts[j]) <= tols[j]) {"),
+            paste0(tn, "if(fabs(u[whichind[j]] - counts[j]) <= tols[j]) {"),
             paste0(tn1, "out[0] *= 1;"),
             paste0(tn, "} else {"),
             paste0(tn1, "out[0] *= 0;"),

@@ -29,9 +29,9 @@ within the underlying Rcpp code, which a return value of 0 corresponds to reject
 the simulation. Variables in \code{CRIT} must match either those in \code{compartments}
 and/or \code{addVars}.}
 
-\item{addVars:}{a named vector where the names specify the additional variables and the
-values specify the values of the variable. These can be used to specify variables 
-that can be used for stopping criteria.}
+\item{addVars:}{a character vector where the names specify the additional variables to be added to the 
+function call. These can be used to specify variables that can be used for 
+e.g. additional stopping criteria.}
 
 \item{tspan:}{A \code{logical} determining whether to return time series counts or not.}
 

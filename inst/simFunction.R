@@ -7,10 +7,27 @@
     // initialise time and rates of the system
     double t = tstart;
     RATELINES1 
+    
+    // check states
+    for(i = 0; i < u.size(); i++){
+        if(u[i] < 0) {
+            stop("Some states less than zero");
+        }
+    }
+    
+    // check rates
+    for(i = 0; i < rates.size(); i++){
+        if(R_FINITE(rates[i])) {
+            if(rates[i] < 0.0) {
+                stop("Some rates less than zero or non-finite");
+            }
+        } else {
+            stop("Some rates are non-finite");
+        }
+    }
 
     // set up output vector
     MATCHCRIT0
-    
     TSPAN0
     
     // sample next event time
@@ -19,7 +36,25 @@
         while(tstar < tstop){
             // sample event type
             u_tmp = R::runif(0.0, totrate);
-            RATELINES2 
+            RATELINES2  
+            
+            // check states
+            for(i = 0; i < u.size(); i++){
+                if(u[i] < 0) {
+                    stop("Some states less than zero");
+                }
+            }
+            
+            // check rates
+            for(i = 0; i < rates.size(); i++){
+                if(R_FINITE(rates[i])) {
+                    if(rates[i] < 0.0) {
+                        stop("Some rates less than zero or non-finite");
+                    }
+                } else {
+                    stop("Some rates are non-finite");
+                }
+            }
             
             // update time
             t = tstar;
@@ -29,15 +64,19 @@
                 tstar = t + R::rexp(1.0 / totrate);
             } else {
                 tstar = tstop;
-                t = tstop;
             }
-            
             TSPAN1
-            
             RATELINES3
         }
     }
-    // return output
+    
+    // record final event time
+    if(totrate > 0.0) {
+        t = tstar;
+    }
+    
     MATCHCRIT1
+    
+    // return output
     return out;
 }')

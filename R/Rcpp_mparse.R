@@ -79,7 +79,8 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
         tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
         
         ## check tspan
-        checkTspan <- paste0(tempSpace, "// check tspan")
+        checkTspan <- paste0("")
+        checkTspan <- c(checkTspan, paste0(tempSpace, "// check tspan"))
         checkTspan <- c(checkTspan, paste0(tempSpace, "for(i = 1; i < tspan.size(); i++){"))
         tempSpace <- paste0(rep(" ", tempnSpace + 4), collapse = "")
         checkTspan <- c(checkTspan, paste0(tempSpace, "if(tspan[i] <= tspan[i - 1]) {"))
@@ -114,12 +115,13 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
         Rcpp_code <- c(
             Rcpp_code[1:(currline - 1)], 
             checkTspan,
+            "",
             paste0(tempSpace, "// update tspan"), 
             paste0(tempSpace, "k = 0;"), 
             upTspan, 
             Rcpp_code[(currline + 1):length(Rcpp_code)]
         )
-        ratelines <- ratelines[-1] + length(checkTspan) + length(upTspan) + 1
+        ratelines <- ratelines[-1] + length(checkTspan) + length(upTspan) + 2
     } else {
         Rcpp_code <- Rcpp_code[-ratelines[1]]
         ratelines <- ratelines[-1] - 1
@@ -180,14 +182,15 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
     ## update tspan
     if(!is.null(tspan)) {
         currline <- ratelines[1]
-        upTspan <- paste(paste(rep(" ", 8), collapse = ""), upTspan)
+        upTspan <- paste(paste(rep(" ", 7), collapse = ""), upTspan)
         Rcpp_code <- c(
             Rcpp_code[1:(currline - 1)], 
+            "",
             paste0(paste(rep(" ", 12), collapse = ""), "// update tspan"),
             upTspan, 
             Rcpp_code[(currline + 1):length(Rcpp_code)]
         )
-        ratelines <- ratelines[-1] + length(upTspan)
+        ratelines <- ratelines[-1] + length(upTspan) + 1
     } else {
         Rcpp_code <- Rcpp_code[-ratelines[1]]
         ratelines <- ratelines[-1] - 1
@@ -205,17 +208,19 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
     if(is.null(matchCrit)) {
         tempSpace <- paste(rep(" ", 4), collapse = "")
         if(is.null(tspan)){
-            output <- paste0(tempSpace, "out[0] = (totrate == 0.0 ? 1:0);\n",
+            matchCrit <- paste0(tempSpace, "// set output\n",
+                                tempSpace, "out[0] = (totrate == 0.0 ? 1:0);\n",
                                 tempSpace, "out[1] = t;\n",
                                 tempSpace, "out[Range(2, u.size() + 1)] = as<NumericVector>(u);")
         } else {
-            output <- paste0(tempSpace, "out(tspan.size(), 0) = (totrate == 0.0 ? 1:0);\n",
+            matchCrit <- paste0(tempSpace, "// set output\n",
+                                tempSpace, "out(tspan.size(), 0) = (totrate == 0.0 ? 1:0);\n",
                                 tempSpace, "out(tspan.size(), 1) = t;\n",
                                 tempSpace, "out(tspan.size(), Range(2, u.size() + 1)) = as<NumericVector>(u);")
         }
     }
     currline <- ratelines[1]
-    Rcpp_code <- c(Rcpp_code[1:(currline - 1)], output, Rcpp_code[(currline + 1):length(Rcpp_code)])
+    Rcpp_code <- c(Rcpp_code[1:(currline - 1)], matchCrit, Rcpp_code[(currline + 1):length(Rcpp_code)])
     Rcpp_code
 }
 

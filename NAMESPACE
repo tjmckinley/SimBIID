@@ -3,6 +3,7 @@
 S3method(ABCSMC,ABCSMC)
 S3method(ABCSMC,default)
 S3method(print,parsedRcpp)
+S3method(window,PMCMC)
 export(ABCRef)
 export(ABCSMC)
 export(PMCMC)

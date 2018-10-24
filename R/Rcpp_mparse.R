@@ -219,11 +219,20 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
                                 tempSpace, "out[Range(2, u.size() + 1)] = as<NumericVector>(u);")
         } else {
             matchCrit <- paste0(tempSpace, "// set output\n",
+                                tempSpace, "while(k < tspan.size()) {\n",
+                                tempSpace, "    out(k, 0) = NA_REAL;\n",
+                                tempSpace, "    out(k, 1) = tspan[k];\n",
+                                tempSpace, "    for(i = 0; i < u.size(); i++) {\n",
+                                tempSpace, "        out(k, i + 2) = (double) u[i];\n",
+                                tempSpace, "    }\n",
+                                tempSpace, "    k++;\n",
+                                tempSpace, "}\n")
+            matchCrit <- c(matchCrit, paste0("",
                                 tempSpace, "out(tspan.size(), 0) = (totrate == 0.0 ? 1:0);\n",
                                 tempSpace, "out(tspan.size(), 1) = t;\n",
                                 tempSpace, "for(i = 0; i < u.size(); i++) {\n",
                                 tempSpace, tempSpace, "out(tspan.size(), i + 2) = (double) u[i];\n",
-                                tempSpace, "}")
+                                tempSpace, "}"))
         }
     }
     currline <- ratelines[1]

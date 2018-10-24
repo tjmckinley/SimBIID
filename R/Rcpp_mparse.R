@@ -77,6 +77,30 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
     if(!is.null(tspan)) {
         tempnSpace <- 4
         tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
+        
+        ## check tspan
+        checkTspan <- paste0(tempSpace, "// check tspan")
+        checkTspan <- c(checkTspan, paste0(tempSpace, "for(i = 1; i < tspan.size(); i++){"))
+        tempSpace <- paste0(rep(" ", tempnSpace + 4), collapse = "")
+        checkTspan <- c(checkTspan, paste0(tempSpace, "if(tspan[i] <= tspan[i - 1]) {"))
+        tempSpace <- paste0(rep(" ", tempnSpace + 8), collapse = "")
+        checkTspan <- c(checkTspan, paste0(tempSpace, "stop(\"'tspan' not ordered\");"))
+        tempSpace <- paste0(rep(" ", tempnSpace + 4), collapse = "")
+        checkTspan <- c(checkTspan, paste0(tempSpace, "}"))
+        checkTspan <- c(checkTspan, paste0(tempSpace, "if(tstart >= tspan[0]){"))
+        tempSpace <- paste0(rep(" ", tempnSpace + 8), collapse = "")
+        checkTspan <- c(checkTspan, paste0(tempSpace, "stop(\"'tstart' >= tspan[0]\");"))
+        tempSpace <- paste0(rep(" ", tempnSpace + 4), collapse = "")
+        checkTspan <- c(checkTspan, paste0(tempSpace, "}"))
+        checkTspan <- c(checkTspan, paste0(tempSpace, "if(tstop < tspan[tspan.size() - 1]){"))
+        tempSpace <- paste0(rep(" ", tempnSpace + 8), collapse = "")
+        checkTspan <- c(checkTspan, paste0(tempSpace, "stop(\"'tstop' < tspan[n]\");"))
+        tempSpace <- paste0(rep(" ", tempnSpace + 4), collapse = "")
+        checkTspan <- c(checkTspan, paste0(tempSpace, "}"))
+        tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
+        checkTspan <- c(checkTspan, paste0(tempSpace, "}"))
+        
+        ## update tspan
         upTspan <- paste0(tempSpace, "while(tspan[k] < t && k < tspan.size()) {")
         tempSpace <- paste0(rep(" ", tempnSpace + 4), collapse = "")
         upTspan <- c(upTspan, paste0(tempSpace, "out(k, 0) = NA_REAL;"))
@@ -89,12 +113,13 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
         currline <- ratelines[1]
         Rcpp_code <- c(
             Rcpp_code[1:(currline - 1)], 
+            checkTspan,
             paste0(tempSpace, "// update tspan"), 
             paste0(tempSpace, "k = 0;"), 
             upTspan, 
             Rcpp_code[(currline + 1):length(Rcpp_code)]
         )
-        ratelines <- ratelines[-1] + length(upTspan) + 1
+        ratelines <- ratelines[-1] + length(checkTspan) + length(upTspan) + 1
     } else {
         Rcpp_code <- Rcpp_code[-ratelines[1]]
         ratelines <- ratelines[-1] - 1

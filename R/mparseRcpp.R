@@ -21,15 +21,15 @@
 #' 
 #' @param matchCrit: \code{logical} determining whether to implement match criteria or not.
 #' 
-#' @param addVars: a named vector where the names specify the additional variables and the
-#'                 values specify the values of the variable. These can be used to specify variables 
-#'                 that can be used for stopping criteria.
-#' 
 #' @param stopCrit: A \code{character} vector including additional stopping criteria for rejecting
 #'                  simulations early. These will be inserted within \code{if(CRIT){out[0] = 0; return out;}} statements
 #'                  within the underlying Rcpp code, which a return value of 0 corresponds to rejecting
 #'                  the simulation. Variables in \code{CRIT} must match either those in \code{compartments}
 #'                  and/or \code{addVars}.
+#' 
+#' @param addVars: a named vector where the names specify the additional variables and the
+#'                 values specify the values of the variable. These can be used to specify variables 
+#'                 that can be used for stopping criteria.
 #'                  
 #' @param tspan: An numeric vector corresponding to times at which states are to be returned.
 #'                  
@@ -43,7 +43,8 @@
 #'             \item{matchCrit:}{ copy of \code{matchCrit} argument;}
 #'             \item{stopCrit:}{ copy of \code{stopCrit} argument;}
 #'             \item{addVars:}{ copy of \code{addVars} argument;}
-#'             \item{tspan:}{ copy of \code{tspan} argument.}
+#'             \item{tspan:}{ copy of \code{tspan} argument;}
+#'             \item{runFromR:}{ copy of \code{runFromR} argument.}
 #'         }
 #'         This can be compiled into an \code{XPtr} or \code{function} object
 #'         using \code{compileRcpp()}.
@@ -170,6 +171,8 @@ mparseRcpp <- function(
         code = Rcpp_code,
         matchCrit = matchCrit,
         stopCrit = stopCrit,
+        addVars = addVars,
+        tspan = tspan,
         runFromR = runFromR
     )
     class(output) <- "parsedRcpp"

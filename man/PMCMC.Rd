@@ -4,13 +4,14 @@
 \alias{PMCMC}
 \title{Runs particle MCMC algorithm}
 \usage{
-PMCMC(dataset, priors, iniStates, func, iniPars = NA, tols = rep(0,
-  ncol(dataset) - 1), whichind = NULL, fixpars = F, niter = 1000,
+PMCMC(data, priors, func, iniStates, iniPars = NA, tols = rep(0,
+  ncol(data) - 1), whichind = NULL, fixpars = F, niter = 1000,
   npart = 100, nprintsum = 1000, nmultskip = 1000, adapt = T,
   propVar = NA, adaptmixprop = 0.05, nupdate = 100)
 }
 \arguments{
-\item{dataset}{Data frame containing time series count data, of form (time, counts*).}
+\item{data}{A \code{data.frame} containing time series count data, with the first column called
+\code{time}, followed by columns of time-series counts.}
 
 \item{priors}{A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 
 \code{p2}, with number of rows equal to the number of parameters. The column
@@ -19,8 +20,6 @@ Each entry in the \code{dist} column must contain one of \code{c("unif", "norm",
 and the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
 (lower and upper bounds in the uniform case; mean and standard deviation in the 
 normal case; and shape and rate in the gamma case).}
-
-\item{iniStates}{A numerical vector of initial states for the infectious disease model.}
 
 \item{func}{\code{XPtr} to simulation function. This function must take the following arguments
 in order: 
@@ -35,13 +34,15 @@ in order:
 indicating which elements of \code{u} correspond to which elements of \code{counts}.
 Must index from 0 NOT 1.}}}
 
+\item{iniStates}{A numerical vector of initial states for the infectious disease model.}
+
 \item{iniPars}{Vector of initial parameter values. If left unspecified, then these are 
 sampled from the prior distributions.}
 
 \item{tols}{Tolerances for matching data during ABC.}
 
-\item{whichind}{Vector of which elements of \code{iniStates} match to columns \code{2:ncol(dataset)}
-of `dataset`. If left as \code{NULL} then defaults to elements \code{1:length(iniStates)}
+\item{whichind}{Vector of which elements of \code{iniStates} match to columns \code{2:ncol(data)}
+of `data`. If left as \code{NULL} then defaults to elements \code{1:length(iniStates)}
 or returns an error.}
 
 \item{fixpars}{A logical determining whether to fix the input parameters (useful for 
@@ -88,7 +89,7 @@ If \code{fixpars = F}, the routine returns a \code{PMCMC} object, essentially a
  \item{npart}{the chosen number of particles;}
  \item{time}{the time taken to run the routine (in seconds);}
  \item{\code{propVar}}{the proposal covariance for the parameter updates;}
- \item{\code{dataset}}{data frame containing time series count data data, of form (group, count*);}
+ \item{\code{data}}{data frame containing time series count data data, of form (group, count*);}
  \item{\code{priors}:}{ a copy of the \code{priors} input.}
 }
 }

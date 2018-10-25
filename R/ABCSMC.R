@@ -1,13 +1,13 @@
 #' @title Runs ABC-SMC algorithm
 #'
-#' @description Runs ABC-SMC algorithm of Toni et al. (2009)
+#' @description     Runs ABC-SMC algorithm of Toni et al. (2009) for fitting 
+#'                  infectious disease models to time series count data 
 #'
 #' @export
 #'
 #' @param x         An \code{ABCSMC} object or the number of particles (must be a positive integer).
-#' @param tols 		A \code{data.frame} of tolerances, with the number of rows defining
-#'                  the number of generations required, and columns defining the summary statistics
-#'                  to match to. The columns must match to those in `data`.
+#' @param data      A \code{data.frame} with a single row and columns containing the observed summary statistics
+#'                  to match to. Columns must match to `tols`.
 #' @param priors    A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 
 #'                  \code{p2}, with number of rows equal to the number of parameters. The column
 #'                  \code{parname} simply gives names to each parameter for plotting and summarising.
@@ -21,8 +21,9 @@
 #'                  else it returns a \code{vector} of simulated summary measures. The output from the 
 #'                  function must be a vector with length equal to \code{nrow(data)} and with entries 
 #'                  in the same order as the rows of \code{data}.
-#' @param data      A \code{data.frame} with a single row and columns containing the observed summary statistics
-#'                  to match to. Columns must match to `tols`.
+#' @param tols 		A \code{data.frame} of tolerances, with the number of rows defining
+#'                  the number of generations required, and columns defining the summary statistics
+#'                  to match to. The columns must match to those in `data`.
 #' @param parallel  A \code{logical} determining whether to use parallel processing or not.
 #' @param mc.cores  Number of cores to use if using parallel processing.
 #' @param ...       Further arguments to pass to \code{func}. (Not used if extending runs.)
@@ -110,7 +111,7 @@ ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
 #' @rdname ABCSMC
 #' @export
 
-ABCSMC.default <- function(x, tols, priors, func, data, parallel = F, mc.cores = NA, ...) {
+ABCSMC.default <- function(x, data, priors, func, tols, parallel = F, mc.cores = NA, ...) {
     
     ## check inputs
     npart <- x

@@ -10,7 +10,7 @@ ABCSMC(x, ...)
 
 \method{ABCSMC}{ABCSMC}(x, tols, parallel = F, mc.cores = NA)
 
-\method{ABCSMC}{default}(x, tols, priors, func, data, parallel = F,
+\method{ABCSMC}{default}(x, data, priors, func, tols, parallel = F,
   mc.cores = NA, ...)
 }
 \arguments{
@@ -26,6 +26,9 @@ to match to. The columns must match to those in `data`.}
 
 \item{mc.cores}{Number of cores to use if using parallel processing.}
 
+\item{data}{A \code{data.frame} with a single row and columns containing the observed summary statistics
+to match to. Columns must match to `tols`.}
+
 \item{priors}{A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 
 \code{p2}, with number of rows equal to the number of parameters. The column
 \code{parname} simply gives names to each parameter for plotting and summarising.
@@ -40,9 +43,6 @@ simulations do not match the data then the function must return an \code{NA},
 else it returns a \code{vector} of simulated summary measures. The output from the 
 function must be a vector with length equal to \code{nrow(data)} and with entries 
 in the same order as the rows of \code{data}.}
-
-\item{data}{A \code{data.frame} with a single row and columns containing the observed summary statistics
-to match to. Columns must match to `tols`.}
 }
 \value{
 An \code{ABCSMC} object, essentially a \code{list} containing:
@@ -69,5 +69,6 @@ An \code{ABCSMC} object, essentially a \code{list} containing:
 }
 }
 \description{
-Runs ABC-SMC algorithm of Toni et al. (2009)
+Runs ABC-SMC algorithm of Toni et al. (2009) for fitting 
+                 infectious disease models to time series count data
 }

@@ -5,7 +5,8 @@
 #'
 #' @export
 #'
-#' @param dataset 		Data frame containing time series count data, of form (time, counts*).
+#' @param data 		    A \code{data.frame} containing time series count data, with the first column called
+#'                      \code{time}, followed by columns of time-series counts.
 #' @param priors        A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 
 #'                      \code{p2}, with number of rows equal to the number of parameters. The column
 #'                      \code{parname} simply gives names to each parameter for plotting and summarising.
@@ -13,7 +14,6 @@
 #'                      and the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
 #'                      (lower and upper bounds in the uniform case; mean and standard deviation in the 
 #'                      normal case; and shape and rate in the gamma case).
-#' @param iniStates     A numerical vector of initial states for the infectious disease model.
 #' @param func          \code{XPtr} to simulation function. This function must take the following arguments
 #'                      in order: 
 #'                      \itemize{
@@ -26,11 +26,12 @@
 #'                      \item{\code{IntegerVector whichind}:}{ a vector the same length as \code{counts}, 
 #'                      indicating which elements of \code{u} correspond to which elements of \code{counts}.
 #'                      Must index from 0 NOT 1.}}
+#' @param iniStates     A numerical vector of initial states for the infectious disease model.
 #' @param iniPars       Vector of initial parameter values. If left unspecified, then these are 
 #'                      sampled from the prior distributions.
 #' @param tols          Tolerances for matching data during ABC.
-#' @param whichind      Vector of which elements of \code{iniStates} match to columns \code{2:ncol(dataset)}
-#'                      of `dataset`. If left as \code{NULL} then defaults to elements \code{1:length(iniStates)}
+#' @param whichind      Vector of which elements of \code{iniStates} match to columns \code{2:ncol(data)}
+#'                      of `data`. If left as \code{NULL} then defaults to elements \code{1:length(iniStates)}
 #'                      or returns an error.
 #' @param fixpars       A logical determining whether to fix the input parameters (useful for 
 #'                      determining the variance of the marginal likelihood estimates).
@@ -72,19 +73,19 @@
 #'  \item{npart}{the chosen number of particles;}
 #'  \item{time}{the time taken to run the routine (in seconds);}
 #'  \item{\code{propVar}}{the proposal covariance for the parameter updates;}
-#'  \item{\code{dataset}}{data frame containing time series count data data, of form (group, count*);}
+#'  \item{\code{data}}{data frame containing time series count data data, of form (group, count*);}
 #'  \item{\code{priors}:}{ a copy of the \code{priors} input.}
 #' }
 #'
 
-PMCMC <- function(dataset, priors, iniStates, func, iniPars = NA, 
-    tols = rep(0, ncol(dataset) - 1), whichind = NULL, fixpars = F, 
+PMCMC <- function(data, priors, func, iniStates, iniPars = NA, 
+    tols = rep(0, ncol(data) - 1), whichind = NULL, fixpars = F, 
     niter = 1000, npart = 100, nprintsum = 1000, nmultskip = 1000, 
     adapt = T, propVar = NA, adaptmixprop = 0.05, nupdate = 100) {
     
     ## check inputs are present
-    if(missing(dataset)){
-        stop("'dataset' argument missing")
+    if(missing(data)){
+        stop("'data' argument missing")
     }
     if(missing(priors)){
         stop("'priors' argument missing")
@@ -97,16 +98,16 @@ PMCMC <- function(dataset, priors, iniStates, func, iniPars = NA,
     } 
     
     ## check data set
-    checkInput(dataset, "data.frame")
-    if(colnames(dataset)[1] != "time"){
-        stop("First column of 'dataset' must be 'time'")
+    checkInput(data, "data.frame")
+    if(colnames(data)[1] != "time"){
+        stop("First column of 'data' must be 'time'")
     }
-    if(ncol(dataset) < 1) {
-        stop("Must have at least one count column in 'dataset'")
+    if(ncol(data) < 1) {
+        stop("Must have at least one count column in 'data'")
     }
-    checkInput(dataset$time, "numeric")
-    for(j in 2:ncol(dataset)) {
-        checkInput(dataset[, j, drop = T], "numeric", int = T)
+    checkInput(data$time, "numeric")
+    for(j in 2:ncol(data)) {
+        checkInput(data[, j, drop = T], "numeric", int = T)
     }   
     
     ## check priors 
@@ -172,7 +173,7 @@ PMCMC <- function(dataset, priors, iniStates, func, iniPars = NA,
     }
     
     ## check tolerance argument
-    checkInput(tols, c("numeric", "vector"), ncol(dataset) - 1)
+    checkInput(tols, c("numeric", "vector"), ncol(data) - 1)
     if(!all(tols >= 0)) {
         stop("'tols' must be >= 0")
     }
@@ -180,14 +181,14 @@ PMCMC <- function(dataset, priors, iniStates, func, iniPars = NA,
     ## check whichind
     if(!is.null(whichind)) {
         checkInput(
-            whichind, c("numeric", "vector"), ncol(dataset) - 1, 
+            whichind, c("numeric", "vector"), ncol(data) - 1, 
             int = T, inSet = 1:length(iniStates), uni = T
         )
         whichind <- whichind - 1
     } else {
         whichind <- 1:length(iniStates) - 1
-        if((ncol(dataset) - 1) == length(iniStates)){
-            stop("length of 'iniStates' does not match number of columns of 'dataset' (-1)")
+        if((ncol(data) - 1) == length(iniStates)){
+            stop("length of 'iniStates' does not match number of columns of 'data' (-1)")
         }
     }
     
@@ -207,7 +208,7 @@ PMCMC <- function(dataset, priors, iniStates, func, iniPars = NA,
     checkInput(nupdate, c("numeric", "vector"), 1, int = T, gt = 0)
     
     ## run function
-    output <- PMCMC_cpp(as.matrix(dataset), priors, orig_priors$parnames, iniPars, propVar, niter, npart, 
+    output <- PMCMC_cpp(as.matrix(data), priors, orig_priors$parnames, iniPars, propVar, niter, npart, 
                     adaptmixprop, tols, whichind, nprintsum, nmultskip, nupdate, as.numeric(fixpars), 
                     as.numeric(adapt), iniStates, func)
     
@@ -225,9 +226,9 @@ PMCMC <- function(dataset, priors, iniStates, func, iniPars = NA,
     output[[1]] <- as.mcmc(output[[1]])
     
     ## finalise output and set names
-    output <- c(output[1], tols = list(tols), whichind = whichind + 1, iniStates = iniStates, output[-1], list(dataset), list(orig_priors))
+    output <- c(output[1], tols = list(tols), whichind = whichind + 1, iniStates = iniStates, output[-1], list(data), list(orig_priors))
     names(output) <- c("pars", "tols", "whichind", "iniStates", "skiprate", "accrate", 
-        "nmultskip", "npart", "time", "propVar", "dataset", "priors")
+        "nmultskip", "npart", "time", "propVar", "data", "priors")
         
     ## export class and object
     class(output) <- "PMCMC"

@@ -16,11 +16,11 @@
 #'                  (lower and upper bounds in the uniform case; mean and standard deviation in the 
 #'                  normal case; and shape and rate in the gamma case).
 #' @param func      Function that runs the simulator and checks whether the simulation matches the data. 
-#'                  The first three arguments must be \code{pars}, \code{data} and \code{tols}. If the
-#'                  simulations do not match the data then the function must return an \code{NA}, 
-#'                  else it returns a \code{vector} of simulated summary measures. The output from the 
-#'                  function must be a vector with length equal to \code{nrow(data)} and with entries 
-#'                  in the same order as the rows of \code{data}.
+#'                  The first four arguments must be \code{pars}, \code{data}, \code{tols} and 
+#'                  \code{iniStates}. If the simulations do not match the data then the function must 
+#'                  return an \code{NA}, else it must returns a \code{vector} of simulated summary measures. 
+#'                  In this latter case the output from the function must be a vector with length equal to 
+#'                  \code{ncol(data)} and with entries in the same order as the columns of \code{data}.
 #' @param tols 		A \code{data.frame} of tolerances, with the number of rows defining
 #'                  the number of generations required, and columns defining the summary statistics
 #'                  to match to. The columns must match to those in `data`.
@@ -150,10 +150,10 @@ ABCSMC.default <- function(x, data, priors, func, tols, parallel = F, mc.cores =
     }
     fargs <- formals(func)
     if(length(fargs) < 3){
-        stop("Number of arguments of 'func' must be at least 3")
+        stop("Number of arguments of 'func' must be at least 4")
     }
-    if(!all(match(names(fargs)[1:3], c("pars", "data", "tols")) - 1:3 == 0)){
-        stop("First three arguments of 'func' must be: 'pars', 'data' and 'tols'")
+    if(!all(match(names(fargs)[1:3], c("pars", "data", "tols", "iniStates")) - 1:4 == 0)){
+        stop("First four arguments of 'func' must be: 'pars', 'data', 'tols' and 'iniStates'")
     }
     if(!all(apply(tols, 2, function(x) {
         all(diff(x) < 0)
@@ -209,7 +209,7 @@ ABCSMC.default <- function(x, data, priors, func, tols, parallel = F, mc.cores =
     args <- list(...)
     
     ## extract arguments for "func"
-    fargs <- fargs[is.na(match(names(fargs), c("pars", "data", "tols")))]
+    fargs <- fargs[is.na(match(names(fargs), c("pars", "data", "tols", "iniStates")))]
     if(length(fargs) > 0) {
         fargs1 <- match(names(fargs), names(args))
         if(!all(!is.na(fargs1))){
@@ -266,12 +266,14 @@ ABCSMC.default <- function(x, data, priors, func, tols, parallel = F, mc.cores =
             temp <- lapply(1:npart, runProp,
                 t = t, priors = priors, 
                 prevWeights = tempWeights, prevPars = tempPars, 
-                propCov = propCov, tols = tols[t, ], data = as.numeric(data[1, ]), func = func, func_args = fargs)
+                propCov = propCov, tols = tols[t, ], data = as.numeric(data[1, ]), 
+                func = func, func_args = fargs)
         } else  {
             temp <- mclapply(1:npart, runProp,
                 t = t, priors = priors, 
                 prevWeights = tempWeights, prevPars = tempPars, 
-                propCov = propCov, tols = tols[t, ], data = as.numeric(data[1, ]), func = func, func_args = fargs, 
+                propCov = propCov, tols = tols[t, ], data = as.numeric(data[1, ]), 
+                func = func, func_args = fargs, 
                 mc.cores = mc.cores)
         }
         

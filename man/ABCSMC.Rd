@@ -38,11 +38,11 @@ and the corresponding \code{p1} and \code{p2} entries relate to the hyperparamet
 normal case; and shape and rate in the gamma case).}
 
 \item{func}{Function that runs the simulator and checks whether the simulation matches the data. 
-The first three arguments must be \code{pars}, \code{data} and \code{tols}. If the
-simulations do not match the data then the function must return an \code{NA}, 
-else it returns a \code{vector} of simulated summary measures. The output from the 
-function must be a vector with length equal to \code{nrow(data)} and with entries 
-in the same order as the rows of \code{data}.}
+The first four arguments must be \code{pars}, \code{data}, \code{tols} and 
+\code{iniStates}. If the simulations do not match the data then the function must 
+return an \code{NA}, else it must returns a \code{vector} of simulated summary measures. 
+In this latter case the output from the function must be a vector with length equal to 
+\code{ncol(data)} and with entries in the same order as the columns of \code{data}.}
 }
 \value{
 An \code{ABCSMC} object, essentially a \code{list} containing:

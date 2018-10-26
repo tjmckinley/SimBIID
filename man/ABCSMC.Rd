@@ -67,7 +67,7 @@ An \code{ABCSMC} object, essentially a \code{list} containing:
 \item{\code{priors}:}{ a copy of the \code{priors} input;}
 \item{\code{data}:}{ a copy of the \code{data} input;}
 \item{\code{func}:}{ a copy of the \code{func} input;}
-\item{\code{iniStates}}{a vector of initial states for the infectious disease model;}
+\item{\code{iniStates}}{ a vector of initial states for the infectious disease model;}
 \item{\code{addargs}:}{ a copy of the \code{...} inputs.}
 }
 }

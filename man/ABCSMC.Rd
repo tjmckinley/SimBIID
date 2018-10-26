@@ -10,8 +10,8 @@ ABCSMC(x, ...)
 
 \method{ABCSMC}{ABCSMC}(x, tols, parallel = F, mc.cores = NA)
 
-\method{ABCSMC}{default}(x, data, priors, func, tols, parallel = F,
-  mc.cores = NA, ...)
+\method{ABCSMC}{default}(x, data, priors, func, iniStates, tols,
+  parallel = F, mc.cores = NA, ...)
 }
 \arguments{
 \item{x}{An \code{ABCSMC} object or the number of particles (must be a positive integer).}
@@ -43,6 +43,8 @@ The first four arguments must be \code{pars}, \code{data}, \code{tols} and
 return an \code{NA}, else it must returns a \code{vector} of simulated summary measures. 
 In this latter case the output from the function must be a vector with length equal to 
 \code{ncol(data)} and with entries in the same order as the columns of \code{data}.}
+
+\item{iniStates}{A numerical vector of initial states for the infectious disease model.}
 }
 \value{
 An \code{ABCSMC} object, essentially a \code{list} containing:
@@ -64,7 +66,8 @@ An \code{ABCSMC} object, essentially a \code{list} containing:
 \item{\code{tols}:}{ a copy of the \code{tols} input;}
 \item{\code{priors}:}{ a copy of the \code{priors} input;}
 \item{\code{data}:}{ a copy of the \code{data} input;}
-\item{\code{func}:}{ a copy of the \code{func} input}
+\item{\code{func}:}{ a copy of the \code{func} input;}
+\item{\code{iniStates}}{a vector of initial states for the infectious disease model;}
 \item{\code{addargs}:}{ a copy of the \code{...} inputs.}
 }
 }

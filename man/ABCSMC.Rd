@@ -10,24 +10,23 @@ ABCSMC(x, ...)
 
 \method{ABCSMC}{ABCSMC}(x, tols, parallel = F, mc.cores = NA)
 
-\method{ABCSMC}{default}(x, data, priors, func, iniStates, tols,
-  parallel = F, mc.cores = NA, ...)
+\method{ABCSMC}{default}(x, priors, func, iniStates, npart = 100,
+  tols = rep(0, ncol(x) - 1), parallel = F, mc.cores = NA, ...)
 }
 \arguments{
-\item{x}{An \code{ABCSMC} object or the number of particles (must be a positive integer in that case).}
+\item{x}{An \code{ABCSMC} object or a \code{data.frame} with a single row and columns 
+containing the observed summary statistics to match to. Columns must match to `tols`.}
 
 \item{...}{Further arguments to pass to \code{func}. (Not used if extending runs.)}
 
 \item{tols}{A \code{data.frame} of tolerances, with the number of rows defining
 the number of generations required, and columns defining the summary statistics
-to match to. The columns must match to those in `data`.}
+to match to. The columns must match to those in `data`. Defaults to exact matching for
+all columns.}
 
 \item{parallel}{A \code{logical} determining whether to use parallel processing or not.}
 
 \item{mc.cores}{Number of cores to use if using parallel processing.}
-
-\item{data}{A \code{data.frame} with a single row and columns containing the observed summary statistics
-to match to. Columns must match to `tols`.}
 
 \item{priors}{A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 
 \code{p2}, with number of rows equal to the number of parameters. The column
@@ -45,6 +44,8 @@ In this latter case the output from the function must be a vector with length eq
 \code{ncol(data)} and with entries in the same order as the columns of \code{data}.}
 
 \item{iniStates}{A numerical vector of initial states for the infectious disease model.}
+
+\item{npart}{An integer specifying the number of particles.}
 }
 \value{
 An \code{ABCSMC} object, essentially a \code{list} containing:

@@ -27,6 +27,7 @@
 #'                      indicating which elements of \code{u} correspond to which elements of \code{counts}.
 #'                      Must index from 0 NOT 1.}}
 #' @param iniStates     A numerical vector of initial states for the infectious disease model.
+#' @param npart         An integer specifying the number of particles for the alive particle filter.
 #' @param tols          Tolerances for matching data during ABC. Defaults to matching every count column
 #'                      of \code{data} exactly.
 #' @param whichind      Vector of which elements of \code{iniStates} match to columns \code{2:ncol(data)}
@@ -37,7 +38,6 @@
 #' @param fixpars       A logical determining whether to fix the input parameters (useful for 
 #'                      determining the variance of the marginal likelihood estimates).
 #' @param niter         An integer specifying the number of iterations to run the MCMC.
-#' @param npart         An integer specifying the number of particles for the alive particle filter.
 #' @param nprintsum     Prints summary of MCMC to screen every \code{nprintsum} iterations. 
 #'                      Also defines how often adaptive scaling of proposal variances occur.
 #' @param nmultskip     Upper bound for how many simulations to run before rejecting proposal.
@@ -103,12 +103,12 @@ PMCMC.PMCMC <- function(x, niter = 1000, nprintsum = 1000,
         priors = x$priors, 
         func = x$func, 
         iniStates = x$iniStates, 
+        npart = x$npart, 
         tols = x$tols, 
         whichind = x$whichind, 
         iniPars = x$pars[nrow(x$pars), ], 
         fixpars = F, 
         niter = niter, 
-        npart = x$npart, 
         nprintsum = nprintsum, 
         nmultskip = x$nmultskip, 
         adapt = adapt, 
@@ -131,10 +131,10 @@ PMCMC.PMCMC <- function(x, niter = 1000, nprintsum = 1000,
 #' @export
 
 PMCMC.default <- function(
-    x, priors, func, iniStates, 
-    tols = rep(0, ncol(data) - 1), whichind = NULL, 
+    x, priors, func, iniStates, npart = 100,
+    tols = rep(0, ncol(x) - 1), whichind = NULL, 
     iniPars = NA, fixpars = F, 
-    niter = 1000, npart = 100, nprintsum = 1000, nmultskip = 1000, 
+    niter = 1000, nprintsum = 1000, nmultskip = 1000, 
     adapt = T, propVar = NA, adaptmixprop = 0.05, nupdate = 100
 ) {
     

@@ -5,9 +5,8 @@
 #'
 #' @export
 #'
-#' @param x         An \code{ABCSMC} object or the number of particles (must be a positive integer in that case).
-#' @param data      A \code{data.frame} with a single row and columns containing the observed summary statistics
-#'                  to match to. Columns must match to `tols`.
+#' @param x         An \code{ABCSMC} object or a \code{data.frame} with a single row and columns 
+#'                  containing the observed summary statistics to match to. Columns must match to `tols`.
 #' @param priors    A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 
 #'                  \code{p2}, with number of rows equal to the number of parameters. The column
 #'                  \code{parname} simply gives names to each parameter for plotting and summarising.
@@ -22,9 +21,11 @@
 #'                  In this latter case the output from the function must be a vector with length equal to 
 #'                  \code{ncol(data)} and with entries in the same order as the columns of \code{data}.
 #' @param iniStates A numerical vector of initial states for the infectious disease model.
+#' @param npart     An integer specifying the number of particles.
 #' @param tols 		A \code{data.frame} of tolerances, with the number of rows defining
 #'                  the number of generations required, and columns defining the summary statistics
-#'                  to match to. The columns must match to those in `data`.
+#'                  to match to. The columns must match to those in `data`. Defaults to exact matching for
+#'                  all columns.
 #' @param parallel  A \code{logical} determining whether to use parallel processing or not.
 #' @param mc.cores  Number of cores to use if using parallel processing.
 #' @param ...       Further arguments to pass to \code{func}. (Not used if extending runs.)
@@ -83,11 +84,11 @@ ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
     
     ## collect arguments
     tempargs <- list(
-        x = nrow(x$pars[[1]]), 
+        x = x$data, 
+        npart = nrow(x$pars[[1]]), 
         tols = tols, 
         priors = x$priors, 
         func = x$func, 
-        data = x$data, 
         iniStates = x$iniStates,
         parallel = parallel,
         mc.cores = mc.cores, 
@@ -114,12 +115,12 @@ ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
 #' @rdname ABCSMC
 #' @export
 
-ABCSMC.default <- function(x, data, priors, func, iniStates, tols, parallel = F, mc.cores = NA, ...) {
-    
+ABCSMC.default <- function(x, priors, func, iniStates, npart = 100, tols = rep(0, ncol(x) - 1), 
+                           parallel = F, mc.cores = NA, ...) {
     
     ## check missing arguments
-    if(missing(x) & missing(data)){
-        stop("'x' and 'data' can't both be missing")
+    if(missing(x)){
+        stop("'x' argument missing")
     }
     if(missing(priors)){
         stop("'priors' argument missing")
@@ -130,12 +131,8 @@ ABCSMC.default <- function(x, data, priors, func, iniStates, tols, parallel = F,
     if(missing(iniStates)){
         stop("'iniStates' argument missing")
     }
-    if(missing(tols)){
-        stop("'tols' argument missing")
-    }
     
     ## check inputs
-    npart <- x
     checkInput(parallel, c("vector", "logical"), 1)
     if(parallel) {
         if(!require(parallel)) {
@@ -159,9 +156,10 @@ ABCSMC.default <- function(x, data, priors, func, iniStates, tols, parallel = F,
     }
     checkInput(priors, "data.frame", ncol = 4)
     checkInput(func, "function", 1)
+    data <- x
     checkInput(data, "data.frame", nrow = 1)
     if(!all(sapply(data, is.numeric))) {
-        stop("'data' must be numeric")
+        stop("All columns of 'data' must be numeric")
     }
     if(ncol(data) != ncol(tols)){
         stop("Number of columns of 'data' and 'tols' must match")

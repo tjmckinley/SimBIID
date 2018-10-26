@@ -11,9 +11,9 @@ PMCMC(x, ...)
 \method{PMCMC}{PMCMC}(x, niter = 1000, nprintsum = 1000, adapt = T,
   adaptmixprop = 0.05, nupdate = 100)
 
-\method{PMCMC}{default}(x, priors, func, iniStates, tols = rep(0,
-  ncol(data) - 1), whichind = NULL, iniPars = NA, fixpars = F,
-  niter = 1000, npart = 100, nprintsum = 1000, nmultskip = 1000,
+\method{PMCMC}{default}(x, priors, func, iniStates, npart = 100,
+  tols = rep(0, ncol(x) - 1), whichind = NULL, iniPars = NA,
+  fixpars = F, niter = 1000, nprintsum = 1000, nmultskip = 1000,
   adapt = T, propVar = NA, adaptmixprop = 0.05, nupdate = 100)
 }
 \arguments{
@@ -54,6 +54,8 @@ Must index from 0 NOT 1.}}}
 
 \item{iniStates}{A numerical vector of initial states for the infectious disease model.}
 
+\item{npart}{An integer specifying the number of particles for the alive particle filter.}
+
 \item{tols}{Tolerances for matching data during ABC. Defaults to matching every count column
 of \code{data} exactly.}
 
@@ -66,8 +68,6 @@ sampled from the prior distributions.}
 
 \item{fixpars}{A logical determining whether to fix the input parameters (useful for 
 determining the variance of the marginal likelihood estimates).}
-
-\item{npart}{An integer specifying the number of particles for the alive particle filter.}
 
 \item{nmultskip}{Upper bound for how many simulations to run before rejecting proposal.}
 

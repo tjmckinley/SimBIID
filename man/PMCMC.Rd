@@ -2,16 +2,34 @@
 % Please edit documentation in R/PMCMC.R
 \name{PMCMC}
 \alias{PMCMC}
+\alias{PMCMC.PMCMC}
+\alias{PMCMC.default}
 \title{Runs particle MCMC algorithm}
 \usage{
-PMCMC(data, priors, func, iniStates, tols = rep(0, ncol(data) - 1),
-  whichind = NULL, iniPars = NA, fixpars = F, niter = 1000,
-  npart = 100, nprintsum = 1000, nmultskip = 1000, adapt = T,
-  propVar = NA, adaptmixprop = 0.05, nupdate = 100)
+PMCMC(x, ...)
+
+\method{PMCMC}{PMCMC}(x, niter = 1000, nprintsum = 1000, adapt = T,
+  adaptmixprop = 0.05, nupdate = 100)
+
+\method{PMCMC}{default}(x, priors, func, iniStates, tols = rep(0,
+  ncol(data) - 1), whichind = NULL, iniPars = NA, fixpars = F,
+  niter = 1000, npart = 100, nprintsum = 1000, nmultskip = 1000,
+  adapt = T, propVar = NA, adaptmixprop = 0.05, nupdate = 100)
 }
 \arguments{
-\item{data}{A \code{data.frame} containing time series count data, with the first column called
+\item{x}{A \code{PMCMC} object, or a \code{data.frame} containing time series count data, with the first column called
 \code{time}, followed by columns of time-series counts.}
+
+\item{niter}{An integer specifying the number of iterations to run the MCMC.}
+
+\item{nprintsum}{Prints summary of MCMC to screen every \code{nprintsum} iterations. 
+Also defines how often adaptive scaling of proposal variances occur.}
+
+\item{adapt}{Logical determining whether to use adaptive proposal or not.}
+
+\item{adaptmixprop}{Mixing proportion for adaptive proposal.}
+
+\item{nupdate}{Controls when to start adaptive update.}
 
 \item{priors}{A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 
 \code{p2}, with number of rows equal to the number of parameters. The column
@@ -49,33 +67,22 @@ sampled from the prior distributions.}
 \item{fixpars}{A logical determining whether to fix the input parameters (useful for 
 determining the variance of the marginal likelihood estimates).}
 
-\item{niter}{An integer specifying the number of iterations to run the MCMC.}
-
 \item{npart}{An integer specifying the number of particles for the alive particle filter.}
 
-\item{nprintsum}{Prints summary of MCMC to screen every \code{nprintsum} iterations. 
-Also defines how often adaptive scaling of proposal variances occur.}
-
 \item{nmultskip}{Upper bound for how many simulations to run before rejecting proposal.}
-
-\item{adapt}{Logical determining whether to use adaptive proposal or not.}
 
 \item{propVar}{A numeric (npars x npars) matrix with log (or logistic) covariances to use
 as (initial) proposal matrix. If left unspecified then defaults to 
 \code{diag(nrow(priors)) * (0.1 ^ 2) / nrow(priors)}.}
-
-\item{adaptmixprop}{Mixing proportion for adaptive proposal.}
-
-\item{nupdate}{Controls when to start adaptive update.}
 }
 \value{
 If the code throws an error, then it returns a missing value (\code{NA}). If 
         \code{fixpars = T} it returns a list of length 2 containing:
 \itemize{
-     \item{\code{output}}{ a matrix with two columns. The first contains the simulated
+     \item{\code{output}:}{ a matrix with two columns. The first contains the simulated
          log-likelihood, and the second is a binary indicator relating to whether the
          simulation was 'skipped' or not (1 = skipped, 0 = not skipped);}
-     \item{\code{pars}}{ a vector of parameters used for the simulations.}
+     \item{\code{pars}:}{ a vector of parameters used for the simulations.}
 }
 If \code{fixpars = F}, the routine returns a \code{PMCMC} object, essentially a 
          \code{list} containing:

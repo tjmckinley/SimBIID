@@ -5,7 +5,7 @@
 #'
 #' @export
 #'
-#' @param data 		    A \code{data.frame} containing time series count data, with the first column called
+#' @param x 		    A \code{PMCMC} object, or a \code{data.frame} containing time series count data, with the first column called
 #'                      \code{time}, followed by columns of time-series counts.
 #' @param priors        A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 
 #'                      \code{p2}, with number of rows equal to the number of parameters. The column
@@ -56,10 +56,10 @@
 #' @return If the code throws an error, then it returns a missing value (\code{NA}). If 
 #'         \code{fixpars = T} it returns a list of length 2 containing:
 #' \itemize{
-#'      \item{\code{output}}{ a matrix with two columns. The first contains the simulated
+#'      \item{\code{output}:}{ a matrix with two columns. The first contains the simulated
 #'          log-likelihood, and the second is a binary indicator relating to whether the
 #'          simulation was 'skipped' or not (1 = skipped, 0 = not skipped);}
-#'      \item{\code{pars}}{ a vector of parameters used for the simulations.}
+#'      \item{\code{pars}:}{ a vector of parameters used for the simulations.}
 #' }
 #' If \code{fixpars = F}, the routine returns a \code{PMCMC} object, essentially a 
 #'          \code{list} containing:
@@ -77,10 +77,61 @@
 #'  \item{\code{data}:}{ data frame containing time series count data data, of form (group, count*);}
 #'  \item{\code{priors}:}{ a copy of the \code{priors} input.}
 #' }
-#'
+#' @rdname PMCMC
 
-PMCMC <- function(
-    data, priors, func, iniStates, 
+PMCMC <- function(x, ...) {
+    UseMethod("PMCMC")
+}
+
+#' @rdname PMCMC
+#' @export
+
+PMCMC.PMCMC <- function(x, niter = 1000, nprintsum = 1000, 
+                        adapt = T, adaptmixprop = 0.05, 
+                        nupdate = 100) {
+    ## check object
+    if(class(x) != "PMCMC") {
+        stop("'x' not a PMCMC object")
+    }
+    if(length(x) <= 2){
+        stop("'x' not a valid PMCMC to continue running...")
+    }
+    
+    ## collect arguments
+    tempargs <- list(
+        x = x$data, 
+        priors = x$priors, 
+        func = x$func, 
+        iniStates = x$iniStates, 
+        tols = x$tols, 
+        whichind = x$whichind, 
+        iniPars = x$pars[nrow(x$pars), ], 
+        fixpars = F, 
+        niter = niter, 
+        npart = x$npart, 
+        nprintsum = nprintsum, 
+        nmultskip = x$nmultskip, 
+        adapt = adapt, 
+        propVar = x$propVar, 
+        adaptmixprop = adaptmixprop, 
+        nupdate = nupdate
+    )
+    
+    ## run PMCMC
+    temp <- do.call("PMCMC.default", tempargs)
+    
+    ## combine with original runs
+    x$pars <- as.mcmc(rbind(as.matrix(x$pars), as.matrix(temp$pars)))
+    
+    ## return new object
+    x
+}
+    
+#' @rdname PMCMC
+#' @export
+
+PMCMC.default <- function(
+    x, priors, func, iniStates, 
     tols = rep(0, ncol(data) - 1), whichind = NULL, 
     iniPars = NA, fixpars = F, 
     niter = 1000, npart = 100, nprintsum = 1000, nmultskip = 1000, 
@@ -88,8 +139,8 @@ PMCMC <- function(
 ) {
     
     ## check inputs are present
-    if(missing(data)){
-        stop("'data' argument missing")
+    if(missing(x)){
+        stop("'x' argument missing")
     }
     if(missing(priors)){
         stop("'priors' argument missing")
@@ -102,6 +153,7 @@ PMCMC <- function(
     } 
     
     ## check data set
+    data <- x
     checkInput(data, "data.frame")
     if(colnames(data)[1] != "time"){
         stop("First column of 'data' must be 'time'")

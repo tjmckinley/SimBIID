@@ -17,7 +17,7 @@
 #' @param func          \code{XPtr} to simulation function. This function must take the following arguments
 #'                      in order: 
 #'                      \itemize{
-#'                      \item{\code{NumericVector gdata}:}{ a vector of parameters;}
+#'                      \item{\code{NumericVector pars}:}{ a vector of parameters;}
 #'                      \item{\code{double tstart}:}{ the start time;}
 #'                      \item{\code{double tstop}:}{ the end time;}
 #'                      \item{\code{IntegerVector u}:}{ a vector of states;}

@@ -5,7 +5,7 @@
 #'
 #' @export
 #'
-#' @param x         An \code{ABCSMC} object or the number of particles (must be a positive integer).
+#' @param x         An \code{ABCSMC} object or the number of particles (must be a positive integer in that case).
 #' @param data      A \code{data.frame} with a single row and columns containing the observed summary statistics
 #'                  to match to. Columns must match to `tols`.
 #' @param priors    A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 

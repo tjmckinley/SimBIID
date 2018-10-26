@@ -14,7 +14,7 @@ ABCSMC(x, ...)
   parallel = F, mc.cores = NA, ...)
 }
 \arguments{
-\item{x}{An \code{ABCSMC} object or the number of particles (must be a positive integer).}
+\item{x}{An \code{ABCSMC} object or the number of particles (must be a positive integer in that case).}
 
 \item{...}{Further arguments to pass to \code{func}. (Not used if extending runs.)}
 

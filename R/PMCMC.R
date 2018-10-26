@@ -64,17 +64,17 @@
 #' If \code{fixpars = F}, the routine returns a \code{PMCMC} object, essentially a 
 #'          \code{list} containing:
 #' \itemize{
-#'  \item{\code{pars}}{an \code{mcmc} object containing posterior samples for the parameters;}
-#'  \item{\code{tols}}{tolerances;}
-#'  \item{\code{whichind}}{matching indicators;}
-#'  \item{\code{iniStates}}{a vector of initial states for the infectious disease model;}
-#'  \item{\code{skiprate}}{the cumulative skip rate;}
-#'  \item{\code{accrate}}{the cumulative acceptance rate;}
-#'  \item{\code{nmultskip}}{the chosen value of \code{nmultskip};}
-#'  \item{\code{npart}}{the chosen number of particles;}
-#'  \item{\code{time}}{the time taken to run the routine (in seconds);}
-#'  \item{\code{propVar}}{the proposal covariance for the parameter updates;}
-#'  \item{\code{data}}{data frame containing time series count data data, of form (group, count*);}
+#'  \item{\code{pars}:}{ an \code{mcmc} object containing posterior samples for the parameters;}
+#'  \item{\code{tols}:}{ tolerances;}
+#'  \item{\code{whichind}:}{ matching indicators;}
+#'  \item{\code{iniStates}:}{ a vector of initial states for the infectious disease model;}
+#'  \item{\code{skiprate}:}{ the cumulative skip rate;}
+#'  \item{\code{accrate}:}{ the cumulative acceptance rate;}
+#'  \item{\code{nmultskip}:}{ the chosen value of \code{nmultskip};}
+#'  \item{\code{npart}:}{ the chosen number of particles;}
+#'  \item{\code{time}:}{ the time taken to run the routine (in seconds);}
+#'  \item{\code{propVar}:}{ the proposal covariance for the parameter updates;}
+#'  \item{\code{data}:}{ data frame containing time series count data data, of form (group, count*);}
 #'  \item{\code{priors}:}{ a copy of the \code{priors} input.}
 #' }
 #'

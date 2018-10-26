@@ -4,8 +4,8 @@
 \alias{PMCMC}
 \title{Runs particle MCMC algorithm}
 \usage{
-PMCMC(data, priors, func, iniStates, iniPars = NA, tols = rep(0,
-  ncol(data) - 1), whichind = NULL, fixpars = F, niter = 1000,
+PMCMC(data, priors, func, iniStates, tols = rep(0, ncol(data) - 1),
+  whichind = NULL, iniPars = NA, fixpars = F, niter = 1000,
   npart = 100, nprintsum = 1000, nmultskip = 1000, adapt = T,
   propVar = NA, adaptmixprop = 0.05, nupdate = 100)
 }
@@ -36,14 +36,15 @@ Must index from 0 NOT 1.}}}
 
 \item{iniStates}{A numerical vector of initial states for the infectious disease model.}
 
-\item{iniPars}{Vector of initial parameter values. If left unspecified, then these are 
-sampled from the prior distributions.}
-
-\item{tols}{Tolerances for matching data during ABC.}
+\item{tols}{Tolerances for matching data during ABC. Defaults to matching every count column
+of \code{data} exactly.}
 
 \item{whichind}{Vector of which elements of \code{iniStates} match to columns \code{2:ncol(data)}
 of `data`. If left as \code{NULL} then defaults to elements \code{1:length(iniStates)}
-or returns an error.}
+or returns an error. Must be same length as \code{tols}.}
+
+\item{iniPars}{Vector of initial parameter values. If left unspecified, then these are 
+sampled from the prior distributions.}
 
 \item{fixpars}{A logical determining whether to fix the input parameters (useful for 
 determining the variance of the marginal likelihood estimates).}

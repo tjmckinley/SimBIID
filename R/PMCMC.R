@@ -27,12 +27,13 @@
 #'                      indicating which elements of \code{u} correspond to which elements of \code{counts}.
 #'                      Must index from 0 NOT 1.}}
 #' @param iniStates     A numerical vector of initial states for the infectious disease model.
-#' @param iniPars       Vector of initial parameter values. If left unspecified, then these are 
-#'                      sampled from the prior distributions.
-#' @param tols          Tolerances for matching data during ABC.
+#' @param tols          Tolerances for matching data during ABC. Defaults to matching every count column
+#'                      of \code{data} exactly.
 #' @param whichind      Vector of which elements of \code{iniStates} match to columns \code{2:ncol(data)}
 #'                      of `data`. If left as \code{NULL} then defaults to elements \code{1:length(iniStates)}
-#'                      or returns an error.
+#'                      or returns an error. Must be same length as \code{tols}.
+#' @param iniPars       Vector of initial parameter values. If left unspecified, then these are 
+#'                      sampled from the prior distributions.
 #' @param fixpars       A logical determining whether to fix the input parameters (useful for 
 #'                      determining the variance of the marginal likelihood estimates).
 #' @param niter         An integer specifying the number of iterations to run the MCMC.
@@ -78,10 +79,13 @@
 #' }
 #'
 
-PMCMC <- function(data, priors, func, iniStates, iniPars = NA, 
-    tols = rep(0, ncol(data) - 1), whichind = NULL, fixpars = F, 
+PMCMC <- function(
+    data, priors, func, iniStates, 
+    tols = rep(0, ncol(data) - 1), whichind = NULL, 
+    iniPars = NA, fixpars = F, 
     niter = 1000, npart = 100, nprintsum = 1000, nmultskip = 1000, 
-    adapt = T, propVar = NA, adaptmixprop = 0.05, nupdate = 100) {
+    adapt = T, propVar = NA, adaptmixprop = 0.05, nupdate = 100
+) {
     
     ## check inputs are present
     if(missing(data)){

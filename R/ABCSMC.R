@@ -168,10 +168,10 @@ ABCSMC.default <- function(x, priors, func, iniStates, npart = 100, tols = rep(0
         stop("colnames(tols) !- colnames(data)")
     }
     fargs <- formals(func)
-    if(length(fargs) < 3){
+    if(length(fargs) < 4){
         stop("Number of arguments of 'func' must be at least 4")
     }
-    if(!all(match(names(fargs)[1:3], c("pars", "data", "tols", "iniStates")) - 1:4 == 0)){
+    if(!identical(names(fargs)[1:4], c("pars", "data", "tols", "iniStates"))){
         stop("First four arguments of 'func' must be: 'pars', 'data', 'tols' and 'iniStates'")
     }
     if(!all(apply(tols, 2, function(x) {

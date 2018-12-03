@@ -16,7 +16,7 @@
 #'         extracted from \code{SimBIID_runs} object.
 
 plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums"), 
-                              rep = 1, quant = seq(0.55, 0.95, by = 0.05)) {
+                              rep = NA, quant = seq(0.55, 0.95, by = 0.05)) {
     ## check x
     if(class(x) != "SimBIID_runs"){
         stop("'x' is not a SimBIID_runs object")
@@ -33,7 +33,9 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
     type <- type[1]
     checkInput(type, inSet = c("runs", "sums"))
     ## check rep
-    checkInput(rep, c("vector", "numeric"), inSet = x$sums$rep, int = T)
+    if(!is.na(rep[1])){
+        checkInput(rep, c("vector", "numeric"), inSet = x$sums$rep, int = T)
+    }
     ## check quant
     checkInput(quant, c("vector", "numeric"), inSet = seq(0.55, 0.95, by = 0.05))
     quant <- sort(quant)
@@ -53,6 +55,15 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
                 geom_histogram() +
                 facet_wrap(~ output, scales = "free") +
                 xlab("")
+        if(!is.na(rep[1])){
+            rep1 <- rep
+            repSums <- x$sums %>%
+                slice(rep1) %>%
+                select(!!which) %>%
+                gather(output, value) %>%
+                mutate(output = factor(output, levels = which))
+            p <- p + geom_point(aes(x = value), data = repSums, y = 0, colour = "red", shape = 16)
+        }
     } else {
         ## produce plot
         which <- unique(c("rep", "t", which))

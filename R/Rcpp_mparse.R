@@ -10,7 +10,7 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
         compType <- "Rcpp_object <- Rcpp::cppFunction"
         ## set output type
         if(is.null(matchCrit)) {
-            if(is.null(tspan)){
+            if(!tspan){
                 compType <- paste0(compType, "('NumericVector ")
             } else {
                 compType <- paste0(compType, "('NumericMatrix ")
@@ -28,7 +28,7 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
     } else {
         Rcpp_code[1] <- paste0(compType, "simFunction(NumericVector gdata, double tstart, double tstop, IntegerVector u")
     }
-    if(!is.null(tspan)){
+    if(tspan){
         Rcpp_code[1] <- paste0(Rcpp_code[1], ", NumericVector tspan")
     }
     
@@ -66,7 +66,7 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
     ## update output size
     if(is.null(matchCrit)){
         ## initialise tspan outputs
-        if(!is.null(tspan)){
+        if(tspan){
             outsize <- paste0(paste(rep(" ", 4), collapse = ""), "NumericMatrix out(tspan.size() + 1, u.size() + 2);")
         } else {
             outsize <- paste0(paste(rep(" ", 4), collapse = ""), "NumericVector out(u.size() + 2);")
@@ -79,7 +79,7 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
     ratelines <- ratelines[-1]
     
     ## update tspan
-    if(!is.null(tspan)) {
+    if(tspan) {
         tempnSpace <- 4
         tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
         
@@ -187,7 +187,7 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
     ratelines <- ratelines + length(upStates) + length(upRates) - 1
     
     ## update tspan
-    if(!is.null(tspan)) {
+    if(tspan) {
         currline <- ratelines[1]
         upTspan <- paste(paste(rep(" ", 7), collapse = ""), upTspan)
         Rcpp_code <- c(
@@ -214,7 +214,7 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
     }
     if(is.null(matchCrit)) {
         tempSpace <- paste(rep(" ", 4), collapse = "")
-        if(is.null(tspan)){
+        if(!tspan){
             matchCrit <- paste0(tempSpace, "// set output\n",
                                 tempSpace, "out[0] = (totrate == 0.0 ? 1:0);\n",
                                 tempSpace, "out[1] = t;\n",

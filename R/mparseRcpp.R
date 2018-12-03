@@ -146,8 +146,6 @@ mparseRcpp <- function(
         if(!is.null(matchCrit)) {
             stop("'tspan' and 'matchCrit' can't be specified together")
         }
-    } else {
-        tspan <- NULL
     }
     
     ## check run from R

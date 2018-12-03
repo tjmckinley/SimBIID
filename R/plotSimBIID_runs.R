@@ -85,27 +85,33 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
             spread(output.x, value) %>%
             mutate(output.y = factor(output.y, levels = which[-match(c("rep", "t"), which)])) %>%
             mutate(pair = as.character(quant[pair, 2]))
-        
-       # ## generate colorRamp
-       # getPalette <- colorRampPalette(brewer.pal(9, "PRGn"))
-       # fillCols <- seq(0.55, 0.95, by = 0.05)
-       # fillCols <- getPalette(length(fillCols))
-       # fillCols <- fillCols[match(as.character(quant[, 2]), as.character(seq(0.55, 0.95, by = 0.05)))]
        
        ## produce plot
        p <- p1 %>%
            ggplot(aes(x = t)) +
-               facet_wrap(~ output.y) +
-               xlab("Time") + ylab("Counts") #+
-               #scale_fill_manual(values = fillCols)
+               xlab("Time") + ylab("Counts")
        for(i in unique(p1$pair)){
             temp <- filter(p1, pair == i)
             p <- p + geom_ribbon(aes(ymin = lci, ymax = uci), 
                  data = temp, alpha = 0.2)
        }
-       p <- p + labs(fill = "Quantile") +
-            geom_line(aes(y = mean))
-       p <- p + labs(title = paste0("Intervals = ", paste0(paste0(rev(quant[, 2]) * 100, "%"), collapse = ", ")))
+       
+       ## add individual simulations if required
+       if(!is.na(rep[1])){
+           rep1 <- rep
+           repSums <- x$runs %>%
+               filter(rep %in% rep1) %>%
+               select(!!which) %>%
+               gather(output, value, -rep, -t) %>%
+               mutate(output.y = factor(output, levels = levels(p1$output.y)))
+           for(i in rep1){
+               temp <- filter(repSums, rep == i)
+               p <- p + geom_line(aes(x = t, y = value), data = temp)
+           }
+       }
+       p <- p + geom_line(aes(y = mean), colour = "red") +
+           facet_wrap(~ output.y) +
+           labs(title = paste0("Intervals = ", paste0(paste0(rev(quant[, 2]) * 100, "%"), collapse = ", ")))
     }
     print(p)
 }

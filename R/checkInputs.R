@@ -24,7 +24,7 @@ checkInput <- function(input, type = NULL, length = NA,
         for(i in 1:length(type)){
             output <- do.call(type[i], list(input))
             if(!output){
-                stop(paste0(inputName, " object is not: ", gsub("is.", "", type)))
+                stop(paste0(inputName, " object is not: ", gsub("is.", "", type), "\n"))
             }
         }
     }

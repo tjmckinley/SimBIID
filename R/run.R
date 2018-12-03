@@ -159,3 +159,10 @@ run <- function(
     out
 }
 
+## print method
+
+#' @export
+print.SimBIID_runs <- function(x, ...) {
+    cat(paste("'SimBIID_runs' object with n =", nrow(x$sums), "replicates."))
+}
+

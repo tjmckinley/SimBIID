@@ -17,7 +17,7 @@
 #' @param compartments: contains the names of the involved compartments, for
 #'          example, \code{compartments = c("S", "I", "R")}.
 #'
-#' @param pars: named vector of parameters.
+#' @param pars: named vector of parameters, or `data.frame` with each column relating to a parameter.
 #' 
 #' @param matchCrit: \code{logical} determining whether to implement match criteria or not.
 #' 

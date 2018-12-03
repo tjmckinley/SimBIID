@@ -19,7 +19,7 @@ k2*I -> R")} expresses a SIR model.}
 \item{compartments:}{contains the names of the involved compartments, for
 example, \code{compartments = c("S", "I", "R")}.}
 
-\item{pars:}{named vector of parameters.}
+\item{pars:}{a character vector containing the names of the parameters.}
 
 \item{matchCrit:}{\code{logical} determining whether to implement match criteria or not.}
 

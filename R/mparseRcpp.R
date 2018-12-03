@@ -17,7 +17,7 @@
 #' @param compartments: contains the names of the involved compartments, for
 #'          example, \code{compartments = c("S", "I", "R")}.
 #'
-#' @param pars: named vector of parameters, or `data.frame` with each column relating to a parameter.
+#' @param pars: a character vector containing the names of the parameters.
 #' 
 #' @param matchCrit: \code{logical} determining whether to implement match criteria or not.
 #' 
@@ -73,23 +73,21 @@ mparseRcpp <- function(
     ## Check pars
     pars_names <- NULL
     if (!is.null(pars)) {
-        if (is.data.frame(pars)) {
-            pars_names <- colnames(pars)
-        } else {
-            if (is.atomic(pars) && is.numeric(pars)) {
-                pars_names <- names(pars)
-            } else {
-                stop("'pars' must either be a 'data.frame' or a 'numeric' vector.")
-            }
+        if (!is.atomic(pars) | !is.character(pars)) {
+            stop("'pars' must be a 'character' vector of parameter names.")
         }
-
-        if (is.null(pars_names) || any(duplicated(pars_names)) || any(nchar(pars_names) == 0)) {
+        if (any(nchar(pars) == 0)) {
+            stop("'pars' must have non-empty parameter names.")
+        }
+        if (any(duplicated(pars))) {
             stop("'pars' must have non-duplicated parameter names.")
         }
+    } else {
+        stop("Must input 'pars' as character vector of parameter names.")
     }
 
     ## check element names
-    if (any(duplicated(c(compartments, pars_names)))) {
+    if (any(duplicated(c(compartments, pars)))) {
         stop("'pars' and 'compartments' have names in common.")
     }
     
@@ -158,7 +156,7 @@ mparseRcpp <- function(
 
     ## Parse transitions
     transitions <- SimInf:::parse_transitions(
-        transitions, compartments, NULL, pars_names, NULL
+        transitions, compartments, NULL, pars, NULL
     )
 
     ## write Rcpp code to file

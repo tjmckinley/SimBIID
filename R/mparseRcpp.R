@@ -35,7 +35,7 @@
 #' @param runFromR: \code{logical} determining whether code is to be compiled to run directly in R,
 #'                  or whether to be compiled as an \code{XPtr} object for use in Rcpp.
 #'
-#' @return An object of class \code{parsedRcpp}, which is essentially a \code{list} 
+#' @return An object of class \code{SimBIID_model}, which is essentially a \code{list} 
 #'         containing elements:
 #'         \itemize{
 #'             \item{code:}{ parsed code to compile;}
@@ -172,12 +172,12 @@ mparseRcpp <- function(
         tspan = tspan,
         runFromR = runFromR
     )
-    class(output) <- "parsedRcpp"
+    class(output) <- "SimBIID_model"
     output
 }
 
-## print function for parsedRcpp object
+## print function for SimBIID_model object
 #' @export
-print.parsedRcpp <- function(x, ...) {
+print.SimBIID_model <- function(x, ...) {
     writeLines(x$code)
 }

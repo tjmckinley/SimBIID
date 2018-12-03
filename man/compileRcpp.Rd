@@ -7,14 +7,14 @@
 compileRcpp(parsed = NULL)
 }
 \arguments{
-\item{parsed:}{An object of class \code{parsedRcpp}.}
+\item{parsed:}{An object of class \code{SimBIID_model}.}
 }
 \value{
 An object of class \code{XPtr} that points to the compiled function, or
         an R \code{function} object for calling directly from R.
 }
 \description{
-Compiles an object of class \code{parsedRcpp} into an
+Compiles an object of class \code{SimBIID_model} into an
              \code{XPtr} object for use in Rcpp functions, or an
              object of class \code{function} for calling directly from R.
 }

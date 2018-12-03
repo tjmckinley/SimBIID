@@ -39,7 +39,7 @@ e.g. additional stopping criteria.}
 or whether to be compiled as an \code{XPtr} object for use in Rcpp.}
 }
 \value{
-An object of class \code{parsedRcpp}, which is essentially a \code{list} 
+An object of class \code{SimBIID_model}, which is essentially a \code{list} 
         containing elements:
         \itemize{
             \item{code:}{ parsed code to compile;}

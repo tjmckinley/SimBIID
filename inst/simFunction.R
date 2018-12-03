@@ -72,7 +72,7 @@
     
     // record final event time
     if(totrate > 0.0) {
-        t = tstar;
+        t = tstop;
     }
     
     MATCHCRIT1

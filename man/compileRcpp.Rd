@@ -2,12 +2,12 @@
 % Please edit documentation in R/compileRcpp.R
 \name{compileRcpp}
 \alias{compileRcpp}
-\title{Compile parsed Rcpp model}
+\title{Compiles \code{SimBIID_model} object}
 \usage{
-compileRcpp(parsed = NULL)
+compileRcpp(model = NULL)
 }
 \arguments{
-\item{parsed:}{An object of class \code{SimBIID_model}.}
+\item{model:}{An object of class \code{SimBIID_model}.}
 }
 \value{
 An object of class \code{XPtr} that points to the compiled function, or

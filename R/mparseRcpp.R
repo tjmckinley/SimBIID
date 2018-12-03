@@ -1,7 +1,6 @@
 #' @title Parse custom model using \code{SimInf} style markup
 #'
-#' @description Parse custom model using \code{SimInf} style markup and 
-#' create code to compile to an \code{XPtr} object to use in \code{ABCSMC} functions.
+#' @description Parse custom model using \code{SimInf} style markup.
 #' Does not have full functionality of \code{mparse}. Currently only supports
 #' simulations on a single node.
 #'

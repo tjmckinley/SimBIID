@@ -53,8 +53,7 @@ An object of class \code{parsedRcpp}, which is essentially a \code{list}
         using \code{compileRcpp()}.
 }
 \description{
-Parse custom model using \code{SimInf} style markup and 
-create code to compile to an \code{XPtr} object to use in \code{ABCSMC} functions.
+Parse custom model using \code{SimInf} style markup.
 Does not have full functionality of \code{mparse}. Currently only supports
 simulations on a single node.
 }

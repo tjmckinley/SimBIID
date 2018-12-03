@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // PMCMC_cpp
 List PMCMC_cpp(NumericMatrix dataset, NumericMatrix priors, CharacterVector parnames, NumericVector iniPars, NumericMatrix propVar_R, int niter, int npart, double scale, IntegerVector tols, IntegerVector whichind, int nprintsum, int nmultskip, int nupdate, int fixpars, int adapt, IntegerVector iniStates, SEXP func_);
-RcppExport SEXP _ABCSMC_PMCMC_cpp(SEXP datasetSEXP, SEXP priorsSEXP, SEXP parnamesSEXP, SEXP iniParsSEXP, SEXP propVar_RSEXP, SEXP niterSEXP, SEXP npartSEXP, SEXP scaleSEXP, SEXP tolsSEXP, SEXP whichindSEXP, SEXP nprintsumSEXP, SEXP nmultskipSEXP, SEXP nupdateSEXP, SEXP fixparsSEXP, SEXP adaptSEXP, SEXP iniStatesSEXP, SEXP func_SEXP) {
+RcppExport SEXP _SimBIID_PMCMC_cpp(SEXP datasetSEXP, SEXP priorsSEXP, SEXP parnamesSEXP, SEXP iniParsSEXP, SEXP propVar_RSEXP, SEXP niterSEXP, SEXP npartSEXP, SEXP scaleSEXP, SEXP tolsSEXP, SEXP whichindSEXP, SEXP nprintsumSEXP, SEXP nmultskipSEXP, SEXP nupdateSEXP, SEXP fixparsSEXP, SEXP adaptSEXP, SEXP iniStatesSEXP, SEXP func_SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -35,11 +35,11 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_ABCSMC_PMCMC_cpp", (DL_FUNC) &_ABCSMC_PMCMC_cpp, 17},
+    {"_SimBIID_PMCMC_cpp", (DL_FUNC) &_SimBIID_PMCMC_cpp, 17},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_ABCSMC(DllInfo *dll) {
+RcppExport void R_init_SimBIID(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

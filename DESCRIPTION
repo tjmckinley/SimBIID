@@ -1,11 +1,11 @@
-Package: ABCSMC
+Package: SimBIID
 Type: Package
-Title: Sequential Monte Carlo based ABC
+Title: Simulation-based inference methods for infectious disease models
 Version: 1.0
-Date: 2017-03-31
+Date: 2018-12-03
 Author: TJ McKinley
 Maintainer: TJ McKinley <t.mckinley@exeter.ac.uk>
-Description: Implements ABC-SMC algorithm of Toni et al. (2009)
+Description: Implements various simulation-based inference routines for infectious disease models
 License: GPL (>= 2)
 Imports:
     dplyr,

@@ -3,7 +3,7 @@
 Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFromR) {
     
     ## read source code
-    Rcpp_code <- readLines(system.file("", "simFunction.R", package = "ABCSMC"))
+    Rcpp_code <- readLines(system.file("", "simFunction.R", package = "SimBIID"))
     
     ## set compilation type
     if(runFromR) {

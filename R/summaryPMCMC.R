@@ -15,7 +15,7 @@
 
 summary.PMCMC <- function(object, transfunc = NA) {
     
-    ## check object is an ABCSMC object
+    ## check object is a PMCMC object
     if(class(object) != "PMCMC"){
         stop("'object' is not a PMCMC object")
     }

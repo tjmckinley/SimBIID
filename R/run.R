@@ -84,7 +84,8 @@ run <- function(
         stop("'SimBIID_model' does not allow a 'tspan' argument")
     }
     if(!missing(tspan)){
-        checkInput(tspan, c("vector", "numeric"), int = T)
+        checkInput(tspan, c("vector", "numeric"), int = T, gte = tstart)
+        tspan <- sort(tspan)
     }
     checkInput(nrep, c("numeric"), 1, int = T, gt = 0)
     checkInput(parallel, c("vector", "logical"), 1)

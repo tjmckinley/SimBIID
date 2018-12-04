@@ -10,6 +10,7 @@ License: GPL (>= 2)
 Imports:
     dplyr,
     purrr,
+    tibble,
     ggplot2,
     tidyr,
     mvtnorm,

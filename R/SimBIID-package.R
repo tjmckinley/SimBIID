@@ -12,6 +12,7 @@
 #' @author TJ McKinley <t.mckinley@@exeter.ac.uk>
 #' @import dplyr
 #' @import purrr
+#' @import tibble
 #' @import ggplot2
 #' @import tidyr
 #' @import mvtnorm

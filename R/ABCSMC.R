@@ -16,11 +16,12 @@
 #'                  normal case; and shape and rate in the gamma case).
 #' @param func      Function that runs the simulator and checks whether the simulation matches the data. 
 #'                  The first four arguments must be \code{pars}, \code{data}, \code{tols} and 
-#'                  \code{iniStates}. If the simulations do not match the data then the function must 
+#'                  \code{u}. If the simulations do not match the data then the function must 
 #'                  return an \code{NA}, else it must returns a \code{vector} of simulated summary measures. 
 #'                  In this latter case the output from the function must be a vector with length equal to 
 #'                  \code{ncol(data)} and with entries in the same order as the columns of \code{data}.
-#' @param iniStates A numerical vector of initial states for the infectious disease model.
+#' @param u         A \code{data.frame} of initial states, with a single row, and columns defining the 
+#'                  compartments.
 #' @param npart     An integer specifying the number of particles.
 #' @param tols 		A \code{data.frame} of tolerances, with the number of rows defining
 #'                  the number of generations required, and columns defining the summary statistics
@@ -50,7 +51,7 @@
 #' \item{\code{priors}:}{ a copy of the \code{priors} input;}
 #' \item{\code{data}:}{ a copy of the \code{data} input;}
 #' \item{\code{func}:}{ a copy of the \code{func} input;}
-#' \item{\code{iniStates}}{ a vector of initial states for the infectious disease model;}
+#' \item{\code{u}}{ a copy of the \code{u} input;}
 #' \item{\code{addargs}:}{ a copy of the \code{...} inputs.}
 #' }
 #' @rdname ABCSMC
@@ -89,7 +90,7 @@ ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
         tols = tols, 
         priors = x$priors, 
         func = x$func, 
-        iniStates = x$iniStates,
+        u = x$u,
         parallel = parallel,
         mc.cores = mc.cores, 
         prevPars = x$pars[[length(x$pars)]], 
@@ -115,7 +116,7 @@ ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
 #' @rdname ABCSMC
 #' @export
 
-ABCSMC.default <- function(x, priors, func, iniStates, npart = 100, tols = rep(0, ncol(x) - 1), 
+ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = rep(0, ncol(x) - 1), 
                            parallel = F, mc.cores = NA, ...) {
     
     ## check missing arguments
@@ -128,8 +129,8 @@ ABCSMC.default <- function(x, priors, func, iniStates, npart = 100, tols = rep(0
     if(missing(func)){
         stop("'func' argument missing")
     }
-    if(missing(iniStates)){
-        stop("'iniStates' argument missing")
+    if(missing(u)){
+        stop("'u' argument missing")
     }
     
     ## check inputs
@@ -171,17 +172,22 @@ ABCSMC.default <- function(x, priors, func, iniStates, npart = 100, tols = rep(0
     if(length(fargs) < 4){
         stop("Number of arguments of 'func' must be at least 4")
     }
-    if(!identical(names(fargs)[1:4], c("pars", "data", "tols", "iniStates"))){
-        stop("First four arguments of 'func' must be: 'pars', 'data', 'tols' and 'iniStates'")
+    if(!identical(names(fargs)[1:4], c("pars", "data", "tols", "u"))){
+        stop("First four arguments of 'func' must be: 'pars', 'data', 'tols' and 'u'")
     }
     if(!all(apply(tols, 2, function(x) {
         all(diff(x) < 0)
     }))){
         stop("'tols' cannot increase")
     }
-    ## check iniStates
-    checkInput(iniStates, "numeric", int = T, gte = 0)
-    checkInput(sum(iniStates), "numeric", int = T, gt = 1)
+    ## check u
+    checkInput(u, "data.frame", nrow = 1)
+    for(j in ncol(u)){
+        checkInput(u[, j], c("vector", "numeric"), int = T, gte = 0)
+    }
+    checkInput(sum(u[1, ]), "numeric", int = T, gt = 1)
+    uorig <- u
+    u <- unlist(u)
     
     ## check priors
     if(!all(sort(match(colnames(priors), c("parnames", "dist", "p1", "p2"))) - 1:4 == 0)){
@@ -231,7 +237,7 @@ ABCSMC.default <- function(x, priors, func, iniStates, npart = 100, tols = rep(0
     args <- list(...)
     
     ## extract arguments for "func"
-    fargs <- fargs[is.na(match(names(fargs), c("pars", "data", "tols", "iniStates")))]
+    fargs <- fargs[is.na(match(names(fargs), c("pars", "data", "tols", "u")))]
     if(length(fargs) > 0) {
         fargs1 <- match(names(fargs), names(args))
         if(!all(!is.na(fargs1))){
@@ -289,14 +295,14 @@ ABCSMC.default <- function(x, priors, func, iniStates, npart = 100, tols = rep(0
                 t = t, priors = priors, 
                 prevWeights = tempWeights, prevPars = tempPars, 
                 propCov = propCov, tols = tols[t, ], data = as.numeric(data[1, ]), 
-                iniStates = iniStates,
+                u = u,
                 func = func, func_args = fargs)
         } else  {
             temp <- mclapply(1:npart, runProp,
                 t = t, priors = priors, 
                 prevWeights = tempWeights, prevPars = tempPars, 
                 propCov = propCov, tols = tols[t, ], data = as.numeric(data[1, ]), 
-                iniStates = iniStates,
+                u = u,
                 func = func, func_args = fargs, 
                 mc.cores = mc.cores)
         }
@@ -340,7 +346,7 @@ ABCSMC.default <- function(x, priors, func, iniStates, npart = 100, tols = rep(0
     ## output results
     output <- list(pars = pars, output = out, weights = weights, accrate = accrate,
                    tols = orig_tols, priors = orig_priors, data = data,
-                   func = func, iniStates = iniStates, addargs = args)
+                   func = func, u = uorig, addargs = args)
     class(output) <- "ABCSMC"
     output
 }

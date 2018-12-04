@@ -14,13 +14,15 @@ run(model, pars, tstart, tstop, u, tspan, nrep = 1, parallel = F,
 
 \item{model:}{An object of class \code{SimBIID_model}.}
 
-\item{pars:}{A named vector of parameters.}
+\item{pars:}{A \code{data.frame} of parameters, with a single row, and each column
+a parameter.}
 
 \item{tstart:}{The time at which to start the simulation.}
 
 \item{tstop:}{The time at which to stop the simulation.}
 
-\item{u:}{A vector of initial states.}
+\item{u:}{A \code{data.frame} of initial states, with a single row, and columns defining the 
+compartments.}
 
 \item{tspan:}{A numeric vector containing the times at which to 
 save the states of the system.}

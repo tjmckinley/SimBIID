@@ -9,10 +9,12 @@
 #' @export
 #'
 #' @param model: An object of class \code{SimBIID_model}.
-#' @param pars: A named vector of parameters.
+#' @param pars: A \code{data.frame} of parameters, with a single row, and each column
+#'              a parameter.
 #' @param tstart: The time at which to start the simulation.
 #' @param tstop: The time at which to stop the simulation.
-#' @param u: A vector of initial states.
+#' @param u: A \code{data.frame} of initial states, with a single row, and columns defining the 
+#'                  compartments.
 #' @param tspan: A numeric vector containing the times at which to 
 #'               save the states of the system.
 #' @param nrep: Specifies the number of simulations to run.
@@ -66,17 +68,25 @@ run <- function(
     if(!model$runFromR) {
         stop("'model' must be specified with 'runFromR = T'")
     }
-    checkInput(pars, c("vector", "numeric"), length(model$pars))
-    parnames <- names(pars)
+    checkInput(pars, "data.frame", nrow = 1, ncol = length(model$pars))
+    for(j in 1:ncol(pars)){
+        checkInput(pars[, j], c("vector", "numeric"))
+    }
+    parnames <- colnames(pars)
     checkInput(parnames, inSet = model$pars)
-    pars <- pars[match(model$pars, parnames)]
+    pars <- pars[, match(model$pars, parnames)]
+    pars <- unlist(pars)
     checkInput(tstart, c("vector", "numeric"), 1)
     checkInput(tstop, c("vector", "numeric"), 1, gt = tstart)
-    checkInput(u, c("vector", "numeric"), length(model$compartments), gte = 0, int = T)
-    unames <- names(u)
+    checkInput(u, "data.frame", nrow = 1, ncol = length(model$compartments))
+    for(j in 1:ncol(u)){
+        checkInput(u[, j], c("vector", "numeric"), gte = 0, int = T)
+    }
+    unames <- colnames(u)
     checkInput(unames, c("vector", "character"), length(model$compartments))
     checkInput(unames, inSet = model$compartments)
-    u <- u[match(model$compartments, unames)]
+    u <- u[, match(model$compartments, unames)]
+    u <- unlist(u)
     if(missing(tspan) & model$tspan){
         stop("'SimBIID_model' requires that 'tspan' must be set")
     }

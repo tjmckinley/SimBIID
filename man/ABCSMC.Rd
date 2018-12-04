@@ -10,8 +10,8 @@ ABCSMC(x, ...)
 
 \method{ABCSMC}{ABCSMC}(x, tols, parallel = F, mc.cores = NA)
 
-\method{ABCSMC}{default}(x, priors, func, iniStates, npart = 100,
-  tols = rep(0, ncol(x) - 1), parallel = F, mc.cores = NA, ...)
+\method{ABCSMC}{default}(x, priors, func, u, npart = 100, tols = rep(0,
+  ncol(x) - 1), parallel = F, mc.cores = NA, ...)
 }
 \arguments{
 \item{x}{An \code{ABCSMC} object or a \code{data.frame} with a single row and columns 
@@ -38,12 +38,13 @@ normal case; and shape and rate in the gamma case).}
 
 \item{func}{Function that runs the simulator and checks whether the simulation matches the data. 
 The first four arguments must be \code{pars}, \code{data}, \code{tols} and 
-\code{iniStates}. If the simulations do not match the data then the function must 
+\code{u}. If the simulations do not match the data then the function must 
 return an \code{NA}, else it must returns a \code{vector} of simulated summary measures. 
 In this latter case the output from the function must be a vector with length equal to 
 \code{ncol(data)} and with entries in the same order as the columns of \code{data}.}
 
-\item{iniStates}{A numerical vector of initial states for the infectious disease model.}
+\item{u}{A \code{data.frame} of initial states, with a single row, and columns defining the 
+compartments.}
 
 \item{npart}{An integer specifying the number of particles.}
 }
@@ -68,7 +69,7 @@ An \code{ABCSMC} object, essentially a \code{list} containing:
 \item{\code{priors}:}{ a copy of the \code{priors} input;}
 \item{\code{data}:}{ a copy of the \code{data} input;}
 \item{\code{func}:}{ a copy of the \code{func} input;}
-\item{\code{iniStates}}{ a vector of initial states for the infectious disease model;}
+\item{\code{u}}{ a copy of the \code{u} input;}
 \item{\code{addargs}:}{ a copy of the \code{...} inputs.}
 }
 }

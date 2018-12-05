@@ -8,12 +8,12 @@
 \usage{
 PMCMC(x, ...)
 
-\method{PMCMC}{PMCMC}(x, niter = 1000, nprintsum = 1000, adapt = T,
+\method{PMCMC}{PMCMC}(x, niter = 1000, nprintsum = 100, adapt = T,
   adaptmixprop = 0.05, nupdate = 100)
 
 \method{PMCMC}{default}(x, priors, func, u, npart = 100, tols = rep(0,
   ncol(x) - 1), whichind = NULL, iniPars = NA, fixpars = F,
-  niter = 1000, nprintsum = 1000, nmultskip = 1000, adapt = T,
+  niter = 1000, nprintsum = 100, nmultskip = 1000, adapt = T,
   propVar = NA, adaptmixprop = 0.05, nupdate = 100)
 }
 \arguments{

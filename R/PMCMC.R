@@ -90,7 +90,7 @@ PMCMC <- function(x, ...) {
 #' @rdname PMCMC
 #' @export
 
-PMCMC.PMCMC <- function(x, niter = 1000, nprintsum = 1000, 
+PMCMC.PMCMC <- function(x, niter = 1000, nprintsum = 100, 
                         adapt = T, adaptmixprop = 0.05, 
                         nupdate = 100) {
     ## check object
@@ -138,7 +138,7 @@ PMCMC.default <- function(
     x, priors, func, u, npart = 100,
     tols = rep(0, ncol(x) - 1), whichind = NULL, 
     iniPars = NA, fixpars = F, 
-    niter = 1000, nprintsum = 1000, nmultskip = 1000, 
+    niter = 1000, nprintsum = 100, nmultskip = 1000, 
     adapt = T, propVar = NA, adaptmixprop = 0.05, nupdate = 100
 ) {
     

@@ -11,10 +11,10 @@ PMCMC(x, ...)
 \method{PMCMC}{PMCMC}(x, niter = 1000, nprintsum = 1000, adapt = T,
   adaptmixprop = 0.05, nupdate = 100)
 
-\method{PMCMC}{default}(x, priors, func, iniStates, npart = 100,
-  tols = rep(0, ncol(x) - 1), whichind = NULL, iniPars = NA,
-  fixpars = F, niter = 1000, nprintsum = 1000, nmultskip = 1000,
-  adapt = T, propVar = NA, adaptmixprop = 0.05, nupdate = 100)
+\method{PMCMC}{default}(x, priors, func, u, npart = 100, tols = rep(0,
+  ncol(x) - 1), whichind = NULL, iniPars = NA, fixpars = F,
+  niter = 1000, nprintsum = 1000, nmultskip = 1000, adapt = T,
+  propVar = NA, adaptmixprop = 0.05, nupdate = 100)
 }
 \arguments{
 \item{x}{A \code{PMCMC} object, or a \code{data.frame} containing time series count data, with the first column called
@@ -52,16 +52,18 @@ in order:
 indicating which elements of \code{u} correspond to which elements of \code{counts}.
 Must index from 0 NOT 1.}}}
 
-\item{iniStates}{A numerical vector of initial states for the infectious disease model.}
+\item{u}{A \code{data.frame} of initial states, with a single row, and columns defining the 
+compartments.}
 
 \item{npart}{An integer specifying the number of particles for the alive particle filter.}
 
 \item{tols}{Tolerances for matching data during ABC. Defaults to matching every count column
 of \code{data} exactly.}
 
-\item{whichind}{Vector of which elements of \code{iniStates} match to columns \code{2:ncol(data)}
-of `data`. If left as \code{NULL} then defaults to elements \code{1:length(iniStates)}
-or returns an error. Must be same length as \code{tols}.}
+\item{whichind}{Vector of which elements of \code{u} match to columns \code{2:ncol(data)}
+of `data`. If left as \code{NULL} then defaults to elements \code{1:length(u)}
+or returns an error. Must be same length as \code{tols} and must index from 1 (it's 
+converted to C indexing internally).}
 
 \item{iniPars}{Vector of initial parameter values. If left unspecified, then these are 
 sampled from the prior distributions.}
@@ -90,7 +92,7 @@ If \code{fixpars = F}, the routine returns a \code{PMCMC} object, essentially a
  \item{\code{pars}:}{ an \code{mcmc} object containing posterior samples for the parameters;}
  \item{\code{tols}:}{ tolerances;}
  \item{\code{whichind}:}{ matching indicators;}
- \item{\code{iniStates}:}{ a vector of initial states for the infectious disease model;}
+ \item{\code{u}:}{ a copy of the \code{u} input;}
  \item{\code{skiprate}:}{ the cumulative skip rate;}
  \item{\code{accrate}:}{ the cumulative acceptance rate;}
  \item{\code{nmultskip}:}{ the chosen value of \code{nmultskip};}

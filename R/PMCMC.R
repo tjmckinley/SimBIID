@@ -26,13 +26,15 @@
 #'                      \item{\code{IntegerVector whichind}:}{ a vector the same length as \code{counts}, 
 #'                      indicating which elements of \code{u} correspond to which elements of \code{counts}.
 #'                      Must index from 0 NOT 1.}}
-#' @param iniStates     A numerical vector of initial states for the infectious disease model.
+#' @param u             A \code{data.frame} of initial states, with a single row, and columns defining the 
+#'                      compartments.
 #' @param npart         An integer specifying the number of particles for the alive particle filter.
 #' @param tols          Tolerances for matching data during ABC. Defaults to matching every count column
 #'                      of \code{data} exactly.
-#' @param whichind      Vector of which elements of \code{iniStates} match to columns \code{2:ncol(data)}
-#'                      of `data`. If left as \code{NULL} then defaults to elements \code{1:length(iniStates)}
-#'                      or returns an error. Must be same length as \code{tols}.
+#' @param whichind      Vector of which elements of \code{u} match to columns \code{2:ncol(data)}
+#'                      of `data`. If left as \code{NULL} then defaults to elements \code{1:length(u)}
+#'                      or returns an error. Must be same length as \code{tols} and must index from 1 (it's 
+#'                      converted to C indexing internally).
 #' @param iniPars       Vector of initial parameter values. If left unspecified, then these are 
 #'                      sampled from the prior distributions.
 #' @param fixpars       A logical determining whether to fix the input parameters (useful for 
@@ -67,7 +69,7 @@
 #'  \item{\code{pars}:}{ an \code{mcmc} object containing posterior samples for the parameters;}
 #'  \item{\code{tols}:}{ tolerances;}
 #'  \item{\code{whichind}:}{ matching indicators;}
-#'  \item{\code{iniStates}:}{ a vector of initial states for the infectious disease model;}
+#'  \item{\code{u}:}{ a copy of the \code{u} input;}
 #'  \item{\code{skiprate}:}{ the cumulative skip rate;}
 #'  \item{\code{accrate}:}{ the cumulative acceptance rate;}
 #'  \item{\code{nmultskip}:}{ the chosen value of \code{nmultskip};}
@@ -102,7 +104,7 @@ PMCMC.PMCMC <- function(x, niter = 1000, nprintsum = 1000,
         x = x$data, 
         priors = x$priors, 
         func = x$func, 
-        iniStates = x$iniStates, 
+        u = x$u, 
         npart = x$npart, 
         tols = x$tols, 
         whichind = x$whichind, 
@@ -131,7 +133,7 @@ PMCMC.PMCMC <- function(x, niter = 1000, nprintsum = 1000,
 #' @export
 
 PMCMC.default <- function(
-    x, priors, func, iniStates, npart = 100,
+    x, priors, func, u, npart = 100,
     tols = rep(0, ncol(x) - 1), whichind = NULL, 
     iniPars = NA, fixpars = F, 
     niter = 1000, nprintsum = 1000, nmultskip = 1000, 
@@ -145,8 +147,8 @@ PMCMC.default <- function(
     if(missing(priors)){
         stop("'priors' argument missing")
     }
-    if(missing(iniStates)){
-        stop("'iniStates' argument missing")
+    if(missing(u)){
+        stop("'u' argument missing")
     }
     if(missing(func)){
         stop("'func' argument missing")
@@ -216,7 +218,14 @@ PMCMC.default <- function(
     } else {
         iniPars <- rep(NA, nrow(priors))
     }
-    checkInput(iniStates, c("numeric", "vector"), int = T)
+    ## check u
+    checkInput(u, "data.frame", nrow = 1)
+    for(j in ncol(u)){
+        checkInput(u[, j], c("vector", "numeric"), int = T, gte = 0)
+    }
+    checkInput(sum(u[1, ]), "numeric", int = T, gt = 1)
+    uorig <- u
+    u <- unlist(u)
     
     ## check proposal variances
     if(is.na(propVar[1])) {
@@ -238,13 +247,13 @@ PMCMC.default <- function(
     if(!is.null(whichind)) {
         checkInput(
             whichind, c("numeric", "vector"), ncol(data) - 1, 
-            int = T, inSet = 1:length(iniStates), uni = T
+            int = T, inSet = 1:length(u), uni = T
         )
         whichind <- whichind - 1
     } else {
-        whichind <- 1:length(iniStates) - 1
-        if((ncol(data) - 1) == length(iniStates)){
-            stop("length of 'iniStates' does not match number of columns of 'data' (-1)")
+        whichind <- 1:length(u) - 1
+        if((ncol(data) - 1) == length(u)){
+            stop("length of 'u' does not match number of columns of 'data' (-1)")
         }
     }
     
@@ -266,7 +275,7 @@ PMCMC.default <- function(
     ## run function
     output <- PMCMC_cpp(as.matrix(data), priors, orig_priors$parnames, iniPars, propVar, niter, npart, 
                     adaptmixprop, tols, whichind, nprintsum, nmultskip, nupdate, as.numeric(fixpars), 
-                    as.numeric(adapt), iniStates, func)
+                    as.numeric(adapt), u, func)
     
     ## check to see if code has stopped afer initialisation
     if(length(output[[1]]) == 1) {
@@ -282,8 +291,8 @@ PMCMC.default <- function(
     output[[1]] <- as.mcmc(output[[1]])
     
     ## finalise output and set names
-    output <- c(output[1], tols = list(tols), whichind = whichind + 1, iniStates = iniStates, output[-1], list(data), list(orig_priors))
-    names(output) <- c("pars", "tols", "whichind", "iniStates", "skiprate", "accrate", 
+    output <- c(output[1], tols = list(tols), whichind = whichind + 1, u = uorig, output[-1], list(data), list(orig_priors))
+    names(output) <- c("pars", "tols", "whichind", "u", "skiprate", "accrate", 
         "nmultskip", "npart", "time", "propVar", "data", "priors")
         
     ## export class and object

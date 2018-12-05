@@ -98,7 +98,7 @@ PMCMC.PMCMC <- function(x, niter = 1000, nprintsum = 100,
         stop("'x' not a PMCMC object")
     }
     if(length(x) <= 2){
-        stop("'x' not a valid PMCMC to continue running...")
+        stop("'x' not a valid PMCMC object to continue running...")
     }
     
     ## collect arguments

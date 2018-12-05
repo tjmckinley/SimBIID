@@ -11,10 +11,10 @@ PMCMC(x, ...)
 \method{PMCMC}{PMCMC}(x, niter = 1000, nprintsum = 100, adapt = T,
   adaptmixprop = 0.05, nupdate = 100)
 
-\method{PMCMC}{default}(x, priors, func, u, npart = 100, tols = rep(0,
-  ncol(x) - 1), whichind = NULL, iniPars = NA, fixpars = F,
-  niter = 1000, nprintsum = 100, nmultskip = 1000, adapt = T,
-  propVar = NA, adaptmixprop = 0.05, nupdate = 100)
+\method{PMCMC}{default}(x, priors, func, u, npart = 100, tols = NULL,
+  whichind = NULL, iniPars = NA, fixpars = F, niter = 1000,
+  nprintsum = 100, nmultskip = 1000, adapt = T, propVar = NA,
+  adaptmixprop = 0.05, nupdate = 100)
 }
 \arguments{
 \item{x}{A \code{PMCMC} object, or a \code{data.frame} containing time series count data, with the first column called
@@ -57,8 +57,9 @@ compartments.}
 
 \item{npart}{An integer specifying the number of particles for the alive particle filter.}
 
-\item{tols}{Tolerances for matching data during ABC. Defaults to matching every count column
-of \code{data} exactly.}
+\item{tols}{A \code{data.frame} of tolerances, with a single row and columns defining the 
+time-series to match to. The columns must match to those in `x`. 
+Defaults to exact matching for all columns.}
 
 \item{whichind}{Not needed if \code{func} is a \code{SimBIID_model} object (in this case it matches
 column names of \code{data} to column names of \code{u}. Otherwise this must be a
@@ -67,8 +68,9 @@ of `data`. If left as \code{NULL} then defaults to elements \code{1:length(u)}
 or returns an error. Must be same length as \code{tols} and must index from 1 (it's 
 converted to C indexing internally).}
 
-\item{iniPars}{Vector of initial parameter values. If left unspecified, then these are 
-sampled from the prior distributions.}
+\item{iniPars}{A `data.frame` object with a single row and columns relating to initial values for 
+the parameters of the model. If left unspecified, then these are sampled from the 
+prior distributions.}
 
 \item{fixpars}{A logical determining whether to fix the input parameters (useful for 
 determining the variance of the marginal likelihood estimates).}
@@ -92,8 +94,8 @@ If \code{fixpars = F}, the routine returns a \code{PMCMC} object, essentially a
          \code{list} containing:
 \itemize{
  \item{\code{pars}:}{ an \code{mcmc} object containing posterior samples for the parameters;}
- \item{\code{tols}:}{ tolerances;}
- \item{\code{whichind}:}{ matching indicators;}
+ \item{\code{tols}:}{ a copy of the \code{tols} input;}
+ \item{\code{whichind}:}{ a copy of the \code{whichind} input;}
  \item{\code{u}:}{ a copy of the \code{u} input;}
  \item{\code{skiprate}:}{ the cumulative skip rate;}
  \item{\code{accrate}:}{ the cumulative acceptance rate;}

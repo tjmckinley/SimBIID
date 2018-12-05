@@ -10,8 +10,8 @@ ABCSMC(x, ...)
 
 \method{ABCSMC}{ABCSMC}(x, tols, parallel = F, mc.cores = NA)
 
-\method{ABCSMC}{default}(x, priors, func, u, npart = 100, tols = rep(0,
-  ncol(x) - 1), parallel = F, mc.cores = NA, ...)
+\method{ABCSMC}{default}(x, priors, func, u, npart = 100, tols = NULL,
+  parallel = F, mc.cores = NA, ...)
 }
 \arguments{
 \item{x}{An \code{ABCSMC} object or a \code{data.frame} with a single row and columns 
@@ -21,7 +21,7 @@ containing the observed summary statistics to match to. Columns must match to `t
 
 \item{tols}{A \code{data.frame} of tolerances, with the number of rows defining
 the number of generations required, and columns defining the summary statistics
-to match to. The columns must match to those in `data`. Defaults to exact matching for
+to match to. The columns must match to those in `x`. Defaults to exact matching for
 all columns.}
 
 \item{parallel}{A \code{logical} determining whether to use parallel processing or not.}

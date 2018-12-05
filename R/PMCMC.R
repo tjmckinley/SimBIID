@@ -29,16 +29,18 @@
 #' @param u             A \code{data.frame} of initial states, with a single row, and columns defining the 
 #'                      compartments.
 #' @param npart         An integer specifying the number of particles for the alive particle filter.
-#' @param tols          Tolerances for matching data during ABC. Defaults to matching every count column
-#'                      of \code{data} exactly.
+#' @param tols          A \code{data.frame} of tolerances, with a single row and columns defining the 
+#'                      time-series to match to. The columns must match to those in `x`. 
+#'                      Defaults to exact matching for all columns.
 #' @param whichind      Not needed if \code{func} is a \code{SimBIID_model} object (in this case it matches
 #'                      column names of \code{data} to column names of \code{u}. Otherwise this must be a
 #'                      vector relating which elements of \code{u} match to columns \code{2:ncol(data)}
 #'                      of `data`. If left as \code{NULL} then defaults to elements \code{1:length(u)}
 #'                      or returns an error. Must be same length as \code{tols} and must index from 1 (it's 
 #'                      converted to C indexing internally).
-#' @param iniPars       Vector of initial parameter values. If left unspecified, then these are 
-#'                      sampled from the prior distributions.
+#' @param iniPars       A `data.frame` object with a single row and columns relating to initial values for 
+#'                      the parameters of the model. If left unspecified, then these are sampled from the 
+#'                      prior distributions.
 #' @param fixpars       A logical determining whether to fix the input parameters (useful for 
 #'                      determining the variance of the marginal likelihood estimates).
 #' @param niter         An integer specifying the number of iterations to run the MCMC.
@@ -69,8 +71,8 @@
 #'          \code{list} containing:
 #' \itemize{
 #'  \item{\code{pars}:}{ an \code{mcmc} object containing posterior samples for the parameters;}
-#'  \item{\code{tols}:}{ tolerances;}
-#'  \item{\code{whichind}:}{ matching indicators;}
+#'  \item{\code{tols}:}{ a copy of the \code{tols} input;}
+#'  \item{\code{whichind}:}{ a copy of the \code{whichind} input;}
 #'  \item{\code{u}:}{ a copy of the \code{u} input;}
 #'  \item{\code{skiprate}:}{ the cumulative skip rate;}
 #'  \item{\code{accrate}:}{ the cumulative acceptance rate;}
@@ -112,7 +114,7 @@ PMCMC.PMCMC <- function(x, niter = 1000, nprintsum = 100,
         npart = x$npart, 
         tols = x$tols, 
         whichind = x$whichind, 
-        iniPars = x$pars[nrow(x$pars), -c((ncol(x$pars) - 2):ncol(x$pars))], 
+        iniPars = data.frame(x$pars[nrow(x$pars), -c((ncol(x$pars) - 2):ncol(x$pars)), drop = F]), 
         fixpars = F, 
         niter = niter, 
         nprintsum = nprintsum, 
@@ -138,7 +140,7 @@ PMCMC.PMCMC <- function(x, niter = 1000, nprintsum = 100,
 
 PMCMC.default <- function(
     x, priors, func, u, npart = 100,
-    tols = rep(0, ncol(x) - 1), whichind = NULL, 
+    tols = NULL, whichind = NULL, 
     iniPars = NA, fixpars = F, 
     niter = 1000, nprintsum = 100, nmultskip = 1000, 
     adapt = T, propVar = NA, adaptmixprop = 0.05, nupdate = 100
@@ -204,6 +206,22 @@ PMCMC.default <- function(
             stop("Priors: 'gamma' hyperparameters not positive")
         }
     }
+    
+    ## check initial conditions
+    if(!any(is.na(iniPars))) {
+        checkInput(iniPars, "data.frame", nrow = 1, ncol = nrow(priors))
+        for(j in 1:ncol(iniPars)){
+            checkInput(iniPars[, j], c("numeric", "vector"), naAllow = T)
+        }
+        if(!identical(colnames(iniPars), priors$parnames)){
+            stop("'iniPars' columns don't match to priors.")
+        }
+        iniPars <- unlist(iniPars)
+    } else {
+        iniPars <- rep(NA, nrow(priors))
+    }
+    
+    ## convert priors to matrix
     orig_priors <- priors
     priors$parnames <- NULL
     priors$dist <- match(priors$dist, c("unif", "norm", "gamma"))
@@ -240,13 +258,6 @@ PMCMC.default <- function(
         checkInput(colnames(data)[-1], inSet = colnames(u))
         whichind <- match(colnames(data)[-1], colnames(u))
     }
-    
-    ## check initial conditions
-    if(!any(is.na(iniPars))) {
-        checkInput(iniPars, c("numeric", "vector"), nrow(priors), naAllow = T)
-    } else {
-        iniPars <- rep(NA, nrow(priors))
-    }
     ## check u
     checkInput(u, "data.frame", nrow = 1)
     for(j in ncol(u)){
@@ -255,6 +266,7 @@ PMCMC.default <- function(
     checkInput(sum(u[1, ]), "numeric", int = T, gt = 1)
     uorig <- u
     u <- unlist(u)
+    checkInput(colnames(tols), inSet = colnames(u))
     
     ## check proposal variances
     if(is.na(propVar[1])) {
@@ -267,10 +279,24 @@ PMCMC.default <- function(
     }
     
     ## check tolerance argument
-    checkInput(tols, c("numeric", "vector"), ncol(data) - 1)
-    if(!all(tols >= 0)) {
-        stop("'tols' must be >= 0")
+    if(!is.data.frame(tols)){
+        if(is.null(tols[1])){
+            tols <- matrix(rep(0, ncol(data) - 1), nrow = 1)
+            tols <- as.data.frame(tols)
+            colnames(tols) <- colnames(data)[-1]
+        } else {
+            stop("'tols' not NULL or a data.frame")
+        }
     }
+    checkInput(tols, "data.frame", nrow = 1, ncol = ncol(data) - 1)
+    for(j in 1:ncol(tols)){
+        checkInput(tols[, j], c("vector", "numeric"), gte = 0)
+    }
+    if(!identical(colnames(tols), colnames(data)[-1])){
+        stop("Time-series columns of 'tols' and 'data' don't match.")
+    }
+    tolsorig <- tols
+    tols <- unlist(tols)
     
     ## check whichind
     whichindorig <- whichind
@@ -321,7 +347,7 @@ PMCMC.default <- function(
     output[[1]] <- as.mcmc(output[[1]])
     
     ## finalise output and set names
-    output <- c(output[1], list(tols), list(whichindorig), list(uorig), output[-1], list(data), list(orig_priors), list(funcorig))
+    output <- c(output[1], list(tolsorig), list(whichindorig), list(uorig), output[-1], list(data), list(orig_priors), list(funcorig))
     names(output) <- c("pars", "tols", "whichind", "u", "skiprate", "accrate", 
         "nmultskip", "npart", "time", "propVar", "data", "priors", "func")
         

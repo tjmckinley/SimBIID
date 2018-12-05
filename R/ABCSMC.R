@@ -25,7 +25,7 @@
 #' @param npart     An integer specifying the number of particles.
 #' @param tols 		A \code{data.frame} of tolerances, with the number of rows defining
 #'                  the number of generations required, and columns defining the summary statistics
-#'                  to match to. The columns must match to those in `data`. Defaults to exact matching for
+#'                  to match to. The columns must match to those in `x`. Defaults to exact matching for
 #'                  all columns.
 #' @param parallel  A \code{logical} determining whether to use parallel processing or not.
 #' @param mc.cores  Number of cores to use if using parallel processing.
@@ -116,7 +116,7 @@ ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
 #' @rdname ABCSMC
 #' @export
 
-ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = rep(0, ncol(x) - 1), 
+ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL, 
                            parallel = F, mc.cores = NA, ...) {
     
     ## check missing arguments
@@ -151,10 +151,6 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = rep(0, ncol(x
         cat(paste0("Number of cores: ", mc.cores, "\n"))
     }
     checkInput(npart, "numeric", 1, int = T, gt = 1)
-    checkInput(tols, "data.frame", gte = 0)
-    if(!all(sapply(tols, is.numeric))) {
-        stop("'tols' must be numeric")
-    }
     checkInput(priors, "data.frame", ncol = 4)
     checkInput(func, "function", 1)
     data <- x
@@ -162,11 +158,24 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = rep(0, ncol(x
     if(!all(sapply(data, is.numeric))) {
         stop("All columns of 'data' must be numeric")
     }
+    if(!is.data.frame(tols)){
+        if(is.null(tols[1])){
+            tols <- matrix(rep(0, ncol(data) - 1), nrow = 1)
+            tols <- as.data.frame(tols)
+            colnames(tols) <- colnames(data)[-1]
+        } else {
+            stop("'tols' not NULL or a data.frame")
+        }
+    }
+    checkInput(tols, "data.frame", gte = 0)
+    if(!all(sapply(tols, is.numeric))) {
+        stop("'tols' must be numeric")
+    }
     if(ncol(data) != ncol(tols)){
         stop("Number of columns of 'data' and 'tols' must match")
     }
     if(!all(match(colnames(data), colnames(tols)) - 1:ncol(data) == 0)){
-        stop("colnames(tols) !- colnames(data)")
+        stop("colnames(tols) != colnames(data)")
     }
     fargs <- formals(func)
     if(length(fargs) < 4){

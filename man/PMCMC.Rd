@@ -102,7 +102,8 @@ If \code{fixpars = F}, the routine returns a \code{PMCMC} object, essentially a
  \item{\code{time}:}{ the time taken to run the routine (in seconds);}
  \item{\code{propVar}:}{ the proposal covariance for the parameter updates;}
  \item{\code{data}:}{ a copy of the \code{x} input;}
- \item{\code{priors}:}{ a copy of the \code{priors} input.}
+ \item{\code{priors}:}{ a copy of the \code{priors} input;}
+ \item{\code{func}:}{ a copy of the \code{func} input.}
 }
 }
 \description{

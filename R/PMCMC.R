@@ -79,9 +79,11 @@
 #'  \item{\code{time}:}{ the time taken to run the routine (in seconds);}
 #'  \item{\code{propVar}:}{ the proposal covariance for the parameter updates;}
 #'  \item{\code{data}:}{ a copy of the \code{x} input;}
-#'  \item{\code{priors}:}{ a copy of the \code{priors} input.}
+#'  \item{\code{priors}:}{ a copy of the \code{priors} input;}
+#'  \item{\code{func}:}{ a copy of the \code{func} input.}
 #' }
 #' @rdname PMCMC
+#' 
 
 PMCMC <- function(x, ...) {
     UseMethod("PMCMC")
@@ -208,6 +210,7 @@ PMCMC.default <- function(
     priors <- as.matrix(priors)
     
     ## check function
+    funcorig <- func
     if(class(func) != "XPtr" & class(func) != "SimBIID_model"){
         stop("'func' not a 'SimBIID_model' object or an 'XPtr' object")
     }
@@ -270,6 +273,7 @@ PMCMC.default <- function(
     }
     
     ## check whichind
+    whichindorig <- whichind
     if(!is.null(whichind)) {
         checkInput(
             whichind, c("numeric", "vector"), ncol(data) - 1, 
@@ -317,9 +321,9 @@ PMCMC.default <- function(
     output[[1]] <- as.mcmc(output[[1]])
     
     ## finalise output and set names
-    output <- c(output[1], list(tols), list(whichind + 1), list(uorig), output[-1], list(data), list(orig_priors))
+    output <- c(output[1], list(tols), list(whichindorig), list(uorig), output[-1], list(data), list(orig_priors), list(funcorig))
     names(output) <- c("pars", "tols", "whichind", "u", "skiprate", "accrate", 
-        "nmultskip", "npart", "time", "propVar", "data", "priors")
+        "nmultskip", "npart", "time", "propVar", "data", "priors", "func")
         
     ## export class and object
     class(output) <- "PMCMC"

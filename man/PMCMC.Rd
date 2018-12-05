@@ -101,7 +101,7 @@ If \code{fixpars = F}, the routine returns a \code{PMCMC} object, essentially a
  \item{\code{npart}:}{ the chosen number of particles;}
  \item{\code{time}:}{ the time taken to run the routine (in seconds);}
  \item{\code{propVar}:}{ the proposal covariance for the parameter updates;}
- \item{\code{data}:}{ data frame containing time series count data data, of form (group, count*);}
+ \item{\code{data}:}{ a copy of the \code{x} input;}
  \item{\code{priors}:}{ a copy of the \code{priors} input.}
 }
 }

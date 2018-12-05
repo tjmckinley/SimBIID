@@ -78,7 +78,7 @@
 #'  \item{\code{npart}:}{ the chosen number of particles;}
 #'  \item{\code{time}:}{ the time taken to run the routine (in seconds);}
 #'  \item{\code{propVar}:}{ the proposal covariance for the parameter updates;}
-#'  \item{\code{data}:}{ data frame containing time series count data data, of form (group, count*);}
+#'  \item{\code{data}:}{ a copy of the \code{x} input;}
 #'  \item{\code{priors}:}{ a copy of the \code{priors} input.}
 #' }
 #' @rdname PMCMC
@@ -317,7 +317,7 @@ PMCMC.default <- function(
     output[[1]] <- as.mcmc(output[[1]])
     
     ## finalise output and set names
-    output <- c(output[1], tols = list(tols), whichind = whichind + 1, u = uorig, output[-1], list(data), list(orig_priors))
+    output <- c(output[1], list(tols), list(whichind + 1), list(uorig), output[-1], list(data), list(orig_priors))
     names(output) <- c("pars", "tols", "whichind", "u", "skiprate", "accrate", 
         "nmultskip", "npart", "time", "propVar", "data", "priors")
         

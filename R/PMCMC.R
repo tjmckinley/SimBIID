@@ -14,8 +14,8 @@
 #'                      and the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
 #'                      (lower and upper bounds in the uniform case; mean and standard deviation in the 
 #'                      normal case; and shape and rate in the gamma case).
-#' @param func          \code{XPtr} to simulation function. This function must take the following arguments
-#'                      in order: 
+#' @param func          A \code{SimBIID_model} object or an \code{XPtr} to simulation function. If the latter, 
+#'                      then this function must take the following arguments in order: 
 #'                      \itemize{
 #'                      \item{\code{NumericVector pars}:}{ a vector of parameters;}
 #'                      \item{\code{double tstart}:}{ the start time;}
@@ -31,7 +31,9 @@
 #' @param npart         An integer specifying the number of particles for the alive particle filter.
 #' @param tols          Tolerances for matching data during ABC. Defaults to matching every count column
 #'                      of \code{data} exactly.
-#' @param whichind      Vector of which elements of \code{u} match to columns \code{2:ncol(data)}
+#' @param whichind      Not needed if \code{func} is a \code{SimBIID_model} object (in this case it matches
+#'                      column names of \code{data} to column names of \code{u}. Otherwise this must be a
+#'                      vector relating which elements of \code{u} match to columns \code{2:ncol(data)}
 #'                      of `data`. If left as \code{NULL} then defaults to elements \code{1:length(u)}
 #'                      or returns an error. Must be same length as \code{tols} and must index from 1 (it's 
 #'                      converted to C indexing internally).
@@ -206,11 +208,35 @@ PMCMC.default <- function(
     priors <- as.matrix(priors)
     
     ## check function
-    if(class(func) != "XPtr"){
-        stop("'XPtr' not a function")
+    if(class(func) != "XPtr" & class(func) != "SimBIID_model"){
+        stop("'func' not a 'SimBIID_model' object or an 'XPtr' object")
     }
-    checkXPtr(func, "SEXP", c("NumericVector", "double", "double", "IntegerVector",
+    if(class(func) == "XPtr"){
+        checkXPtr(func, "SEXP", c("NumericVector", "double", "double", "IntegerVector",
            "IntegerVector", "IntegerVector", "IntegerVector"))
+    } else {
+        ## check model
+        if(func$tspan){
+            warning("'SimBIID_model' object will have 'tspan' set to F")
+        }
+        ## generate model
+        func <- mparseRcpp(
+            transitions = func$transitions,
+            compartments = func$compartments,
+            pars = func$pars,
+            matchCrit = T,
+            addVars = func$addVars,
+            stopCrit = func$stopCrit,
+            tspan = F,
+            runFromR = F
+        )
+        ## compile model
+        func <- compileRcpp(func)
+        
+        ## set whichind
+        checkInput(colnames(data)[-1], inSet = colnames(u))
+        whichind <- match(colnames(data)[-1], colnames(u))
+    }
     
     ## check initial conditions
     if(!any(is.na(iniPars))) {

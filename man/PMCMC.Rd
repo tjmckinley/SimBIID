@@ -39,8 +39,8 @@ and the corresponding \code{p1} and \code{p2} entries relate to the hyperparamet
 (lower and upper bounds in the uniform case; mean and standard deviation in the 
 normal case; and shape and rate in the gamma case).}
 
-\item{func}{\code{XPtr} to simulation function. This function must take the following arguments
-in order: 
+\item{func}{A \code{SimBIID_model} object or an \code{XPtr} to simulation function. If the latter, 
+then this function must take the following arguments in order: 
 \itemize{
 \item{\code{NumericVector pars}:}{ a vector of parameters;}
 \item{\code{double tstart}:}{ the start time;}
@@ -60,7 +60,9 @@ compartments.}
 \item{tols}{Tolerances for matching data during ABC. Defaults to matching every count column
 of \code{data} exactly.}
 
-\item{whichind}{Vector of which elements of \code{u} match to columns \code{2:ncol(data)}
+\item{whichind}{Not needed if \code{func} is a \code{SimBIID_model} object (in this case it matches
+column names of \code{data} to column names of \code{u}. Otherwise this must be a
+vector relating which elements of \code{u} match to columns \code{2:ncol(data)}
 of `data`. If left as \code{NULL} then defaults to elements \code{1:length(u)}
 or returns an error. Must be same length as \code{tols} and must index from 1 (it's 
 converted to C indexing internally).}

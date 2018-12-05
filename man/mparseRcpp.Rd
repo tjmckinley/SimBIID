@@ -45,7 +45,7 @@ An object of class \code{SimBIID_model}, which is essentially a \code{list}
             \item{code:}{ parsed code to compile;}
             \item{transitions:}{ copy of \code{transitions} argument;}
             \item{compartments:}{ copy of \code{compartments} argument;}
-            \item{pars:}{ copy of \code{parss} argument;}
+            \item{pars:}{ copy of \code{pars} argument;}
             \item{matchCrit:}{ copy of \code{matchCrit} argument;}
             \item{stopCrit:}{ copy of \code{stopCrit} argument;}
             \item{addVars:}{ copy of \code{addVars} argument;}

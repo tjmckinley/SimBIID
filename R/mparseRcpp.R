@@ -41,7 +41,7 @@
 #'             \item{code:}{ parsed code to compile;}
 #'             \item{transitions:}{ copy of \code{transitions} argument;}
 #'             \item{compartments:}{ copy of \code{compartments} argument;}
-#'             \item{pars:}{ copy of \code{parss} argument;}
+#'             \item{pars:}{ copy of \code{pars} argument;}
 #'             \item{matchCrit:}{ copy of \code{matchCrit} argument;}
 #'             \item{stopCrit:}{ copy of \code{stopCrit} argument;}
 #'             \item{addVars:}{ copy of \code{addVars} argument;}
@@ -155,12 +155,12 @@ mparseRcpp <- function(
     checkInput(runFromR, "logical", 1)
 
     ## Parse transitions
-    transitions <- SimInf:::parse_transitions(
+    transitions1 <- SimInf:::parse_transitions(
         transitions, compartments, NULL, pars, NULL
     )
 
     ## write Rcpp code to file
-    Rcpp_code <- Rcpp_mparse(transitions, matchCrit, addVars, stopCrit, tspan, runFromR)
+    Rcpp_code <- Rcpp_mparse(transitions1, matchCrit, addVars, stopCrit, tspan, runFromR)
     ## replace "gdata" with "pars"
     Rcpp_code <- gsub("gdata", "pars", Rcpp_code)
     

@@ -256,8 +256,8 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL,
     if(length(fargs) > 0) {
         fargs1 <- match(names(fargs), names(args))
         if(!all(!is.na(fargs1))){
-            stop(paste0("Need to include: ", paste(fargs[is.na(fargs1)], collapse = ", "), 
-                        " arguments in function call"))
+            stop(paste0("Need to include: '", paste(names(fargs)[is.na(fargs1)], collapse = "', '"), 
+                        "' arguments in function call"))
         }
         fargs <- args[fargs1]
     }

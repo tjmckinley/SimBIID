@@ -13,7 +13,11 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, afterT
             if(!tspan){
                 compType <- paste0(compType, "('NumericVector ")
             } else {
-                compType <- paste0(compType, "('NumericMatrix ")
+                if(!runFromR) {
+                    compType <- paste0(compType, "('NumericMatrix ")
+                } else {
+                    compType <- paste0(compType, "('List ")
+                }
             }
         } else {
             compType <- paste0(compType, "('IntegerVector ")
@@ -40,8 +44,9 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, afterT
     
     ## extract rate markers
     ratelines <- sort(c(grep("RATELINES", Rcpp_code), grep("MATCHCRIT", Rcpp_code), 
-                        grep("TSPAN", Rcpp_code), grep("AFTER_TSTAR", Rcpp_code)))
-    if(length(ratelines) != 9){
+                        grep("TSPAN", Rcpp_code), grep("AFTER_TSTAR", Rcpp_code),
+                        grep("RETURNCRIT", Rcpp_code)))
+    if(length(ratelines) != 10){
         stop("Something wrong with simFunction code file")
     }
     
@@ -264,7 +269,23 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, afterT
         }
     }
     currline <- ratelines[1]
+    ratelines <- ratelines[-1]
     Rcpp_code <- c(Rcpp_code[1:(currline - 1)], matchCrit, Rcpp_code[(currline + 1):length(Rcpp_code)])
+    ratelines <- ratelines + length(matchCrit) - 1
+    
+    ## set return criteria
+    if(runFromR & tspan) {
+        retCrit <- "    List out1(2);"
+        retCrit <- c(retCrit, "    out1[0] = out(tspan.size(), _);")
+        retCrit <- c(retCrit, "    out1[1] = out(Range(0, tspan.size() - 1), Range(1, out.ncol() - 1));")
+        retCrit <- c(retCrit, "    return out1;")
+    } else {
+        retCrit <- "    return out;"
+    }
+    currline <- ratelines[1]
+    Rcpp_code <- c(Rcpp_code[1:(currline - 1)], retCrit, Rcpp_code[(currline + 1):length(Rcpp_code)])
+    
+    ## return parsed code
     Rcpp_code
 }
 

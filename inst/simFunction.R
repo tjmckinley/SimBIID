@@ -80,5 +80,5 @@
     MATCHCRIT1
     
     // return output
-    return out;
+    RETURNCRIT
 }')

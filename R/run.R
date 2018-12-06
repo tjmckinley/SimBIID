@@ -143,15 +143,14 @@ run <- function(
         runs <- NA
     } else {
         sums <- do.call("rbind", lapply(sims, function(x){
-            x[nrow(x), , drop = F]
+            x[[1]]
         }))
         sums <- cbind(1:nrow(sums), sums)
         colnames(sums) <- c("rep", "completed", "t", model$compartments)
         sums <- as.data.frame(sums)
         
         sims <- do.call("rbind", lapply(1:length(sims), function(i, x){
-            x <- x[[i]]
-            x <- x[-nrow(x), -1, drop = F]
+            x <- x[[i]][[2]]
             x <- cbind(rep(i, nrow(x)), x)
             x
         }, x = sims))

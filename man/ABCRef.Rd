@@ -4,7 +4,8 @@
 \alias{ABCRef}
 \title{Produces ABC reference table}
 \usage{
-ABCRef(npart, priors, func, data, parallel = F, mc.cores = NA, ...)
+ABCRef(npart, priors, pars, func, data, parallel = F, mc.cores = NA,
+  ...)
 }
 \arguments{
 \item{npart}{The number of particles (must be a positive integer).}
@@ -16,6 +17,10 @@ Each entry in the \code{dist} column must contain one of \code{c("unif", "norm",
 and the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
 (lower and upper bounds in the uniform case; mean and standard deviation in the 
 normal case; and shape and rate in the gamma case).}
+
+\item{pars}{A `data.frame` of parameters to use for the simulations (can have a single row, in which case
+this is repeated `npart` times, or must have `npart` rows). You cannot specify both `pars`
+and `priors`.}
 
 \item{func}{Function that runs the simulator. The first argument must be \code{pars}. The function
 must return a \code{vector} of simulated summary measures, or a missing value (\code{NA})

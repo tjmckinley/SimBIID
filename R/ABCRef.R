@@ -12,6 +12,9 @@
 #'                  and the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
 #'                  (lower and upper bounds in the uniform case; mean and standard deviation in the 
 #'                  normal case; and shape and rate in the gamma case).
+#' @param pars      A `data.frame` of parameters to use for the simulations (can have a single row, in which case
+#'                  this is repeated `npart` times, or must have `npart` rows). You cannot specify both `pars`
+#'                  and `priors`.
 #' @param func      Function that runs the simulator. The first argument must be \code{pars}. The function
 #'                  must return a \code{vector} of simulated summary measures, or a missing value (\code{NA})
 #'                  if there is an error. The output from the function must be a vector with length equal 
@@ -25,9 +28,21 @@
 #' @return An \code{data.frame} object with \code{npart} rows, where the first \code{p} columns correspond to 
 #'         the proposed parameters, and the remaining columns correspond to the simulated outputs.
 
-ABCRef <- function(npart, priors, func, data, parallel = F, mc.cores = NA, ...) {
+ABCRef <- function(npart, priors, pars, func, data, parallel = F, mc.cores = NA, ...) {
     
     ## check inputs
+    if(missing(npart)){
+        stop("'npart' must be provided")
+    }
+    if(missing(priors) & missing(pars)){
+        stop("'priors' or 'pars' must be provided")
+    }
+    if(missing(func)){
+        stop("'func' must be provided")
+    }
+    if(missing(data)){
+        stop("'data' must be provided")
+    }
     checkInput(parallel, c("vector", "logical"), 1)
     if(parallel) {
         if(!require(parallel)) {
@@ -45,7 +60,20 @@ ABCRef <- function(npart, priors, func, data, parallel = F, mc.cores = NA, ...) 
         cat(paste0("Number of cores: ", mc.cores, "\n"))
     }
     checkInput(npart, "numeric", 1, int = T)
-    checkInput(priors, "data.frame", ncol = 4)
+    if(!missing(priors)){
+        if(!missing(pars)) {
+            stop("Don't provide 'priors' and 'pars', you must choose one or the other.")
+        }
+        checkInput(priors, "data.frame", ncol = 4)
+    } else {
+        checkInput(pars, "data.frame")
+        if(nrow(pars) != 1 & nrow(pars) != npart) {
+            stop("'pars' must have either 1 row or 'npart' rows")
+        }
+        for(j in 1:ncol(pars)){
+            checkInput(pars[, j], c("vector", "numeric"))
+        }
+    }
     checkInput(func, "function", 1)
     checkInput(data, "data.frame", nrow = 1)
     if(!all(sapply(data, is.numeric))){
@@ -61,38 +89,49 @@ ABCRef <- function(npart, priors, func, data, parallel = F, mc.cores = NA, ...) 
     checkInput(npart, gt = 1)
     
     ## check priors
-    if(!all(sort(match(colnames(priors), c("parnames", "dist", "p1", "p2"))) - 1:4 == 0)){
-        stop("colnames(priors) must be: 'parnames', 'dist', 'p1' and 'p2'")
-    }
-    priors <- select(priors, parnames, dist, p1, p2)
-    checkInput(priors$parnames, "character")
-    checkInput(priors$dist, "character")
-    checkInput(priors$p1, "numeric")
-    checkInput(priors$p2, "numeric")
-    checkInput(priors$dist, inSet = c("unif", "norm", "gamma"))
-    temp <- priors[priors$dist == "unif", , drop = F]
-    if(nrow(temp) > 0) {
-        ## check uniform bounds correct
-        if(!all(apply(temp[, 3:4, drop = F], 1, diff) > 0)){
-            stop("Priors: uniform bounds in incorrect order")
+    if(!missing(priors)){
+        if(!all(sort(match(colnames(priors), c("parnames", "dist", "p1", "p2"))) - 1:4 == 0)){
+            stop("colnames(priors) must be: 'parnames', 'dist', 'p1' and 'p2'")
+        }
+        priors <- select(priors, parnames, dist, p1, p2)
+        checkInput(priors$parnames, "character")
+        checkInput(priors$dist, "character")
+        checkInput(priors$p1, "numeric")
+        checkInput(priors$p2, "numeric")
+        checkInput(priors$dist, inSet = c("unif", "norm", "gamma"))
+        temp <- priors[priors$dist == "unif", , drop = F]
+        if(nrow(temp) > 0) {
+            ## check uniform bounds correct
+            if(!all(apply(temp[, 3:4, drop = F], 1, diff) > 0)){
+                stop("Priors: uniform bounds in incorrect order")
+            }
+        }
+        temp <- priors[priors$dist == "norm", , drop = F]
+        if(nrow(temp) > 0) {
+            ## check normal hyperparameters correct
+            if(!all(temp$p2 > 0)){
+                stop("Priors: normal variance must be > 0")
+            }
+        }
+        temp <- priors[priors$dist == "gamma", , drop = F]
+        if(nrow(temp) > 0) {
+            ## check gamma bounds correct
+            if(!all(temp$p1 > 0) | !all(temp$p2 > 0)){
+                stop("Priors: gamma hyperparameters must be > 0")
+            }
+        }
+        priors$ddist <- paste0("d", priors$dist)
+        priors$dist <- paste0("r", priors$dist)
+        parnames <- priors$parnames
+    } else {
+        parnames <- colnames(pars)
+        if(nrow(pars) == 1){
+            priors <- matrix(rep(pars, npart), ncol = ncol(pars), byrow = T)
+            priors <- as.data.frame(priors)
+        } else {
+            priors <- pars
         }
     }
-    temp <- priors[priors$dist == "norm", , drop = F]
-    if(nrow(temp) > 0) {
-        ## check normal hyperparameters correct
-        if(!all(temp$p2 > 0)){
-            stop("Priors: normal variance must be > 0")
-        }
-    }
-    temp <- priors[priors$dist == "gamma", , drop = F]
-    if(nrow(temp) > 0) {
-        ## check gamma bounds correct
-        if(!all(temp$p1 > 0) | !all(temp$p2 > 0)){
-            stop("Priors: gamma hyperparameters must be > 0")
-        }
-    }
-    priors$ddist <- paste0("d", priors$dist)
-    priors$dist <- paste0("r", priors$dist)   
     
     ## extract arguments for "func"
     fargs <- fargs[is.na(match(names(fargs), "pars"))]
@@ -154,7 +193,7 @@ ABCRef <- function(npart, priors, func, data, parallel = F, mc.cores = NA, ...) 
     pars <- as.data.frame(pars)
     
     ## set names
-    colnames(pars) <- priors$parnames
+    colnames(pars) <- parnames
     if(ncol(out) != ncol(data)){
         stop("ncol(out) != ncol(data)")
     }

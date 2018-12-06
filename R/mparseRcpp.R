@@ -184,6 +184,7 @@ mparseRcpp <- function(
 
     ## write Rcpp code to file
     Rcpp_code <- Rcpp_mparse(transitions1, matchCrit, addVars, stopCrit, tspan, afterTstar, runFromR)
+    
     ## replace "gdata" with "pars"
     Rcpp_code <- gsub("gdata", "pars", Rcpp_code)
     

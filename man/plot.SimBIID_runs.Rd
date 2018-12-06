@@ -5,7 +5,7 @@
 \title{Plots \code{SimBIID_runs} objects}
 \usage{
 plot.SimBIID_runs(x, which = c("all", "t"), type = c("runs", "sums"),
-  rep = NA, quant = seq(0.55, 0.95, by = 0.05))
+  rep = NA, quant = 0.9)
 }
 \arguments{
 \item{x}{An \code{SimBIID_runs} object.}

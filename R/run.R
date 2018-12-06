@@ -9,12 +9,10 @@
 #' @export
 #'
 #' @param model: An object of class \code{SimBIID_model}.
-#' @param pars: A \code{data.frame} of parameters, with a single row, and each column
-#'              a parameter.
+#' @param pars: A named vector of parameters.
 #' @param tstart: The time at which to start the simulation.
 #' @param tstop: The time at which to stop the simulation.
-#' @param u: A \code{data.frame} of initial states, with a single row, and columns defining the 
-#'                  compartments.
+#' @param u: A named vector of initial states.
 #' @param tspan: A numeric vector containing the times at which to 
 #'               save the states of the system.
 #' @param nrep: Specifies the number of simulations to run.
@@ -68,25 +66,21 @@ run <- function(
     if(!model$runFromR) {
         stop("'model' must be specified with 'runFromR = T'")
     }
-    checkInput(pars, "data.frame", nrow = 1, ncol = length(model$pars))
-    for(j in 1:ncol(pars)){
-        checkInput(pars[, j], c("vector", "numeric"))
+    checkInput(pars, c("vector", "numeric"), length(model$pars))
+    parnames <- names(pars)
+    if(!identical(parnames, model$pars)){
+        stop("Names of 'pars' do not match model specification")
     }
-    parnames <- colnames(pars)
-    checkInput(parnames, inSet = model$pars)
-    pars <- pars[, match(model$pars, parnames)]
-    pars <- unlist(pars)
     checkInput(tstart, c("vector", "numeric"), 1)
     checkInput(tstop, c("vector", "numeric"), 1, gt = tstart)
-    checkInput(u, "data.frame", nrow = 1, ncol = length(model$compartments))
-    for(j in 1:ncol(u)){
-        checkInput(u[, j], c("vector", "numeric"), gte = 0, int = T)
+    checkInput(u, c("vector", "numeric"), length(model$compartments), int = T, gte = 0)
+    if(sum(u) <= 0){
+        stop("'sum(u)' not greater than zero.")
     }
-    unames <- colnames(u)
-    checkInput(unames, c("vector", "character"), length(model$compartments))
-    checkInput(unames, inSet = model$compartments)
-    u <- u[, match(model$compartments, unames)]
-    u <- unlist(u)
+    unames <- names(u)
+    if(!identical(unames, model$compartments)){
+        stop("Names of 'u' do not match model specification")
+    }
     if(missing(tspan) & model$tspan){
         stop("'SimBIID_model' requires that 'tspan' must be set")
     }
@@ -97,7 +91,7 @@ run <- function(
         checkInput(tspan, c("vector", "numeric"), int = T, gte = tstart)
         tspan <- sort(tspan)
     }
-    checkInput(nrep, c("numeric"), 1, int = T, gt = 0)
+    checkInput(nrep, "numeric", 1, int = T, gt = 0)
     checkInput(parallel, c("vector", "logical"), 1)
     if(parallel) {
         if(!require(parallel)) {

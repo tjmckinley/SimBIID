@@ -16,28 +16,33 @@
 #'         extracted from \code{SimBIID_runs} object.
 
 plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums"), 
-                              rep = NA, quant = seq(0.55, 0.95, by = 0.05)) {
+                              rep = NA, quant = 0.9) {
     ## check x
     if(class(x) != "SimBIID_runs"){
         stop("'x' is not a SimBIID_runs object")
     }
+    ## check type
+    checkInput(type, c("vector", "character"))
+    type <- type[1]
+    checkInput(type, inSet = c("runs", "sums"))
     ## check which
+    checkInput(which, c("vector", "character"))
+    if(which[1] == "t" & type == "runs") {
+        stop("Can't plot 't' variable with 'type == \"runs\"'")
+    }
     whichset <- c("t", colnames(x$sums)[-c(1:3)])
     if(which[1] != "all") {
         checkInput(which, c("vector", "character"), inSet = whichset)
     } else {
         which <- whichset
     }
-    ## check type
-    checkInput(type, c("vector", "character"))
-    type <- type[1]
-    checkInput(type, inSet = c("runs", "sums"))
     ## check rep
     if(!is.na(rep[1])){
         checkInput(rep, c("vector", "numeric"), inSet = x$sums$rep, int = T)
     }
     ## check quant
-    checkInput(quant, c("vector", "numeric"), inSet = seq(0.55, 0.95, by = 0.05))
+    checkInput(quant, c("vector", "numeric"))
+    checkInput(format(quant, drop0trailing = T), inSet = format(seq(0.55, 0.95, by = 0.05), drop0trailing = T))
     quant <- sort(quant)
     quant <- cbind(rev(1 - quant), rev(quant))
     quant1 <- sort(as.vector(quant))

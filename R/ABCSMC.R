@@ -5,8 +5,8 @@
 #'
 #' @export
 #'
-#' @param x         An \code{ABCSMC} object or a \code{data.frame} with a single row and columns 
-#'                  containing the observed summary statistics to match to. Columns must match to `tols`.
+#' @param x         An \code{ABCSMC} object or a named vector with entries
+#'                  containing the observed summary statistics to match to. Names must match to `tols`.
 #' @param priors    A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 
 #'                  \code{p2}, with number of rows equal to the number of parameters. The column
 #'                  \code{parname} simply gives names to each parameter for plotting and summarising.
@@ -20,12 +20,12 @@
 #'                  return an \code{NA}, else it must returns a \code{vector} of simulated summary measures. 
 #'                  In this latter case the output from the function must be a vector with length equal to 
 #'                  \code{ncol(data)} and with entries in the same order as the columns of \code{data}.
-#' @param u         A \code{data.frame} of initial states, with a single row, and columns defining the 
-#'                  compartments.
+#' @param u         A named vector of initial states.
 #' @param npart     An integer specifying the number of particles.
-#' @param tols 		A \code{data.frame} of tolerances, with the number of rows defining
+#' @param tols 		A \code{vector} or \code{matrix} of tolerances, with the number of rows defining
 #'                  the number of generations required, and columns defining the summary statistics
-#'                  to match to. The columns must match to those in `x`. Defaults to exact matching for
+#'                  to match to. If a \code{vector}, then the length determines the summary statistics.
+#'                  The columns/entries must match to those in `x`. Defaults to exact matching for
 #'                  all columns.
 #' @param parallel  A \code{logical} determining whether to use parallel processing or not.
 #' @param mc.cores  Number of cores to use if using parallel processing.
@@ -71,11 +71,23 @@ ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
     }
     
     ## extract tolerances and check against new tolerances
-    if(ncol(tols) != ncol(x$data)){
+    if(ncol(tols) != length(x$data)){
         stop("ncol(tols) != ncol(x$data)")
     }
-    if(!all(match(colnames(tols), colnames(x$data)) - 1:ncol(x$data) == 0)){
-        stop("colnames(tols) does not match colnames(data)")
+    checkInput(tols, c("numeric"))
+    if(!is.matrix(tols) & !is.vector(tols)){
+        stop("'tols' not a vector or a matrix")
+    }
+    if(is.matrix(tols)) {
+        checkInput(tols, ncol = length(x$data))
+        if(!identical(colnames(tols), names(x$data))){
+            stop("colnames(tols) does not match names(data)")
+        }
+    } else {
+        checkInput(tols, length = length(x$data))
+        if(!identical(names(tols), names(x$data))){
+            stop("names(tols) does not match names(data)")
+        }
     }
     if(sum(apply(rbind(x$tols[nrow(x$tols), ], tols), 2, function(x) {
         sum(x[-1] >= x[1])
@@ -154,28 +166,28 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL,
     checkInput(priors, "data.frame", ncol = 4)
     checkInput(func, "function", 1)
     data <- x
-    checkInput(data, "data.frame", nrow = 1)
-    if(!all(sapply(data, is.numeric))) {
-        stop("All columns of 'data' must be numeric")
+    checkInput(data, c("numeric", "vector"))
+    if(is.null(names(data))){
+        stop("'data' is not a named vector")
     }
-    if(!is.data.frame(tols)){
+    if(!is.matrix(tols) & !is.vector(tols)){
         if(is.null(tols[1])){
-            tols <- matrix(rep(0, ncol(data) - 1), nrow = 1)
-            tols <- as.data.frame(tols)
-            colnames(tols) <- colnames(data)[-1]
+            tols <- rep(0, length(data))
+            names(tols) <- names(data)
         } else {
-            stop("'tols' not NULL or a data.frame")
+            stop("'tols' not NULL, matrix or vector")
         }
     }
-    checkInput(tols, "data.frame", gte = 0)
-    if(!all(sapply(tols, is.numeric))) {
-        stop("'tols' must be numeric")
-    }
-    if(ncol(data) != ncol(tols)){
-        stop("Number of columns of 'data' and 'tols' must match")
-    }
-    if(!all(match(colnames(data), colnames(tols)) - 1:ncol(data) == 0)){
-        stop("colnames(tols) != colnames(data)")
+    if(is.matrix(tols)){
+        checkInput(tols, "numeric", gte = 0, ncol = length(data))
+        if(!identical(names(data), colnames(tols))){
+            stop("colnames(tols) != names(data)")
+        }
+    } else {
+        checkInput(tols, "numeric", gte = 0, length = length(data) - 1)
+        if(!identical(names(data), names(tols))){
+            stop("names(tols) != names(data)")
+        }
     }
     fargs <- formals(func)
     if(length(fargs) < 4){
@@ -190,19 +202,13 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL,
         stop("'tols' cannot increase")
     }
     ## check u
-    checkInput(u, "data.frame", nrow = 1)
-    for(j in ncol(u)){
-        checkInput(u[, j], c("vector", "numeric"), int = T, gte = 0)
-    }
-    checkInput(sum(u[1, ]), "numeric", int = T, gt = 1)
-    uorig <- u
-    u <- unlist(u)
+    checkInput(u, c("vector", "numeric"), int = T, gte = 0)
+    checkInput(sum(u), "numeric", int = T, gt = 1)
     
     ## check priors
-    if(!all(sort(match(colnames(priors), c("parnames", "dist", "p1", "p2"))) - 1:4 == 0)){
+    if(!identical(colnames(priors), c("parnames", "dist", "p1", "p2"))){
         stop("Column names of 'priors' must be: 'parnames', 'dist', 'p1' and 'p2'")
     }
-    priors <- select(priors, parnames, dist, p1, p2)
     checkInput(priors$parnames, "character")
     checkInput(priors$dist, "character")
     checkInput(priors$p1, "numeric")
@@ -282,7 +288,9 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL,
     
     ## save tols
     orig_tols <- tols
-    tols <- as.matrix(tols)
+    if(is.vector(tols)){
+        tols <- matrix(tols, nrow = 1)
+    }
     
     ## run sequential algorithm
     for(t in init:nrow(tols)) {  
@@ -303,14 +311,14 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL,
             temp <- lapply(1:npart, runProp,
                 t = t, priors = priors, 
                 prevWeights = tempWeights, prevPars = tempPars, 
-                propCov = propCov, tols = tols[t, ], data = as.numeric(data[1, ]), 
+                propCov = propCov, tols = tols[t, ], data = data, 
                 u = u,
                 func = func, func_args = fargs)
         } else  {
             temp <- mclapply(1:npart, runProp,
                 t = t, priors = priors, 
                 prevWeights = tempWeights, prevPars = tempPars, 
-                propCov = propCov, tols = tols[t, ], data = as.numeric(data[1, ]), 
+                propCov = propCov, tols = tols[t, ], data = data, 
                 u = u,
                 func = func, func_args = fargs, 
                 mc.cores = mc.cores)
@@ -327,7 +335,7 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL,
         
         ## set names
         colnames(pars[[t]]) <- priors$parnames
-        colnames(out[[t]]) <- colnames(data)
+        colnames(out[[t]]) <- names(data)
         
         ## set proposal covariance
         propCov <- cov(pars[[t]]) * 2
@@ -348,14 +356,18 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL,
     if(init > 1) {
         pars <- pars[-1]
         out <- out[-1]
-        orig_tols <- orig_tols[-1, , drop = F]
+        if(is.matrix(orig_tols)){
+            orig_tols <- orig_tols[-1, , drop = F]
+        } else {
+            orig_tols <- orig_tols[-1]
+        }
         weights <- weights[-1]
     }
     
     ## output results
     output <- list(pars = pars, output = out, weights = weights, accrate = accrate,
                    tols = orig_tols, priors = orig_priors, data = data,
-                   func = func, u = uorig, addargs = args)
+                   func = func, u = u, addargs = args)
     class(output) <- "ABCSMC"
     output
 }

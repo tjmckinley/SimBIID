@@ -141,7 +141,7 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
         }
         
         ## extract data
-        dat <- x$data %>%
+        dat <- x$data %>% as.list() %>% data.frame() %>%
             gather(Output, value)
             
         if(!joint) {

@@ -14,14 +14,15 @@ ABCSMC(x, ...)
   parallel = F, mc.cores = NA, ...)
 }
 \arguments{
-\item{x}{An \code{ABCSMC} object or a \code{data.frame} with a single row and columns 
-containing the observed summary statistics to match to. Columns must match to `tols`.}
+\item{x}{An \code{ABCSMC} object or a named vector with entries
+containing the observed summary statistics to match to. Names must match to `tols`.}
 
 \item{...}{Further arguments to pass to \code{func}. (Not used if extending runs.)}
 
-\item{tols}{A \code{data.frame} of tolerances, with the number of rows defining
+\item{tols}{A \code{vector} or \code{matrix} of tolerances, with the number of rows defining
 the number of generations required, and columns defining the summary statistics
-to match to. The columns must match to those in `x`. Defaults to exact matching for
+to match to. If a \code{vector}, then the length determines the summary statistics.
+The columns/entries must match to those in `x`. Defaults to exact matching for
 all columns.}
 
 \item{parallel}{A \code{logical} determining whether to use parallel processing or not.}
@@ -43,8 +44,7 @@ return an \code{NA}, else it must returns a \code{vector} of simulated summary m
 In this latter case the output from the function must be a vector with length equal to 
 \code{ncol(data)} and with entries in the same order as the columns of \code{data}.}
 
-\item{u}{A \code{data.frame} of initial states, with a single row, and columns defining the 
-compartments.}
+\item{u}{A named vector of initial states.}
 
 \item{npart}{An integer specifying the number of particles.}
 }

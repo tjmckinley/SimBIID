@@ -129,12 +129,24 @@ mparseRcpp <- function(
         tn1 <- paste(rep(" ", 16), collapse = "")
         stopCrit <- lapply(stopCrit, function(x, tn, tn1) {
             x <- paste0(tn, "if(", x, "){")
-            x <- c(x, paste0(tn1, "out[0] = 0;"))
-            if(is.null(matchCrit)) {
-                x <- c(x, paste0(tn1, "out[1] = t;"))
-                x <- c(x, paste0(tn1, "out[Range(2, u.size() + 1)] = u;"))
+            if(!tspan) {
+                x <- c(x, paste0(tn1, "out[0] = 0;"))
+                if(is.null(matchCrit)) {
+                    x <- c(x, paste0(tn1, "out[1] = t;"))
+                    x <- c(x, paste0(tn1, "out[Range(2, u.size() + 1)] = u;"))
+                } else {
+                    x <- c(x, paste0(tn1, "out[Range(1, u.size())] = u;"))
+                }
             } else {
-                x <- c(x, paste0(tn1, "out[Range(1, u.size())] = u;"))
+                x <- c(x, paste0(tn1, "out(tspan.size(), 0) = 0;"))
+                # if(is.null(matchCrit)) {
+                    x <- c(x, paste0(tn1, "out(tspan.size(), 1) = t;"))
+                    x <- c(x, paste0(tn1, "for(int m = 0; m < u.size(); m++){"))
+                    x <- c(x, paste0(tn1, "    out(tspan.size(), m + 2) = u[m];"))
+                    x <- c(x, paste0(tn1, "}"))
+                # } else {
+                #     x <- c(x, paste0(tn1, "out[tspan.size(), Range(1, u.size())] = u;"))
+                # }
             }
             x <- c(x, paste0(tn1, "return out;"))
             x <- c(x, paste0(tn, "}"))

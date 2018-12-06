@@ -6,7 +6,7 @@
 \usage{
 mparseRcpp(transitions = NULL, compartments = NULL, pars = NULL,
   matchCrit = F, addVars = NULL, stopCrit = NULL, tspan = F,
-  runFromR = T)
+  afterTstar = NULL, runFromR = T)
 }
 \arguments{
 \item{transitions:}{character vector containing transitions on the form \code{"X ->
@@ -35,6 +35,9 @@ e.g. additional stopping criteria.}
 
 \item{tspan:}{A \code{logical} determining whether to return time series counts or not.}
 
+\item{afterTstar:}{A \code{character} containing code to insert after each new event time is
+generated.}
+
 \item{runFromR:}{\code{logical} determining whether code is to be compiled to run directly in R,
 or whether to be compiled as an \code{XPtr} object for use in Rcpp.}
 }
@@ -50,6 +53,7 @@ An object of class \code{SimBIID_model}, which is essentially a \code{list}
             \item{stopCrit:}{ copy of \code{stopCrit} argument;}
             \item{addVars:}{ copy of \code{addVars} argument;}
             \item{tspan:}{ copy of \code{tspan} argument;}
+            \item{afterTstar:}{ copy of \code{afterTstar} argument;}
             \item{runFromR:}{ copy of \code{runFromR} argument.}
         }
         This can be compiled into an \code{XPtr} or \code{function} object

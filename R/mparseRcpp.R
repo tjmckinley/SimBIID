@@ -31,6 +31,9 @@
 #'                 e.g. additional stopping criteria.
 #'                  
 #' @param tspan: A \code{logical} determining whether to return time series counts or not.
+#' 
+#' @param afterTstar: A \code{character} containing code to insert after each new event time is
+#'                    generated. 
 #'                  
 #' @param runFromR: \code{logical} determining whether code is to be compiled to run directly in R,
 #'                  or whether to be compiled as an \code{XPtr} object for use in Rcpp.
@@ -46,6 +49,7 @@
 #'             \item{stopCrit:}{ copy of \code{stopCrit} argument;}
 #'             \item{addVars:}{ copy of \code{addVars} argument;}
 #'             \item{tspan:}{ copy of \code{tspan} argument;}
+#'             \item{afterTstar:}{ copy of \code{afterTstar} argument;}
 #'             \item{runFromR:}{ copy of \code{runFromR} argument.}
 #'         }
 #'         This can be compiled into an \code{XPtr} or \code{function} object
@@ -59,6 +63,7 @@ mparseRcpp <- function(
     addVars = NULL,
     stopCrit = NULL,
     tspan = F,
+    afterTstar = NULL,
     runFromR = T
 ) {
     ## Check transitions
@@ -163,6 +168,12 @@ mparseRcpp <- function(
         }
     }
     
+    ## check afterTstar
+    if(!is.null(afterTstar)) {
+        checkInput(afterTstar, "character", 1)
+        warning("No consistency check on 'afterTstar': you might want to check parsed code before compiling.")
+    }
+    
     ## check run from R
     checkInput(runFromR, "logical", 1)
 
@@ -172,7 +183,7 @@ mparseRcpp <- function(
     )
 
     ## write Rcpp code to file
-    Rcpp_code <- Rcpp_mparse(transitions1, matchCrit, addVars, stopCrit, tspan, runFromR)
+    Rcpp_code <- Rcpp_mparse(transitions1, matchCrit, addVars, stopCrit, tspan, afterTstar, runFromR)
     ## replace "gdata" with "pars"
     Rcpp_code <- gsub("gdata", "pars", Rcpp_code)
     
@@ -186,6 +197,7 @@ mparseRcpp <- function(
         stopCrit = stopCrit,
         addVars = addVars,
         tspan = tspan,
+        afterTstar = afterTstar,
         runFromR = runFromR
     )
     class(output) <- "SimBIID_model"

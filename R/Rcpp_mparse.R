@@ -1,6 +1,6 @@
 ## Cpp code: Generate Rcpp code for mparse
 ## (based on idea in SimInf_mparse in SimInf package)
-Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFromR) {
+Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, afterTstar, runFromR) {
     
     ## read source code
     Rcpp_code <- readLines(system.file("", "simFunction.R", package = "SimBIID"))
@@ -39,8 +39,9 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
     Rcpp_code[1] <- paste0(Rcpp_code[1], ") { ")
     
     ## extract rate markers
-    ratelines <- sort(c(grep("RATELINES", Rcpp_code), grep("MATCHCRIT", Rcpp_code), grep("TSPAN", Rcpp_code)))
-    if(length(ratelines) != 7){
+    ratelines <- sort(c(grep("RATELINES", Rcpp_code), grep("MATCHCRIT", Rcpp_code), 
+                        grep("TSPAN", Rcpp_code), grep("AFTER_TSTAR", Rcpp_code)))
+    if(length(ratelines) != 9){
         stop("Something wrong with simFunction code file")
     }
     
@@ -177,6 +178,19 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
         tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
     }
     
+    ## update after_tstar
+    if(!is.null(afterTstar)){
+        afterTstar <- strsplit(afterTstar, "\n")[[1]]
+        afterTstar <- sapply(afterTstar, function(x) paste0(tempSpace, x))
+        currline <- ratelines[1]
+        ratelines <- ratelines[-1]
+        Rcpp_code <- c(Rcpp_code[1:(currline - 1)], afterTstar, Rcpp_code[(currline + 1):length(Rcpp_code)])
+        ratelines <- ratelines + length(afterTstar) - 1
+    } else {
+        Rcpp_code <- Rcpp_code[-ratelines[1]]
+        ratelines <- ratelines[-1] - 1
+    }
+    
     ## update rates
     upRates <- sapply(as.list(upRates), function(x) {
         paste0("        ", x)
@@ -185,6 +199,18 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, runFro
     ratelines <- ratelines[-1]
     Rcpp_code <- c(Rcpp_code[1:(currline - 1)], upStates, upRates, Rcpp_code[(currline + 1):length(Rcpp_code)])
     ratelines <- ratelines + length(upStates) + length(upRates) - 1
+    
+    ## update after_tstar
+    if(!is.null(afterTstar)){
+        afterTstar <- sapply(afterTstar, function(x) paste0("    ", x))
+        currline <- ratelines[1]
+        ratelines <- ratelines[-1]
+        Rcpp_code <- c(Rcpp_code[1:(currline - 1)], afterTstar, Rcpp_code[(currline + 1):length(Rcpp_code)])
+        ratelines <- ratelines + length(afterTstar) - 1
+    } else {
+        Rcpp_code <- Rcpp_code[-ratelines[1]]
+        ratelines <- ratelines[-1] - 1
+    }
     
     ## update tspan
     if(tspan) {

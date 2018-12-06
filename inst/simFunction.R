@@ -33,6 +33,7 @@
     // sample next event time
     if(totrate > 0.0) {
         tstar = t + R::rexp(1.0 / totrate);
+        AFTER_TSTAR0
         while(tstar < tstop){
             // sample event type
             u_tmp = R::runif(0.0, totrate);
@@ -65,6 +66,7 @@
             } else {
                 tstar = tstop;
             }
+            AFTER_TSTAR1
             TSPAN1
             RATELINES3
         }

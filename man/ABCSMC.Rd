@@ -8,10 +8,11 @@
 \usage{
 ABCSMC(x, ...)
 
-\method{ABCSMC}{ABCSMC}(x, tols, parallel = F, mc.cores = NA)
+\method{ABCSMC}{ABCSMC}(x, tols = NULL, ptols = NULL, ngen = 1,
+  parallel = F, mc.cores = NA)
 
 \method{ABCSMC}{default}(x, priors, func, u, npart = 100, tols = NULL,
-  parallel = F, mc.cores = NA, ...)
+  ptols = NULL, ngen = 1, parallel = F, mc.cores = NA, ...)
 }
 \arguments{
 \item{x}{An \code{ABCSMC} object or a named vector with entries
@@ -22,8 +23,12 @@ containing the observed summary statistics to match to. Names must match to `tol
 \item{tols}{A \code{vector} or \code{matrix} of tolerances, with the number of rows defining
 the number of generations required, and columns defining the summary statistics
 to match to. If a \code{vector}, then the length determines the summary statistics.
-The columns/entries must match to those in `x`. Defaults to exact matching for
-all columns.}
+The columns/entries must match to those in `x`.}
+
+\item{ptols}{The proportion of simulated outcomes at each generation to use to derive adaptive 
+tolerances.}
+
+\item{ngen}{The number of generations of ABC-SMC to run.}
 
 \item{parallel}{A \code{logical} determining whether to use parallel processing or not.}
 
@@ -66,6 +71,7 @@ An \code{ABCSMC} object, essentially a \code{list} containing:
 \item{\code{accrate}:}{ a \code{vector} of length \code{nrow(tols)} containing the
                      acceptance rates for each generation of ABC;}
 \item{\code{tols}:}{ a copy of the \code{tols} input;}
+\item{\code{ptols}:}{ a copy of the \code{ptols} input;}
 \item{\code{priors}:}{ a copy of the \code{priors} input;}
 \item{\code{data}:}{ a copy of the \code{data} input;}
 \item{\code{func}:}{ a copy of the \code{func} input;}

@@ -25,8 +25,10 @@
 #' @param tols 		A \code{vector} or \code{matrix} of tolerances, with the number of rows defining
 #'                  the number of generations required, and columns defining the summary statistics
 #'                  to match to. If a \code{vector}, then the length determines the summary statistics.
-#'                  The columns/entries must match to those in `x`. Defaults to exact matching for
-#'                  all columns.
+#'                  The columns/entries must match to those in `x`. 
+#' @param ptols     The proportion of simulated outcomes at each generation to use to derive adaptive 
+#'                  tolerances.
+#' @param ngen      The number of generations of ABC-SMC to run.
 #' @param parallel  A \code{logical} determining whether to use parallel processing or not.
 #' @param mc.cores  Number of cores to use if using parallel processing.
 #' @param ...       Further arguments to pass to \code{func}. (Not used if extending runs.)
@@ -48,6 +50,7 @@
 #' \item{\code{accrate}:}{ a \code{vector} of length \code{nrow(tols)} containing the
 #'                      acceptance rates for each generation of ABC;}
 #' \item{\code{tols}:}{ a copy of the \code{tols} input;}
+#' \item{\code{ptols}:}{ a copy of the \code{ptols} input;}
 #' \item{\code{priors}:}{ a copy of the \code{priors} input;}
 #' \item{\code{data}:}{ a copy of the \code{data} input;}
 #' \item{\code{func}:}{ a copy of the \code{func} input;}
@@ -63,36 +66,46 @@ ABCSMC <- function(x, ...) {
 #' @rdname ABCSMC
 #' @export
 
-ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
+ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = F, mc.cores = NA) {
     
     ## check inputs
     if(class(x) != "ABCSMC"){
         stop("'x' not ABCSMC object")
     }
+    if(is.null(tols[1]) & is.null(ptols[1])){
+        stop("Must input either 'tols' or 'ptols'")
+    }
+    if(!is.null(tols[1]) & !is.null(ptols[1])){
+        stop("Must choose either 'tols' or 'ptols'")
+    }
     
-    ## extract tolerances and check against new tolerances
-    if(ncol(tols) != length(x$data)){
-        stop("ncol(tols) != ncol(x$data)")
-    }
-    checkInput(tols, c("numeric"))
-    if(!is.matrix(tols) & !is.vector(tols)){
-        stop("'tols' not a vector or a matrix")
-    }
-    if(is.matrix(tols)) {
-        checkInput(tols, ncol = length(x$data))
-        if(!identical(colnames(tols), names(x$data))){
-            stop("colnames(tols) does not match names(data)")
+    if(!is.null(tols[1])){
+        ## extract tolerances and check against new tolerances
+        if(!is.matrix(tols) & !is.vector(tols)){
+            stop("'tols' not a vector or a matrix")
+        }
+        if(is.matrix(tols)) {
+            checkInput(tols, ncol = length(x$data))
+            if(!identical(colnames(tols), names(x$data))){
+                stop("colnames(tols) does not match names(data)")
+            }
+        } else {
+            checkInput(tols, length = length(x$data))
+            if(!identical(names(tols), names(x$data))){
+                stop("names(tols) does not match names(data)")
+            }
+        }
+        checkInput(tols, c("numeric"))
+        if(sum(apply(rbind(x$tols[nrow(x$tols), ], tols), 2, function(x) {
+            sum(x[-1] >= x[1])
+        })) > 0) {
+            stop("New tolerances not less than original tolerances")
         }
     } else {
-        checkInput(tols, length = length(x$data))
-        if(!identical(names(tols), names(x$data))){
-            stop("names(tols) does not match names(data)")
-        }
-    }
-    if(sum(apply(rbind(x$tols[nrow(x$tols), ], tols), 2, function(x) {
-        sum(x[-1] >= x[1])
-    })) > 0) {
-        stop("New tolerances not less than original tolerances")
+        checkInput(ngen, c("vector", "numeric"), 1, int = T, gt = 0)
+        checkInput(ptols, c("vector", "numeric"), 1, gt = 0, lt = 1)
+        tols <- apply(abs(t(x$output[[length(x$output)]]) - x$data), 1, quantile, probs = ptols)
+        tols <- ifelse(tols < 0, 0, tols)
     }
     
     ## collect arguments
@@ -100,6 +113,8 @@ ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
         x = x$data, 
         npart = nrow(x$pars[[1]]), 
         tols = tols, 
+        ptols = ptols,
+        ngen = ngen,
         priors = x$priors, 
         func = x$func, 
         u = x$u,
@@ -119,7 +134,7 @@ ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
     x$output <- c(x$output, temp$output)
     x$weights <- c(x$weights, temp$weights)
     x$accrate <- c(x$accrate, temp$accrate)
-    x$tols <- rbind(x$tols, tols)
+    x$tols <- rbind(x$tols, temp$tols)
     
     ## return new object
     x
@@ -128,8 +143,8 @@ ABCSMC.ABCSMC <- function(x, tols, parallel = F, mc.cores = NA) {
 #' @rdname ABCSMC
 #' @export
 
-ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL, 
-                           parallel = F, mc.cores = NA, ...) {
+ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL, ptols = NULL,
+                           ngen = 1, parallel = F, mc.cores = NA, ...) {
     
     ## check missing arguments
     if(missing(x)){
@@ -170,13 +185,20 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL,
     if(is.null(names(data))){
         stop("'data' is not a named vector")
     }
-    if(!is.matrix(tols) & !is.vector(tols)){
-        if(is.null(tols[1])){
-            tols <- rep(0, length(data))
-            names(tols) <- names(data)
-        } else {
-            stop("'tols' not NULL, matrix or vector")
+    
+    orig_tols <- tols
+    if(is.null(tols[1]) & is.null(ptols[1])){
+        stop("Must have at least one of 'tols' or 'ptols'")
+    }
+    if(!is.null(ptols[1])){
+        checkInput(ngen, c("vector", "numeric"), 1, int = T, gt = 0)
+        checkInput(ptols, c("vector", "numeric"), 1, gt = 0, lt = 1)
+        if(!is.vector(tols)){
+            stop("'tols' must be a named vector if 'ptols' is set")
         }
+    }
+    if(!is.matrix(tols) & !is.vector(tols)){
+       stop("'tols' not a matrix or vector")
     }
     if(is.matrix(tols)){
         checkInput(tols, "numeric", gte = 0, ncol = length(data))
@@ -184,22 +206,38 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL,
             stop("colnames(tols) != names(data)")
         }
     } else {
-        checkInput(tols, "numeric", gte = 0, length = length(data) - 1)
+        checkInput(tols, "numeric", gte = 0, length = length(data))
         if(!identical(names(data), names(tols))){
             stop("names(tols) != names(data)")
         }
+        tols <- matrix(tols, nrow = 1)
+        colnames(tols) <- names(data)
     }
+    if(nrow(tols) > 1){
+        if(!all(apply(tols, 2, function(x) {
+            all(diff(x) < 0)
+        }))){
+            stop("'tols' cannot increase")
+        }
+    }
+    if(is.null(ptols[1])){
+        ngen <- nrow(tols)
+    } else {
+        if(nrow(tols) != 1){
+            stop("Some weird error")
+        }
+        if(ngen > nrow(tols)) {
+            tols <- rbind(tols, matrix(NA, ngen - 1, ncol(tols)))
+        }
+    }
+    
+    ## check function
     fargs <- formals(func)
     if(length(fargs) < 4){
         stop("Number of arguments of 'func' must be at least 4")
     }
     if(!identical(names(fargs)[1:4], c("pars", "data", "tols", "u"))){
         stop("First four arguments of 'func' must be: 'pars', 'data', 'tols' and 'u'")
-    }
-    if(!all(apply(tols, 2, function(x) {
-        all(diff(x) < 0)
-    }))){
-        stop("'tols' cannot increase")
     }
     ## check u
     checkInput(u, c("vector", "numeric"), int = T, gte = 0)
@@ -245,7 +283,7 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL,
     ptm_ini <- proc.time()
 
     ## set up output objects
-    accrate <- rep(NA, nrow(tols))
+    accrate <- rep(NA, ngen)
     pars <- list(); out <- list(); weights <- list();
     
     ## extract ellipsis arguments
@@ -267,7 +305,7 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL,
             stop("'prevweights' does not exist")
         }
         if(!exists("genstart", where = args)){
-            stop("'genstart' doe not exist")
+            stop("'genstart' does not exist")
         }
         ## set up dummy objects (removed at the end)
         pars[[1]] <- args$prevPars
@@ -286,12 +324,6 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL,
         genstart <- 0
     }
     
-    ## save tols
-    orig_tols <- tols
-    if(is.vector(tols)){
-        tols <- matrix(tols, nrow = 1)
-    }
-    
     ## run sequential algorithm
     for(t in init:nrow(tols)) {  
         ## set up arguments
@@ -301,6 +333,13 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL,
         } else {
             tempWeights <- weights[[t - 1]]
             tempPars <- pars[[t - 1]]
+        }
+        if(t != init){
+            ## set tolerances if required
+            if(!is.null(ptols[1])){
+                tols[t, ] <- apply(abs(t(out[[t - 1]]) - data), 1, quantile, probs = ptols)
+                tols[t, ] <- ifelse(tols[t, ] < 0, 0, tols[t, ])
+            }
         }
         
         ## set timer
@@ -356,17 +395,13 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL,
     if(init > 1) {
         pars <- pars[-1]
         out <- out[-1]
-        if(is.matrix(orig_tols)){
-            orig_tols <- orig_tols[-1, , drop = F]
-        } else {
-            orig_tols <- orig_tols[-1]
-        }
+        tols <- tols[-1, , drop = F]
         weights <- weights[-1]
     }
     
     ## output results
     output <- list(pars = pars, output = out, weights = weights, accrate = accrate,
-                   tols = orig_tols, priors = orig_priors, data = data,
+                   tols = tols, ptols = ptols, priors = orig_priors, data = data,
                    func = func, u = u, addargs = args)
     class(output) <- "ABCSMC"
     output

@@ -16,9 +16,17 @@
 #' @param compartments: contains the names of the involved compartments, for
 #'          example, \code{compartments = c("S", "I", "R")}.
 #'
-#' @param pars: a character vector containing the names of the parameters.
+#' @param pars: a \code{character} vector containing the names of the parameters.
 #' 
-#' @param matchCrit: \code{logical} determining whether to implement match criteria or not.
+#' @param obsProcess: \code{data.frame} determining the observation process. Columns must be in the order:
+#'                    \code{compnames}, \code{dist}, \code{p1}, \code{p2}. \code{compnames} is a \code{character}
+#'                    denoting the relevant compartment name to place the observation process onto; \code{dist} 
+#'                    is a \code{character} specifying the distribution of the observation process (must be one of 
+#'                    \code{"unif"}, \code{"pois"} or \code{"binom"} at the current time); \code{p1} is the first parameter 
+#'                    (the lower bound in the case of \code{"unif"}, the rate in the case of \code{"pois"}, or the \code{size} 
+#'                    in the case of \code{"binom"}); and finally \code{p2} is the second parameter (the upper bound in the
+#'                    case of \code{"unif"}, \code{NA} in the case of \code{"pois"}, and \code{prob} in the case of 
+#'                    \code{"binom"}).
 #' 
 #' @param stopCrit: A \code{character} vector including additional stopping criteria for rejecting
 #'                  simulations early. These will be inserted within \code{if(CRIT){out[0] = 0; return out;}} statements
@@ -26,7 +34,7 @@
 #'                  the simulation. Variables in \code{CRIT} must match either those in \code{compartments}
 #'                  and/or \code{addVars}.
 #' 
-#' @param addVars: a character vector where the names specify the additional variables to be added to the 
+#' @param addVars: a \code{character} vector where the names specify the additional variables to be added to the 
 #'                 function call. These can be used to specify variables that can be used for 
 #'                 e.g. additional stopping criteria.
 #'                  
@@ -45,7 +53,8 @@
 #'             \item{transitions:}{ copy of \code{transitions} argument;}
 #'             \item{compartments:}{ copy of \code{compartments} argument;}
 #'             \item{pars:}{ copy of \code{pars} argument;}
-#'             \item{matchCrit:}{ copy of \code{matchCrit} argument;}
+#'             \item{obsProcess:}{ copy of \code{obsProcess} argument;}
+#'             \item{obsProcess:}{ copy of \code{obsProcess} argument;}
 #'             \item{stopCrit:}{ copy of \code{stopCrit} argument;}
 #'             \item{addVars:}{ copy of \code{addVars} argument;}
 #'             \item{tspan:}{ copy of \code{tspan} argument;}
@@ -59,7 +68,7 @@ mparseRcpp <- function(
     transitions = NULL, 
     compartments = NULL,
     pars = NULL,
-    matchCrit = F,
+    obsProcess = NULL,
     addVars = NULL,
     stopCrit = NULL,
     tspan = F,
@@ -98,26 +107,63 @@ mparseRcpp <- function(
         stop("'pars' and 'compartments' have names in common.")
     }
     
-    ## check matchCrit
-    checkInput(matchCrit, "logical", 1)
-    if(matchCrit) {
-        tn <- paste(rep(" ", 4), collapse = "")
-        tn1 <- paste(rep(" ", 8), collapse = "")
-        matchCrit <- c(
-            "// check whether simulation matches data",
-            "out[0] = 1;",
-            "for(j = 0; j < counts.size(); j++) {",
-            paste0(tn, "if(fabs(u[whichind[j]] - counts[j]) <= tols[j]) {"),
-            paste0(tn1, "out[0] *= 1;"),
-            paste0(tn, "} else {"),
-            paste0(tn1, "out[0] *= 0;"),
-            paste0(tn, "}"),
-            "}",
-            "out[Range(1, u.size())] = u;"
-        )
-        matchCrit <- paste0(tn, matchCrit)
+    ## check obsProcess
+    if(!is.null(obsProcess[1])){
+        checkInput(obsProcess, "data.frame", ncol = 4, naAllow = T)
+        checkInput(colnames(obsProcess), inSet = c("compnames", "dist", "p1", "p2"))
+        checkInput(obsProcess$compnames, "character", inSet = compartments)
+        checkInput(obsProcess$dist, "character", inSet = c("unif", "pois", "binom"))
+        checkInput(obsProcess$p1, "character")
+        checkInput(obsProcess$p2, "character", naAllow = T)
+        ## set up compiled column
+        obsProcess$compiled <- NA
+        
+        for(i in 1:nrow(obsProcess)){
+            ## check for missing inputs
+            if(obsProcess$dist[i] == "unif" | obsProcess$dist[i] == "binom" ){
+                if(any(is.na(obsProcess[i, 3:4]))){
+                    stop(paste0("'obsProcess' parameters can't be missing for '", obsProcess$dist[i], "'"))
+                }
+            } else {
+                if(is.na(obsProcess[i, 3])){
+                    stop(paste0("'obsProcess' p1 can't be missing for '", obsProcess$dist[i], "'"))
+                }
+                if(!is.na(obsProcess[i, 4])){
+                    stop(paste0("'obsProcess' p2 must be missing for '", obsProcess$dist[i], "'"))
+                }
+            }
+            ## parse character and map to compartments and parameters
+            temp <- SimInf:::parse_transitions(
+                paste0(compartments[1], " -> ", obsProcess$compnames[i], " -> ", compartments[1]), 
+                compartments, NULL, pars, NULL)
+            obsProcess$compnames[i] <- temp[[1]]$propensity
+            
+            temp <- SimInf:::parse_transitions(
+                paste0(compartments[1], " -> ", obsProcess$p1[i], " -> ", compartments[1]), 
+                compartments, NULL, pars, NULL)
+            obsProcess$p1[i] <- temp[[1]]$propensity
+            
+            temp <- SimInf:::parse_transitions(
+                paste0(compartments[1], " -> ", obsProcess$p2[i], " -> ", compartments[1]),
+                compartments, NULL, pars, NULL)
+            obsProcess$p2[i] <- temp[[1]]$propensity
+            
+            if(obsProcess$dist[i] == "unif" | obsProcess$dist[i] == "binom" ){
+                obsProcess$compiled[i] <- paste0("out[0] += R::d", obsProcess$dist[i], 
+                    "(", obsProcess$compname[i], ", ", obsProcess$p1[i], 
+                    ", ", obsProcess$p2[i], ", 1);")
+            } else {
+                obsProcess$compiled[i] <- paste0("out[0] += R::d", obsProcess$dist[i], 
+                     "(", obsProcess$compname[i], ", ", obsProcess$p1[i], 
+                     ", 1);")
+            }
+        }
+        ## merge observation processes
+        compObsProcess <- c("out[0] = 0.0;", obsProcess$compiled, 
+            "out[0] = exp(out[0]);", "out[Range(1, u.size())] = u;")
+        compObsProcess <- paste("    ", compObsProcess)
     } else {
-        matchCrit <- NULL
+        compObsProcess <- NULL
     }
     
     ## check addVars
@@ -136,7 +182,7 @@ mparseRcpp <- function(
             x <- paste0(tn, "if(", x, "){")
             if(!tspan) {
                 x <- c(x, paste0(tn1, "out[0] = 0;"))
-                if(is.null(matchCrit)) {
+                if(is.null(obsProcess[1])) {
                     x <- c(x, paste0(tn1, "out[1] = t;"))
                     x <- c(x, paste0(tn1, "out[Range(2, u.size() + 1)] = u;"))
                 } else {
@@ -144,7 +190,7 @@ mparseRcpp <- function(
                 }
             } else {
                 x <- c(x, paste0(tn1, "out(tspan.size(), 0) = 0;"))
-                # if(is.null(matchCrit)) {
+                # if(is.null(obsProcess)) {
                     x <- c(x, paste0(tn1, "out(tspan.size(), 1) = t;"))
                     x <- c(x, paste0(tn1, "for(int m = 0; m < u.size(); m++){"))
                     x <- c(x, paste0(tn1, "    out(tspan.size(), m + 2) = u[m];"))
@@ -163,8 +209,8 @@ mparseRcpp <- function(
     ## check tspan
     checkInput(tspan, "logical", 1)
     if(tspan) {
-        if(!is.null(matchCrit)) {
-            stop("'tspan' and 'matchCrit' can't be specified together")
+        if(!is.null(obsProcess[1])) {
+            stop("'tspan' and 'obsProcess' can't be specified together")
         }
     }
     
@@ -183,7 +229,7 @@ mparseRcpp <- function(
     )
 
     ## write Rcpp code to file
-    Rcpp_code <- Rcpp_mparse(transitions1, matchCrit, addVars, stopCrit, tspan, afterTstar, runFromR)
+    Rcpp_code <- Rcpp_mparse(transitions1, compObsProcess, addVars, stopCrit, tspan, afterTstar, runFromR)
     
     ## replace "gdata" with "pars"
     Rcpp_code <- gsub("gdata", "pars", Rcpp_code)
@@ -194,7 +240,7 @@ mparseRcpp <- function(
         transitions = transitions,
         compartments = compartments,
         pars = pars,
-        matchCrit = matchCrit,
+        obsProcess = obsProcess,
         stopCrit = stopCrit,
         addVars = addVars,
         tspan = tspan,

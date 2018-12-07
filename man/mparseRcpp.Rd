@@ -5,7 +5,7 @@
 \title{Parse custom model using \code{SimInf} style markup}
 \usage{
 mparseRcpp(transitions = NULL, compartments = NULL, pars = NULL,
-  matchCrit = F, addVars = NULL, stopCrit = NULL, tspan = F,
+  obsProcess = NULL, addVars = NULL, stopCrit = NULL, tspan = F,
   afterTstar = NULL, runFromR = T)
 }
 \arguments{
@@ -19,9 +19,17 @@ k2*I -> R")} expresses a SIR model.}
 \item{compartments:}{contains the names of the involved compartments, for
 example, \code{compartments = c("S", "I", "R")}.}
 
-\item{pars:}{a character vector containing the names of the parameters.}
+\item{pars:}{a \code{character} vector containing the names of the parameters.}
 
-\item{matchCrit:}{\code{logical} determining whether to implement match criteria or not.}
+\item{obsProcess:}{\code{data.frame} determining the observation process. Columns must be in the order:
+\code{compnames}, \code{dist}, \code{p1}, \code{p2}. \code{compnames} is a \code{character}
+denoting the relevant compartment name to place the observation process onto; \code{dist} 
+is a \code{character} specifying the distribution of the observation process (must be one of 
+\code{"unif"}, \code{"pois"} or \code{"binom"} at the current time); \code{p1} is the first parameter 
+(the lower bound in the case of \code{"unif"}, the rate in the case of \code{"pois"}, or the \code{size} 
+in the case of \code{"binom"}); and finally \code{p2} is the second parameter (the upper bound in the
+case of \code{"unif"}, \code{NA} in the case of \code{"pois"}, and \code{prob} in the case of 
+\code{"binom"}).}
 
 \item{stopCrit:}{A \code{character} vector including additional stopping criteria for rejecting
 simulations early. These will be inserted within \code{if(CRIT){out[0] = 0; return out;}} statements
@@ -29,7 +37,7 @@ within the underlying Rcpp code, which a return value of 0 corresponds to reject
 the simulation. Variables in \code{CRIT} must match either those in \code{compartments}
 and/or \code{addVars}.}
 
-\item{addVars:}{a character vector where the names specify the additional variables to be added to the 
+\item{addVars:}{a \code{character} vector where the names specify the additional variables to be added to the 
 function call. These can be used to specify variables that can be used for 
 e.g. additional stopping criteria.}
 
@@ -49,7 +57,8 @@ An object of class \code{SimBIID_model}, which is essentially a \code{list}
             \item{transitions:}{ copy of \code{transitions} argument;}
             \item{compartments:}{ copy of \code{compartments} argument;}
             \item{pars:}{ copy of \code{pars} argument;}
-            \item{matchCrit:}{ copy of \code{matchCrit} argument;}
+            \item{obsProcess:}{ copy of \code{obsProcess} argument;}
+            \item{obsProcess:}{ copy of \code{obsProcess} argument;}
             \item{stopCrit:}{ copy of \code{stopCrit} argument;}
             \item{addVars:}{ copy of \code{addVars} argument;}
             \item{tspan:}{ copy of \code{tspan} argument;}

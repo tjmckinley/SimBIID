@@ -20,7 +20,7 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, afterT
                 }
             }
         } else {
-            compType <- paste0(compType, "('IntegerVector ")
+            compType <- paste0(compType, "('NumericVector ")
         }
     } else {
         compType <- "Rcpp_object <- RcppXPtrUtils::cppXPtr('SEXP "
@@ -78,7 +78,7 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, afterT
             outsize <- paste0(paste(rep(" ", 4), collapse = ""), "NumericVector out(u.size() + 2);")
         }
     } else {
-        outsize <- paste0(paste(rep(" ", 4), collapse = ""), "IntegerVector out(u.size() + 1);")
+        outsize <- paste0(paste(rep(" ", 4), collapse = ""), "NumericVector out(u.size() + 1);")
     }
     currline <- ratelines[1]
     Rcpp_code <- c(Rcpp_code[1:(currline - 1)], outsize, Rcpp_code[(currline + 1):length(Rcpp_code)])

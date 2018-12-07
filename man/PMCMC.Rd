@@ -62,7 +62,7 @@ time-series to match to. The columns must match to those in `x`.
 Defaults to exact matching for all columns.}
 
 \item{whichind}{Not needed if \code{func} is a \code{SimBIID_model} object (in this case it matches
-column names of \code{data} to column names of \code{u}. Otherwise this must be a
+column names of \code{data} to column names of \code{u}). Otherwise this must be a
 vector relating which elements of \code{u} match to columns \code{2:ncol(data)}
 of `data`. If left as \code{NULL} then defaults to elements \code{1:length(u)}
 or returns an error. Must be same length as \code{tols} and must index from 1 (it's 

@@ -106,6 +106,9 @@ ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = F, 
         checkInput(ptols, c("vector", "numeric"), 1, gt = 0, lt = 1)
         tols <- apply(abs(t(x$output[[length(x$output)]]) - x$data), 1, quantile, probs = ptols)
         tols <- ifelse(tols < 0, 0, tols)
+        if(all(tols == x$tols[nrow(x$tols), ])){
+            stop("Tolerances same as previous generation at this 'ptol'")
+        }
     }
     
     ## collect arguments
@@ -334,11 +337,17 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL, ptols =
             tempWeights <- weights[[t - 1]]
             tempPars <- pars[[t - 1]]
         }
+        runind <- T
         if(t != init){
             ## set tolerances if required
             if(!is.null(ptols[1])){
                 tols[t, ] <- apply(abs(t(out[[t - 1]]) - data), 1, quantile, probs = ptols)
                 tols[t, ] <- ifelse(tols[t, ] < 0, 0, tols[t, ])
+                if(all(tols[t, ] == tols[t - 1, ])){
+                    tols <- tols[1:(t - 1), , drop = F]
+                    runind <- F
+                    warning("Tolerances same as previous generation, so now stopping algorithm.")
+                }
             }
         }
         
@@ -346,45 +355,47 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL, ptols =
         ptm <- proc.time()
         
         ## run generation
-        if(!parallel) {
-            temp <- lapply(1:npart, runProp,
-                t = t, priors = priors, 
-                prevWeights = tempWeights, prevPars = tempPars, 
-                propCov = propCov, tols = tols[t, ], data = data, 
-                u = u,
-                func = func, func_args = fargs)
-        } else  {
-            temp <- mclapply(1:npart, runProp,
-                t = t, priors = priors, 
-                prevWeights = tempWeights, prevPars = tempPars, 
-                propCov = propCov, tols = tols[t, ], data = data, 
-                u = u,
-                func = func, func_args = fargs, 
-                mc.cores = mc.cores)
+        if(runind){
+            if(!parallel) {
+                temp <- lapply(1:npart, runProp,
+                    t = t, priors = priors, 
+                    prevWeights = tempWeights, prevPars = tempPars, 
+                    propCov = propCov, tols = tols[t, ], data = data, 
+                    u = u,
+                    func = func, func_args = fargs)
+            } else  {
+                temp <- mclapply(1:npart, runProp,
+                    t = t, priors = priors, 
+                    prevWeights = tempWeights, prevPars = tempPars, 
+                    propCov = propCov, tols = tols[t, ], data = data, 
+                    u = u,
+                    func = func, func_args = fargs, 
+                    mc.cores = mc.cores)
+            }
+            
+            ## extract relative components
+            weights[[t]] <- map_dbl(temp, "weightsNew")
+            weights[[t]] <- weights[[t]] / sum(weights[[t]])
+            pars[[t]] <- map(temp, "pars")
+            pars[[t]] <- do.call("rbind", pars[[t]])
+            out[[t]] <- map(temp, "out")
+            out[[t]] <- do.call("rbind", out[[t]])
+            accrate[t] <- npart / sum(map_dbl(temp, "accrate"))
+            
+            ## set names
+            colnames(pars[[t]]) <- priors$parnames
+            colnames(out[[t]]) <- names(data)
+            
+            ## set proposal covariance
+            propCov <- cov(pars[[t]]) * 2
+            
+            ## stop timer
+            ptm1 <- proc.time() - ptm
+            
+            ## print progress to the screen
+            cat(paste0("Generation ", t + genstart, ", accrate = ", signif(accrate[t], 2), 
+                       ", time = ", signif(ptm1[3], 2), " secs\n"))
         }
-        
-        ## extract relative components
-        weights[[t]] <- map_dbl(temp, "weightsNew")
-        weights[[t]] <- weights[[t]] / sum(weights[[t]])
-        pars[[t]] <- map(temp, "pars")
-        pars[[t]] <- do.call("rbind", pars[[t]])
-        out[[t]] <- map(temp, "out")
-        out[[t]] <- do.call("rbind", out[[t]])
-        accrate[t] <- npart / sum(map_dbl(temp, "accrate"))
-        
-        ## set names
-        colnames(pars[[t]]) <- priors$parnames
-        colnames(out[[t]]) <- names(data)
-        
-        ## set proposal covariance
-        propCov <- cov(pars[[t]]) * 2
-        
-        ## stop timer
-        ptm1 <- proc.time() - ptm
-        
-        ## print progress to the screen
-        cat(paste0("Generation ", t + genstart, ", accrate = ", signif(accrate[t], 2), 
-                   ", time = ", signif(ptm1[3], 2), " secs\n"))
     }
     
     ## stop timer

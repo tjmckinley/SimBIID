@@ -19,7 +19,7 @@
 #' @param pars: a \code{character} vector containing the names of the parameters.
 #' 
 #' @param obsProcess: \code{data.frame} determining the observation process. Columns must be in the order:
-#'                    \code{compnames}, \code{dist}, \code{p1}, \code{p2}. \code{compnames} is a \code{character}
+#'                    \code{datanames}, \code{dist}, \code{p1}, \code{p2}. \code{datanames} is a \code{character}
 #'                    denoting the relevant compartment name to place the observation process onto; \code{dist} 
 #'                    is a \code{character} specifying the distribution of the observation process (must be one of 
 #'                    \code{"unif"}, \code{"pois"} or \code{"binom"} at the current time); \code{p1} is the first parameter 
@@ -54,7 +54,6 @@
 #'             \item{compartments:}{ copy of \code{compartments} argument;}
 #'             \item{pars:}{ copy of \code{pars} argument;}
 #'             \item{obsProcess:}{ copy of \code{obsProcess} argument;}
-#'             \item{obsProcess:}{ copy of \code{obsProcess} argument;}
 #'             \item{stopCrit:}{ copy of \code{stopCrit} argument;}
 #'             \item{addVars:}{ copy of \code{addVars} argument;}
 #'             \item{tspan:}{ copy of \code{tspan} argument;}
@@ -69,6 +68,7 @@ mparseRcpp <- function(
     compartments = NULL,
     pars = NULL,
     obsProcess = NULL,
+    dataNames = NULL,
     addVars = NULL,
     stopCrit = NULL,
     tspan = F,
@@ -110,8 +110,8 @@ mparseRcpp <- function(
     ## check obsProcess
     if(!is.null(obsProcess[1])){
         checkInput(obsProcess, "data.frame", ncol = 4, naAllow = T)
-        checkInput(colnames(obsProcess), inSet = c("compnames", "dist", "p1", "p2"))
-        checkInput(obsProcess$compnames, "character", inSet = compartments)
+        checkInput(colnames(obsProcess), inSet = c("datanames", "dist", "p1", "p2"))
+        checkInput(obsProcess$datanames, "character", inSet = compartments)
         checkInput(obsProcess$dist, "character", inSet = c("unif", "pois", "binom"))
         checkInput(obsProcess$p1, "character")
         checkInput(obsProcess$p2, "character", naAllow = T)
@@ -134,11 +134,6 @@ mparseRcpp <- function(
             }
             ## parse character and map to compartments and parameters
             temp <- SimInf:::parse_transitions(
-                paste0(compartments[1], " -> ", obsProcess$compnames[i], " -> ", compartments[1]), 
-                compartments, NULL, pars, NULL)
-            obsProcess$compnames[i] <- temp[[1]]$propensity
-            
-            temp <- SimInf:::parse_transitions(
                 paste0(compartments[1], " -> ", obsProcess$p1[i], " -> ", compartments[1]), 
                 compartments, NULL, pars, NULL)
             obsProcess$p1[i] <- temp[[1]]$propensity
@@ -150,11 +145,11 @@ mparseRcpp <- function(
             
             if(obsProcess$dist[i] == "unif" | obsProcess$dist[i] == "binom" ){
                 obsProcess$compiled[i] <- paste0("out[0] += R::d", obsProcess$dist[i], 
-                    "(", obsProcess$compname[i], ", ", obsProcess$p1[i], 
+                    "(", obsProcess$datanames[i], ", ", obsProcess$p1[i], 
                     ", ", obsProcess$p2[i], ", 1);")
             } else {
                 obsProcess$compiled[i] <- paste0("out[0] += R::d", obsProcess$dist[i], 
-                     "(", obsProcess$compname[i], ", ", obsProcess$p1[i], 
+                     "(", obsProcess$dataname[i], ", ", obsProcess$p1[i], 
                      ", 1);")
             }
         }
@@ -162,6 +157,8 @@ mparseRcpp <- function(
         compObsProcess <- c("out[0] = 0.0;", obsProcess$compiled, 
             "out[0] = exp(out[0]);", "out[Range(1, u.size())] = u;")
         compObsProcess <- paste("    ", compObsProcess)
+        ## add data variables
+        addVars <- c(addVars, obsProcess$datanames)
     } else {
         compObsProcess <- NULL
     }

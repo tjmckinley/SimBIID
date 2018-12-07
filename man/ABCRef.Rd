@@ -4,8 +4,8 @@
 \alias{ABCRef}
 \title{Produces ABC reference table}
 \usage{
-ABCRef(npart, priors, pars, func, data, parallel = F, mc.cores = NA,
-  ...)
+ABCRef(npart, priors, pars, func, sumNames, parallel = F,
+  mc.cores = NA, ...)
 }
 \arguments{
 \item{npart}{The number of particles (must be a positive integer).}
@@ -18,17 +18,16 @@ and the corresponding \code{p1} and \code{p2} entries relate to the hyperparamet
 (lower and upper bounds in the uniform case; mean and standard deviation in the 
 normal case; and shape and rate in the gamma case).}
 
-\item{pars}{A `data.frame` of parameters to use for the simulations (can have a single row, in which case
-this is repeated `npart` times, or must have `npart` rows). You cannot specify both `pars`
-and `priors`.}
+\item{pars}{A named vector or matrix of parameters to use for the simulations. If \code{pars} is a vector then
+this is repeated `npart` times, else it must be a \code{matrix} with `npart` rows. 
+You cannot specify both `pars` and `priors`.}
 
 \item{func}{Function that runs the simulator. The first argument must be \code{pars}. The function
 must return a \code{vector} of simulated summary measures, or a missing value (\code{NA})
 if there is an error. The output from the function must be a vector with length equal 
-to \code{nrow(data)} and with entries in the same order as the rows of \code{data}.}
+to \code{length(sumNames)}.}
 
-\item{data}{A \code{data.frame} with a single row and columns containing the observed summary
-statistics in order to extract output names.}
+\item{sumNames}{A \code{character} vector of summary statistic names.}
 
 \item{parallel}{A \code{logical} determining whether to use parallel processing or not.}
 

@@ -12,15 +12,14 @@
 #'                  and the corresponding \code{p1} and \code{p2} entries relate to the hyperparameters 
 #'                  (lower and upper bounds in the uniform case; mean and standard deviation in the 
 #'                  normal case; and shape and rate in the gamma case).
-#' @param pars      A `data.frame` of parameters to use for the simulations (can have a single row, in which case
-#'                  this is repeated `npart` times, or must have `npart` rows). You cannot specify both `pars`
-#'                  and `priors`.
+#' @param pars      A named vector or matrix of parameters to use for the simulations. If \code{pars} is a vector then
+#'                  this is repeated `npart` times, else it must be a \code{matrix} with `npart` rows. 
+#'                  You cannot specify both `pars` and `priors`.
 #' @param func      Function that runs the simulator. The first argument must be \code{pars}. The function
 #'                  must return a \code{vector} of simulated summary measures, or a missing value (\code{NA})
 #'                  if there is an error. The output from the function must be a vector with length equal 
-#'                  to \code{nrow(data)} and with entries in the same order as the rows of \code{data}.
-#' @param data      A \code{data.frame} with a single row and columns containing the observed summary
-#'                  statistics in order to extract output names.
+#'                  to \code{length(sumNames)}.
+#' @param sumNames  A \code{character} vector of summary statistic names.
 #' @param parallel  A \code{logical} determining whether to use parallel processing or not.
 #' @param mc.cores  Number of cores to use if using parallel processing.
 #' @param ...       Extra arguments to be passed to \code{func}.
@@ -28,7 +27,7 @@
 #' @return An \code{data.frame} object with \code{npart} rows, where the first \code{p} columns correspond to 
 #'         the proposed parameters, and the remaining columns correspond to the simulated outputs.
 
-ABCRef <- function(npart, priors, pars, func, data, parallel = F, mc.cores = NA, ...) {
+ABCRef <- function(npart, priors, pars, func, sumNames, parallel = F, mc.cores = NA, ...) {
     
     ## check inputs
     if(missing(npart)){
@@ -40,8 +39,8 @@ ABCRef <- function(npart, priors, pars, func, data, parallel = F, mc.cores = NA,
     if(missing(func)){
         stop("'func' must be provided")
     }
-    if(missing(data)){
-        stop("'data' must be provided")
+    if(missing(sumNames)){
+        stop("'sumNames' must be provided")
     }
     checkInput(parallel, c("vector", "logical"), 1)
     if(parallel) {
@@ -66,19 +65,25 @@ ABCRef <- function(npart, priors, pars, func, data, parallel = F, mc.cores = NA,
         }
         checkInput(priors, "data.frame", ncol = 4)
     } else {
-        checkInput(pars, "data.frame")
-        if(nrow(pars) != 1 & nrow(pars) != npart) {
-            stop("'pars' must have either 1 row or 'npart' rows")
+        if(!is.vector(pars) & !is.matrix(pars)){
+            stop("'pars' is neither a vector or a matrix")
         }
-        for(j in 1:ncol(pars)){
-            checkInput(pars[, j], c("vector", "numeric"))
+        checkInput(pars, "numeric")
+        if(is.matrix(pars)){
+            if(nrow(pars) != 1 & nrow(pars) != npart) {
+                stop("'pars' must have either 1 row or 'npart' rows, or be a vector")
+            }
+            if(is.null(colnames(pars))){
+                stop("'pars' must have column names")
+            }
+        } else {
+            if(is.null(names(pars))){
+                stop("'pars' must be named")
+            }
         }
     }
     checkInput(func, "function", 1)
-    checkInput(data, "data.frame", nrow = 1)
-    if(!all(sapply(data, is.numeric))){
-        stop("'data' must be numeric")
-    }
+    checkInput(sumNames, c("vector", "character"))
     fargs <- formals(func)
     if(length(fargs) < 1) {
         stop("'func' must contain more than one argument")
@@ -125,8 +130,13 @@ ABCRef <- function(npart, priors, pars, func, data, parallel = F, mc.cores = NA,
         parnames <- priors$parnames
     } else {
         parnames <- colnames(pars)
-        if(nrow(pars) == 1){
-            priors <- matrix(rep(pars, npart), ncol = ncol(pars), byrow = T)
+        if(is.matrix(pars)){
+            if(nrow(pars) == 1){
+                pars <- as.vector(pars)
+            }
+        }
+        if(is.vector(pars)){
+            priors <- matrix(rep(pars, npart), ncol = length(pars), byrow = T)
             priors <- as.data.frame(priors)
         } else {
             priors <- pars
@@ -139,7 +149,7 @@ ABCRef <- function(npart, priors, pars, func, data, parallel = F, mc.cores = NA,
         args <- list(...)
         fargs1 <- match(names(fargs), names(args))
         if(!all(!is.na(fargs1))){
-            stop(paste0("Need to include: ", paste(fargs[is.na(fargs1)], collapse = ", "), 
+            stop(paste0("Need to include: ", paste(names(fargs)[is.na(fargs1)], collapse = ", "), 
                         " arguments in function call"))
         }
         fargs <- args[fargs1]
@@ -194,10 +204,10 @@ ABCRef <- function(npart, priors, pars, func, data, parallel = F, mc.cores = NA,
     
     ## set names
     colnames(pars) <- parnames
-    if(ncol(out) != ncol(data)){
-        stop("ncol(out) != ncol(data)")
+    if(ncol(out) != length(sumNames)){
+        stop("ncol(out) != length(sumNames)")
     }
-    colnames(out) <- colnames(data)
+    colnames(out) <- sumNames
     
     ## stop timer
     ptm1 <- proc.time() - ptm_ini

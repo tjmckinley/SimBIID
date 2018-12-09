@@ -19,7 +19,7 @@
 #' @param pars: a \code{character} vector containing the names of the parameters.
 #' 
 #' @param obsProcess: \code{data.frame} determining the observation process. Columns must be in the order:
-#'                    \code{datanames}, \code{dist}, \code{p1}, \code{p2}. \code{datanames} is a \code{character}
+#'                    \code{dataNames}, \code{dist}, \code{p1}, \code{p2}. \code{dataNames} is a \code{character}
 #'                    denoting the relevant compartment name to place the observation process onto; \code{dist} 
 #'                    is a \code{character} specifying the distribution of the observation process (must be one of 
 #'                    \code{"unif"}, \code{"pois"} or \code{"binom"} at the current time); \code{p1} is the first parameter 
@@ -68,7 +68,6 @@ mparseRcpp <- function(
     compartments = NULL,
     pars = NULL,
     obsProcess = NULL,
-    dataNames = NULL,
     addVars = NULL,
     stopCrit = NULL,
     tspan = F,
@@ -108,13 +107,16 @@ mparseRcpp <- function(
     }
     
     ## check obsProcess
+    obsProcess_orig <- obsProcess
     if(!is.null(obsProcess[1])){
         checkInput(obsProcess, "data.frame", ncol = 4, naAllow = T)
-        checkInput(colnames(obsProcess), inSet = c("datanames", "dist", "p1", "p2"))
-        checkInput(obsProcess$datanames, "character", inSet = compartments)
+        checkInput(colnames(obsProcess), inSet = c("dataNames", "dist", "p1", "p2"))
+        # checkInput(obsProcess$dataNames, "character", inSet = compartments)
         checkInput(obsProcess$dist, "character", inSet = c("unif", "pois", "binom"))
         checkInput(obsProcess$p1, "character")
-        checkInput(obsProcess$p2, "character", naAllow = T)
+        if(!all(is.na(obsProcess$p2))){
+            checkInput(obsProcess$p2, "character", naAllow = T)
+        }
         ## set up compiled column
         obsProcess$compiled <- NA
         
@@ -125,10 +127,10 @@ mparseRcpp <- function(
                     stop(paste0("'obsProcess' parameters can't be missing for '", obsProcess$dist[i], "'"))
                 }
             } else {
-                if(is.na(obsProcess[i, 3])){
+                if(is.na(obsProcess$p1[i])){
                     stop(paste0("'obsProcess' p1 can't be missing for '", obsProcess$dist[i], "'"))
                 }
-                if(!is.na(obsProcess[i, 4])){
+                if(!is.na(obsProcess$p2[i])){
                     stop(paste0("'obsProcess' p2 must be missing for '", obsProcess$dist[i], "'"))
                 }
             }
@@ -145,20 +147,18 @@ mparseRcpp <- function(
             
             if(obsProcess$dist[i] == "unif" | obsProcess$dist[i] == "binom" ){
                 obsProcess$compiled[i] <- paste0("out[0] += R::d", obsProcess$dist[i], 
-                    "(", obsProcess$datanames[i], ", ", obsProcess$p1[i], 
+                    "(counts[", i - 1, "], ", obsProcess$p1[i], 
                     ", ", obsProcess$p2[i], ", 1);")
             } else {
                 obsProcess$compiled[i] <- paste0("out[0] += R::d", obsProcess$dist[i], 
-                     "(", obsProcess$dataname[i], ", ", obsProcess$p1[i], 
+                     "(counts[", i - 1, "], ", obsProcess$p1[i], 
                      ", 1);")
             }
         }
         ## merge observation processes
         compObsProcess <- c("out[0] = 0.0;", obsProcess$compiled, 
-            "out[0] = exp(out[0]);", "out[Range(1, u.size())] = u;")
+            "out[0] = exp(out[0]);", "out[Range(1, u.size())] = as<NumericVector>(u);")
         compObsProcess <- paste("    ", compObsProcess)
-        ## add data variables
-        addVars <- c(addVars, obsProcess$datanames)
     } else {
         compObsProcess <- NULL
     }
@@ -237,7 +237,7 @@ mparseRcpp <- function(
         transitions = transitions,
         compartments = compartments,
         pars = pars,
-        obsProcess = obsProcess,
+        obsProcess = obsProcess_orig,
         stopCrit = stopCrit,
         addVars = addVars,
         tspan = tspan,

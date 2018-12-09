@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // PMCMC_cpp
-List PMCMC_cpp(NumericMatrix dataset, NumericMatrix priors, CharacterVector parnames, NumericVector iniPars, NumericMatrix propVar_R, int niter, int npart, double scale, IntegerVector tols, IntegerVector whichind, int nprintsum, int nmultskip, int nupdate, int fixpars, int adapt, IntegerVector iniStates, SEXP func_);
-RcppExport SEXP _SimBIID_PMCMC_cpp(SEXP datasetSEXP, SEXP priorsSEXP, SEXP parnamesSEXP, SEXP iniParsSEXP, SEXP propVar_RSEXP, SEXP niterSEXP, SEXP npartSEXP, SEXP scaleSEXP, SEXP tolsSEXP, SEXP whichindSEXP, SEXP nprintsumSEXP, SEXP nmultskipSEXP, SEXP nupdateSEXP, SEXP fixparsSEXP, SEXP adaptSEXP, SEXP iniStatesSEXP, SEXP func_SEXP) {
+List PMCMC_cpp(NumericMatrix dataset, NumericMatrix priors, CharacterVector parnames, NumericVector iniPars, NumericMatrix propVar_R, int niter, int npart, double scale, int nprintsum, int nupdate, int fixpars, int adapt, IntegerVector iniStates, SEXP func_);
+RcppExport SEXP _SimBIID_PMCMC_cpp(SEXP datasetSEXP, SEXP priorsSEXP, SEXP parnamesSEXP, SEXP iniParsSEXP, SEXP propVar_RSEXP, SEXP niterSEXP, SEXP npartSEXP, SEXP scaleSEXP, SEXP nprintsumSEXP, SEXP nupdateSEXP, SEXP fixparsSEXP, SEXP adaptSEXP, SEXP iniStatesSEXP, SEXP func_SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -20,22 +20,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type niter(niterSEXP);
     Rcpp::traits::input_parameter< int >::type npart(npartSEXP);
     Rcpp::traits::input_parameter< double >::type scale(scaleSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type tols(tolsSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type whichind(whichindSEXP);
     Rcpp::traits::input_parameter< int >::type nprintsum(nprintsumSEXP);
-    Rcpp::traits::input_parameter< int >::type nmultskip(nmultskipSEXP);
     Rcpp::traits::input_parameter< int >::type nupdate(nupdateSEXP);
     Rcpp::traits::input_parameter< int >::type fixpars(fixparsSEXP);
     Rcpp::traits::input_parameter< int >::type adapt(adaptSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type iniStates(iniStatesSEXP);
     Rcpp::traits::input_parameter< SEXP >::type func_(func_SEXP);
-    rcpp_result_gen = Rcpp::wrap(PMCMC_cpp(dataset, priors, parnames, iniPars, propVar_R, niter, npart, scale, tols, whichind, nprintsum, nmultskip, nupdate, fixpars, adapt, iniStates, func_));
+    rcpp_result_gen = Rcpp::wrap(PMCMC_cpp(dataset, priors, parnames, iniPars, propVar_R, niter, npart, scale, nprintsum, nupdate, fixpars, adapt, iniStates, func_));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_SimBIID_PMCMC_cpp", (DL_FUNC) &_SimBIID_PMCMC_cpp, 17},
+    {"_SimBIID_PMCMC_cpp", (DL_FUNC) &_SimBIID_PMCMC_cpp, 14},
     {NULL, NULL, 0}
 };
 

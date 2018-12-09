@@ -11,14 +11,15 @@ PMCMC(x, ...)
 \method{PMCMC}{PMCMC}(x, niter = 1000, nprintsum = 100, adapt = T,
   adaptmixprop = 0.05, nupdate = 100)
 
-\method{PMCMC}{default}(x, priors, func, u, npart = 100, tols = NULL,
-  whichind = NULL, iniPars = NA, fixpars = F, niter = 1000,
-  nprintsum = 100, nmultskip = 1000, adapt = T, propVar = NA,
-  adaptmixprop = 0.05, nupdate = 100)
+\method{PMCMC}{default}(x, priors, func, u, npart = 100, iniPars = NA,
+  fixpars = F, niter = 1000, nprintsum = 100, adapt = T,
+  propVar = NA, adaptmixprop = 0.05, nupdate = 100)
 }
 \arguments{
-\item{x}{A \code{PMCMC} object, or a \code{data.frame} containing time series count data, with the first column called
-\code{time}, followed by columns of time-series counts.}
+\item{x}{A \code{PMCMC} object, or a \code{data.frame} containing time series count data, 
+with the first column called \code{time}, followed by columns of time-series counts. 
+The time-series counts columns must be in the order of the `counts` object in the
+`func` function (see below).}
 
 \item{niter}{An integer specifying the number of iterations to run the MCMC.}
 
@@ -46,36 +47,17 @@ then this function must take the following arguments in order:
 \item{\code{double tstart}:}{ the start time;}
 \item{\code{double tstop}:}{ the end time;}
 \item{\code{IntegerVector u}:}{ a vector of states;}
-\item{\code{IntegerVector tols}:}{ a vector of tolerances;}
-\item{\code{IntegerVector counts}:}{ a vector of observed states;}
-\item{\code{IntegerVector whichind}:}{ a vector the same length as \code{counts}, 
-indicating which elements of \code{u} correspond to which elements of \code{counts}.
-Must index from 0 NOT 1.}}}
+\item{\code{IntegerVector counts}:}{ a vector of observed counts at \code{tstop}}.}}
 
-\item{u}{A \code{data.frame} of initial states, with a single row, and columns defining the 
-compartments.}
+\item{u}{A named vector of initial states.}
 
-\item{npart}{An integer specifying the number of particles for the alive particle filter.}
+\item{npart}{An integer specifying the number of particles for the bootstrap particle filter.}
 
-\item{tols}{A \code{data.frame} of tolerances, with a single row and columns defining the 
-time-series to match to. The columns must match to those in `x`. 
-Defaults to exact matching for all columns.}
-
-\item{whichind}{Not needed if \code{func} is a \code{SimBIID_model} object (in this case it matches
-column names of \code{data} to column names of \code{u}). Otherwise this must be a
-vector relating which elements of \code{u} match to columns \code{2:ncol(data)}
-of `data`. If left as \code{NULL} then defaults to elements \code{1:length(u)}
-or returns an error. Must be same length as \code{tols} and must index from 1 (it's 
-converted to C indexing internally).}
-
-\item{iniPars}{A `data.frame` object with a single row and columns relating to initial values for 
-the parameters of the model. If left unspecified, then these are sampled from the 
-prior distributions.}
+\item{iniPars}{A named vector of initial values for the parameters of the model. If left unspecified, 
+then these are sampled from the prior distribution(s).}
 
 \item{fixpars}{A logical determining whether to fix the input parameters (useful for 
 determining the variance of the marginal likelihood estimates).}
-
-\item{nmultskip}{Upper bound for how many simulations to run before rejecting proposal.}
 
 \item{propVar}{A numeric (npars x npars) matrix with log (or logistic) covariances to use
 as (initial) proposal matrix. If left unspecified then defaults to 
@@ -94,12 +76,8 @@ If \code{fixpars = F}, the routine returns a \code{PMCMC} object, essentially a
          \code{list} containing:
 \itemize{
  \item{\code{pars}:}{ an \code{mcmc} object containing posterior samples for the parameters;}
- \item{\code{tols}:}{ a copy of the \code{tols} input;}
- \item{\code{whichind}:}{ a copy of the \code{whichind} input;}
  \item{\code{u}:}{ a copy of the \code{u} input;}
- \item{\code{skiprate}:}{ the cumulative skip rate;}
  \item{\code{accrate}:}{ the cumulative acceptance rate;}
- \item{\code{nmultskip}:}{ the chosen value of \code{nmultskip};}
  \item{\code{npart}:}{ the chosen number of particles;}
  \item{\code{time}:}{ the time taken to run the routine (in seconds);}
  \item{\code{propVar}:}{ the proposal covariance for the parameter updates;}
@@ -109,11 +87,11 @@ If \code{fixpars = F}, the routine returns a \code{PMCMC} object, essentially a
 }
 }
 \description{
-Runs particle MCMC algorithm using alive particle filter for fitting 
+Runs particle MCMC algorithm using bootstrap particle filter for fitting 
              infectious disease models to time series count data
 }
 \details{
-Function runs the alive particle filter for a given model. 
+Function runs a particle MCMC algorithm using a bootstrap particle filter for a given model. 
                      If running with \code{fixpars = T} then this runs \code{niter} simulations
                      using fixed parameter values. This can be used to optimise the number of 
                      particles after a training run.

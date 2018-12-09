@@ -5,8 +5,8 @@
 \title{Parse custom model using \code{SimInf} style markup}
 \usage{
 mparseRcpp(transitions = NULL, compartments = NULL, pars = NULL,
-  obsProcess = NULL, dataNames = NULL, addVars = NULL,
-  stopCrit = NULL, tspan = F, afterTstar = NULL, runFromR = T)
+  obsProcess = NULL, addVars = NULL, stopCrit = NULL, tspan = F,
+  afterTstar = NULL, runFromR = T)
 }
 \arguments{
 \item{transitions:}{character vector containing transitions on the form \code{"X ->
@@ -22,7 +22,7 @@ example, \code{compartments = c("S", "I", "R")}.}
 \item{pars:}{a \code{character} vector containing the names of the parameters.}
 
 \item{obsProcess:}{\code{data.frame} determining the observation process. Columns must be in the order:
-\code{datanames}, \code{dist}, \code{p1}, \code{p2}. \code{datanames} is a \code{character}
+\code{dataNames}, \code{dist}, \code{p1}, \code{p2}. \code{dataNames} is a \code{character}
 denoting the relevant compartment name to place the observation process onto; \code{dist} 
 is a \code{character} specifying the distribution of the observation process (must be one of 
 \code{"unif"}, \code{"pois"} or \code{"binom"} at the current time); \code{p1} is the first parameter 

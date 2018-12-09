@@ -3,23 +3,20 @@
 // a Metropolis-Hastings PMCMC algorithm for fitting time series models
 List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector parnames, 
     NumericVector iniPars, NumericMatrix propVar_R,
-    int niter, int npart, double scale, IntegerVector tols, IntegerVector whichind, 
-    int nprintsum, int nmultskip, 
-    int nupdate, int fixpars, int adapt, IntegerVector iniState, SEXP func_)
+    int niter, int npart, double scale,
+    int nprintsum, int nupdate, int fixpars, int adapt, IntegerVector iniState, SEXP func_)
 {
-    // 'dataset_R' is vector of removal times
-    // 'iniPars' is a vector of initial values for the unknown parameters
-    // 'priors' is an (npars x 2) matrix containing the shape and scale
-    //    hyperparameters for the prior distributions
+    // 'dataset' is a matrix of form: time, events*
+    // 'priors' is an (npars x 3) matrix containing 
+    //          yperparameters for the prior distributions
     // 'parnames' is vector of parameter names
+    // 'iniPars' is a vector of initial parameter values
     // 'propVar_R' is initial covariance matrix (on log or logistic scale) for parameters
     // 'niter' is the number of iterations over which to run the chain
     // 'npart' is number of particles to use for particle filter
     // 'scale' is mixing proportion for adaptive MCMC
     // 'tols' defines how close points have to match
-    // 'whichind' matches states to dataset
-    // 'nprintsum' determines how often summaries are printed to the screen
-    // 'nmultskip' determines when to skip out of simulations
+    // 'nprintsum' determines how oftent o print chain summaries to screen
     // 'nupdate' determines when to start adaptive proposal
     // 'fixpars' is indicator determining whether to fix the parameters
     //      (useful for optimising variance)
@@ -30,10 +27,6 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
     // initialise variables
     int i, j, k, l;
     double u;
-    int cumnt, cumntProp;
-    
-    // calculate number of parameters
-    int npars = iniPars.size();
     
     // print arguments to the screen
     Rprintf("Number of iterations: %d\n", niter);
@@ -44,12 +37,9 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
             Rprintf("Start adaptive proposal at iteration: %d\n", nupdate);
         }
     }
-    Rprintf("Initial upper bound on simulations before rejecting: %d x %d = %d\n", nmultskip, npart, nmultskip * npart);
-    // rescale since skipping in two parts
-    // (integer division OK)
-    int nmultskipini = nmultskip;
-    nmultskip *= npart;
     
+    // calculate number of parameters
+    int npars = iniPars.size();
     Rprintf("\nNumber of parameters: %d\n\n", npars);
     Rprintf("Priors:\n");
     for(i = 0; i < priors.nrow(); i++) {
@@ -67,11 +57,7 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
     }
     Rprintf("\n");
     
-    Rprintf("Fixed tolerances for ABC:\n");
-    for(i = 0; i < tols.size(); i++) {
-        Rprintf("state[%d] tol = %d\n", whichind[i], tols[i]);
-    }
-    Rprintf("\n");
+    // calculate number of classes
     int nclass = iniState.length();
     Rprintf("Number of classes: %d\n\n", nclass);
     Rprintf("Initial states:\n");
@@ -83,16 +69,8 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
     // set up output matrix of length 'niter' to record chain
     // (append extra column for unnormalised posterior and
     // another two for no. of simulations)
-    j = (fixpars == 0 ? (npars + 3):1);
+    j = (fixpars == 0 ? (npars + 1):1);
     NumericMatrix output(niter, j);
-    
-    // set up temporary vectors for particle filtering
-    IntegerMatrix state(npart + 1, nclass);
-    IntegerMatrix stateNew(npart + 1, nclass);
-    
-    // monitor skiprate
-    int nskip = 0, cumskip = 0;
-    double skiprate = 0.0;
     
     // set variables for calculating log-likelihoods
     double LL, accCurr, accProp, acc;
@@ -123,6 +101,14 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
     }
     parsProp.zeros();
     
+    // set up temporary vectors for particle filtering
+    IntegerMatrix state(npart, nclass);
+    IntegerMatrix stateNew(npart, nclass);
+    
+    // set up weights vectors
+    NumericVector weights(npart);
+    NumericVector weightsNew(npart);
+    
     // runs code multiple times for fixed parameters in
     // order to estimate variance of log-importance weight
     if(fixpars == 1) {
@@ -134,13 +120,12 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
             R_CheckUserInterrupt();
             
             // set initial states
-            for(j = 0; j < (npart + 1); j++) {
+            for(j = 0; j < npart; j++) {
                 for(l = 0; l < nclass; l++) {
                     state(j, l) = iniState(l);
                 }
             }
-            LL = AlivePartFilter(npart, pars, state, stateNew, tols, dataset, whichind, 
-                                 &cumnt, nmultskip, func_);
+            LL = bootstrapPartFilter(npart, pars, state, stateNew, weights, weightsNew, dataset, func_);
             output(k, 0) = LL;
         }
         List outlist (2);
@@ -181,16 +166,15 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
         // check for user interruption
         R_CheckUserInterrupt();
         
-        // run particle filter
-        cumnt = 0;
         // set initial states
-        for(j = 0; j < (npart + 1); j++) {
+        for(j = 0; j < npart; j++) {
             for(l = 0; l < nclass; l++) {
                 state(j, l) = iniState(l);
             }
         }
-        LL = AlivePartFilter(npart, pars, state, stateNew, tols, dataset, whichind, 
-                             &cumnt, nmultskip, func_);
+        // run particle filter
+        LL = bootstrapPartFilter(npart, pars, state, stateNew, weights, weightsNew, dataset, func_);
+        Rprintf("LL = %f\n", LL);
         if(R_finite(LL) == 0) {
             // if initial values are provided, then reject
             if(all(!is_na(iniPars))) {
@@ -307,14 +291,13 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
                 }  
             }
             // set initial states
-            for(j = 0; j < (npart + 1); j++) {
+            for(j = 0; j < npart; j++) {
                 for(l = 0; l < nclass; l++) {
                     state(j, l) = iniState(l);
                 }
             }
             // run particle filter
-            LL = AlivePartFilter(npart, parsProp, state, stateNew, tols, dataset, whichind, 
-                                 &cumntProp, nmultskip, func_);
+            LL = bootstrapPartFilter(npart, parsProp, state, stateNew, weights, weightsNew, dataset, func_);
             
             //accept-reject proposal
             if(R_finite(LL) != 0) {
@@ -323,20 +306,12 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
                 acc = accProp - accCurr;
                 if(log(u) < acc) {
                     pars = parsProp;
-                    cumnt = cumntProp;
                     accCurr = accProp;
                     nacc++;
                     cumacc++;
                 } 
-            } else {
-                nskip++;
-                cumskip++;
             }
         }
-        
-        // record number of simulations required in this iteration
-        output(i, npars + 1) = cumnt;
-        output(i, npars + 2) = cumntProp;
         
         // save current value of chain into output vector
         for(j = 0; j < npars; j++) {
@@ -350,15 +325,11 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
             timer.step("");
             NumericVector res(timer);
             
-            //update skiprate
-            skiprate = ((double) nskip) / ((double) nprintsum);
-            nskip = 0;
-            
             // update acceptance rate
             accrate = ((double) nacc) / ((double) nprintsum);
             nacc = 0;
             
-            Rprintf("i = %d acc = %.2f skip = %.2f nsimskip = %d time = %.2f secs \n", i + 1, accrate, skiprate, nmultskip, (res[timer_cnt] / 1e9) - prev_time);
+            Rprintf("i = %d acc = %.2f time = %.2f secs \n", i + 1, accrate, (res[timer_cnt] / 1e9) - prev_time);
             
             //reset timer and acceptance rate counter
             prev_time = res[timer_cnt] / 1e9;
@@ -386,17 +357,15 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
     }
     timer.step("");
     NumericVector res(timer);
-    Rprintf("Final time = %.2f secs Final skip = %.2f\n", res[timer_cnt] / 1e9, cumskip / ((double) niter));
+    Rprintf("Final time = %.2f secs \n", res[timer_cnt] / 1e9);
     
     // return MCMC chain
-    List outlist (7);
+    List outlist (5);
     outlist[0] = output;
-    outlist[1] = cumskip / ((double) niter);
-    outlist[2] = ((double) cumacc) / ((double) niter);
-    outlist[3] = nmultskipini;
-    outlist[4] = npart;
-    outlist[5] = res[timer_cnt] / 1e9;
-    outlist[6] = propVar;
+    outlist[1] = ((double) cumacc) / ((double) niter);
+    outlist[2] = npart;
+    outlist[3] = res[timer_cnt] / 1e9;
+    outlist[4] = propVar;
     return(outlist);
 }
 

@@ -11,15 +11,13 @@
 using namespace Rcpp;
 
 // set up code to pass custom cpp function
-typedef SEXP (*funcPtr)(NumericVector pars, double tstart, double tstop, IntegerVector u,
-              IntegerVector tols, IntegerVector counts, IntegerVector whichind);
+typedef SEXP (*funcPtr)(NumericVector pars, double tstart, double tstop, IntegerVector u, IntegerVector counts);
 
 // wrapper function to run custom Rcpp function           
 template <typename T> 
 IntegerVector core_processing(T func, NumericVector pars, double tstart, 
-            double tstop, IntegerVector state, IntegerVector tols, 
-            IntegerVector counts, IntegerVector whichind) {
-    return as<IntegerVector>(func(pars, tstart, tstop, state, tols, counts, whichind));
+            double tstop, IntegerVector state, IntegerVector counts) {
+    return as<IntegerVector>(func(pars, tstart, tstop, state, counts));
 }
 
 // function to compute Cholesky decomposition and to deal with
@@ -41,18 +39,16 @@ void adaptUpdate(int i, int npars,
                   arma::mat *meanmat1, NumericVector posterior, 
                   arma::mat *propcov);
 
-// alive particle filter
-double AlivePartFilter (int N, arma::vec pars, IntegerMatrix state, IntegerMatrix stateNew,
-                        IntegerVector tols, NumericMatrix dataset, IntegerVector whichind,
-                        int *cumnt, int nmultskip, SEXP func_);
+// bootstrap particle filter
+double bootstrapPartFilter (int N, arma::vec pars, IntegerMatrix state, IntegerMatrix stateNew, 
+                            NumericVector weights, NumericVector weightsNew, NumericMatrix dataset, SEXP func_);
 
 // a Metropolis-Hastings PMCMC algorithm for fitting time series models
 
 // [[Rcpp::export]]
 List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector parnames, 
     NumericVector iniPars, NumericMatrix propVar_R,
-    int niter, int npart, double scale, IntegerVector tols, IntegerVector whichind, 
-    int nprintsum, int nmultskip, 
-    int nupdate, int fixpars, int adapt, IntegerVector iniStates, SEXP func_);
+    int niter, int npart, double scale, 
+    int nprintsum, int nupdate, int fixpars, int adapt, IntegerVector iniStates, SEXP func_);
 
 #endif // __FUNCTIONS__

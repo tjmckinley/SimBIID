@@ -28,7 +28,7 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, afterT
     
     ## set matching critera
     if(!is.null(matchCrit)) {
-        Rcpp_code[1] <- paste0(compType, "simFunction(NumericVector gdata, double tstart, double tstop, IntegerVector u, IntegerVector tols, IntegerVector counts, IntegerVector whichind")
+        Rcpp_code[1] <- paste0(compType, "simFunction(NumericVector gdata, double tstart, double tstop, IntegerVector u, IntegerVector counts")
     } else {
         Rcpp_code[1] <- paste0(compType, "simFunction(NumericVector gdata, double tstart, double tstop, IntegerVector u")
     }

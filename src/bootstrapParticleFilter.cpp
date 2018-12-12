@@ -63,6 +63,12 @@ double bootstrapPartFilter (int N, arma::vec pars, IntegerMatrix state, IntegerM
             }
             // set new weight (on log-scale)
             weightsNew[k] = out[0];
+            // Rprintf("count = %d wn[%d] = %f ", counts[0], k, weightsNew[k]);
+            // Rprintf("w = %f\n", R::dpois(counts[0], 1e-5, 1));
+            // for(j = 0; j < 4; j++) {
+            //     Rprintf("u[%d] = %d ", j, stateNew(k, j));
+            // }
+            // Rprintf("\n");
         }
         
         // update states and weights (deep copy)

@@ -15,9 +15,9 @@ typedef SEXP (*funcPtr)(NumericVector pars, double tstart, double tstop, Integer
 
 // wrapper function to run custom Rcpp function           
 template <typename T> 
-IntegerVector core_processing(T func, NumericVector pars, double tstart, 
+NumericVector core_processing(T func, NumericVector pars, double tstart, 
             double tstop, IntegerVector state, IntegerVector counts) {
-    return as<IntegerVector>(func(pars, tstart, tstop, state, counts));
+    return as<NumericVector>(func(pars, tstart, tstop, state, counts));
 }
 
 // function to compute Cholesky decomposition and to deal with

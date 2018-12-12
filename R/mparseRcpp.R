@@ -157,7 +157,7 @@ mparseRcpp <- function(
         }
         ## merge observation processes
         compObsProcess <- c("out[0] = 0.0;", obsProcess$compiled, 
-            "out[0] = exp(out[0]);", "out[Range(1, u.size())] = as<NumericVector>(u);")
+            "out[Range(1, u.size())] = as<NumericVector>(u);")
         compObsProcess <- paste("    ", compObsProcess)
     } else {
         compObsProcess <- NULL

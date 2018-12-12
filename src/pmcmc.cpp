@@ -3,12 +3,12 @@
 // a Metropolis-Hastings PMCMC algorithm for fitting time series models
 List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector parnames, 
     NumericVector iniPars, NumericMatrix propVar_R,
-    int niter, int npart, double scale,
-    int nprintsum, int nupdate, int fixpars, int adapt, IntegerVector iniState, SEXP func_)
+    int niter, int npart, double scale, int nprintsum, int nupdate, 
+    int fixpars, int adapt, IntegerVector iniState, SEXP func_)
 {
     // 'dataset' is a matrix of form: time, events*
     // 'priors' is an (npars x 3) matrix containing 
-    //          yperparameters for the prior distributions
+    //          hyperparameters for the prior distributions
     // 'parnames' is vector of parameter names
     // 'iniPars' is a vector of initial parameter values
     // 'propVar_R' is initial covariance matrix (on log or logistic scale) for parameters
@@ -174,7 +174,6 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
         }
         // run particle filter
         LL = bootstrapPartFilter(npart, pars, state, stateNew, weights, weightsNew, dataset, func_);
-        Rprintf("LL = %f\n", LL);
         if(R_finite(LL) == 0) {
             // if initial values are provided, then reject
             if(all(!is_na(iniPars))) {
@@ -196,7 +195,9 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
                         pars(i) = iniPars[i];
                     }
                     if(priors(i, 0) == 1) {
-                        if(pars(i) < priors(i, 1) || pars(i) > priors(i, 2)) stop("Some initial values are not bounded correctly");
+                        if(pars(i) < priors(i, 1) || pars(i) > priors(i, 2)) {
+                            stop("Some initial values are not bounded correctly");
+                        }
                     } else {
                         if(priors(i, 0) == 3) {
                             if(pars(i) < 0.0) stop("Some initial values are not bounded correctly");
@@ -309,7 +310,7 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
                     accCurr = accProp;
                     nacc++;
                     cumacc++;
-                } 
+                }
             }
         }
         

@@ -13,7 +13,7 @@ double bootstrapPartFilter (int N, arma::vec pars, IntegerMatrix state, IntegerM
     
     // initialise variables
     int j, k, t, r;
-    double totweight = 0.0, u = 0.0;
+    double totWeight = 0.0, u = 0.0, maxWeight = 0.0, cumWeight = 0.0;
     
     // initialise log-likelihood
     double LL = 0.0;
@@ -27,11 +27,11 @@ double bootstrapPartFilter (int N, arma::vec pars, IntegerMatrix state, IntegerM
     // setup data
     IntegerVector counts(dataset.ncol() - 1);
     
-    // setup cumulative weights
-    for(k = 0; k < weights.size(); k++){
-        weights[k] = (double) k;
+    // set weights
+    totWeight = 1.0;
+    for(k = 0; k < N; k++){
+        weights[k] = 1.0 / ((double) N);
     }
-    totweight = (double) weights.size();
     
     // loop over time series
     for(t = 0; t < (dataset.nrow() - 1); t++){
@@ -48,10 +48,12 @@ double bootstrapPartFilter (int N, arma::vec pars, IntegerMatrix state, IntegerM
                 r = k;
             } else {
                 // resample a particle from the previous time step
+                u = R::runif(0.0, 1.0);
                 r = 0;
-                u = R::runif(0.0, totweight);
-                while(u > weights[r]){
+                cumWeight = weights[r];
+                while(u > cumWeight){
                     r++;
+                    cumWeight += weights[r];
                 }
             }
             out = core_processing<funcPtr>(func, as<NumericVector>(wrap(pars)), 
@@ -59,22 +61,23 @@ double bootstrapPartFilter (int N, arma::vec pars, IntegerMatrix state, IntegerM
             for(j = 0; j < state.ncol(); j++){
                 stateNew(k, j) = (int) out[j + 1];
             }
-            for(j = 0; j < out.size(); j++){
-                Rprintf("out(%d) = %f ", j, out[j]);
-            }
-            Rprintf("\n");
-            Rprintf("count(0) = %d\n", counts[0]);
-            // set new weight
+            // set new weight (on log-scale)
             weightsNew[k] = out[0];
         }
         
-        // update states and weights
-        state = stateNew;
-        weights = weightsNew;
-        totweight = sum(weights);
+        // update states and weights (deep copy)
+        state = clone(stateNew);
+        weights = clone(weightsNew);
+        
+        // normalise weights
+        maxWeight = max(weights);
+        weightsNew = exp(weights - maxWeight);
+        totWeight = maxWeight + log(sum(weightsNew));
+        weights = exp(weights - totWeight);
+        // Rprintf("sum = %f max = %f tot = %f\n", sumWeight, maxWeight, totWeight);
         
         // update log-likelihood
-        LL += log(totweight) - log(N);
+        LL += totWeight - log(N);
     }
     // return log-likelihood
     return(LL);

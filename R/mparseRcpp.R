@@ -181,9 +181,9 @@ mparseRcpp <- function(
                 x <- c(x, paste0(tn1, "out[0] = 0;"))
                 if(is.null(obsProcess[1])) {
                     x <- c(x, paste0(tn1, "out[1] = t;"))
-                    x <- c(x, paste0(tn1, "out[Range(2, u.size() + 1)] = u;"))
+                    x <- c(x, paste0(tn1, "out[Range(2, u.size() + 1)] = as<NumericVector>(u);"))
                 } else {
-                    x <- c(x, paste0(tn1, "out[Range(1, u.size())] = u;"))
+                    x <- c(x, paste0(tn1, "out[Range(1, u.size())] = as<NumericVector>(u);"))
                 }
             } else {
                 x <- c(x, paste0(tn1, "out(tspan.size(), 0) = 0;"))

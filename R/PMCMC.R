@@ -199,6 +199,8 @@ PMCMC.default <- function(
     orig_priors <- priors
     priors$parnames <- NULL
     priors$dist <- match(priors$dist, c("unif", "norm", "gamma"))
+    ## convert rate to scale for PMCMC
+    priors$p2[priors$dist == "gamma"] <- 1 / priors$p2[priors$dist == "gamma"]
     priors <- as.matrix(priors)
     
     ## check function

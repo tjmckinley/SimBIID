@@ -44,16 +44,15 @@ List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector par
     Rprintf("Priors:\n");
     for(i = 0; i < priors.nrow(); i++) {
         if(priors(i, 0) == 1) {
-            Rcpp::Rcout << parnames(i) << " ~ U(";
+            Rcpp::Rcout << parnames(i) << " ~ U(lower = " << priors(i, 1) << ", upper = " << priors(i, 2) << ")" << std::endl;
         }
         else {
             if(priors(i, 0) == 2) {
-            Rcpp::Rcout << parnames(i) << " ~ N(";
+            Rcpp::Rcout << parnames(i) << " ~ N(mean = " << priors(i, 1) << ", sd = " << priors(i, 2) << ")" << std::endl;
             } else {
-            Rcpp::Rcout << parnames(i) << " ~ G(";
+            Rcpp::Rcout << parnames(i) << " ~ G(shape = " << priors(i, 1) << ", scale = " << priors(i, 2) <<")" << std::endl;
             }
         }
-        Rprintf("%.2f, %.2f)\n", priors(i, 1), priors(i, 2));
     }
     Rprintf("\n");
     

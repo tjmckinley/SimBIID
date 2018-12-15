@@ -175,6 +175,14 @@ mparseRcpp <- function(
         checkInput(stopCrit, "character")
         tn <- paste(rep(" ", 12), collapse = "")
         tn1 <- paste(rep(" ", 16), collapse = "")
+        ## parse to link to compartments and parameters
+        stopCrit <- lapply(stopCrit, function(x, compartments, pars) {
+            temp <- SimInf:::parse_transitions(
+                paste0(compartments[1], " -> ", x, " -> ", compartments[1]), 
+                compartments, NULL, pars, NULL)
+            temp[[1]]$propensity
+        }, compartments = compartments, pars = pars)
+        ## append stopping criteria
         stopCrit <- lapply(stopCrit, function(x, tn, tn1) {
             x <- paste0(tn, "if(", x, "){")
             if(!tspan) {

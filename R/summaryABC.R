@@ -51,6 +51,9 @@ print.ABCSMC <- function(x, ...) {
     print(temp, row.names = F, col.names = F, quote = F)
 }
 
+#' @rdname summaryABCSMC
+#' @export
+
 summary.ABCSMC <- function(object, gen = NA, transfunc = NA) {
     
     ## check x is an ABCSMC object

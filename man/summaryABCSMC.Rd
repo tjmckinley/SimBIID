@@ -2,9 +2,12 @@
 % Please edit documentation in R/summaryABC.R
 \name{print.ABCSMC}
 \alias{print.ABCSMC}
+\alias{summary.ABCSMC}
 \title{Summarises \code{ABCSMC} objects}
 \usage{
 \method{print}{ABCSMC}(x, ...)
+
+summary.ABCSMC(object, gen = NA, transfunc = NA)
 }
 \arguments{
 \item{object}{An \code{ABCSMC} object.}

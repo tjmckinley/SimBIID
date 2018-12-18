@@ -68,6 +68,9 @@ An \code{ABCSMC} object, essentially a \code{list} containing:
                      weights. Each element of the list corresponds to a
                      generation of ABC-SMC, with each vector being of length
                      \code{npart};}
+\item{\code{ESS}:}{ a \code{list} of effective sample sizes. Each element of the list 
+                     corresponds to a generation of ABC-SMC, with each vector being of 
+                     length \code{npart};}
 \item{\code{accrate}:}{ a \code{vector} of length \code{nrow(tols)} containing the
                      acceptance rates for each generation of ABC;}
 \item{\code{tols}:}{ a copy of the \code{tols} input;}

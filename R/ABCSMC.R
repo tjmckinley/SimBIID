@@ -47,6 +47,9 @@
 #'                      weights. Each element of the list corresponds to a
 #'                      generation of ABC-SMC, with each vector being of length
 #'                      \code{npart};}
+#' \item{\code{ESS}:}{ a \code{list} of effective sample sizes. Each element of the list 
+#'                      corresponds to a generation of ABC-SMC, with each vector being of 
+#'                      length \code{npart};}
 #' \item{\code{accrate}:}{ a \code{vector} of length \code{nrow(tols)} containing the
 #'                      acceptance rates for each generation of ABC;}
 #' \item{\code{tols}:}{ a copy of the \code{tols} input;}
@@ -125,6 +128,7 @@ ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = F, 
         mc.cores = mc.cores, 
         prevPars = x$pars[[length(x$pars)]], 
         prevWeights = x$weights[[length(x$weights)]],
+        prevESS = x$ESS[[length(x$ESS)]],
         genstart = nrow(x$tols) + 1
     )
     tempargs <- c(tempargs, x$addargs)
@@ -136,6 +140,7 @@ ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = F, 
     x$pars <- c(x$pars, temp$pars)
     x$output <- c(x$output, temp$output)
     x$weights <- c(x$weights, temp$weights)
+    x$ESS <- c(x$ESS, temp$ESS)
     x$accrate <- c(x$accrate, temp$accrate)
     x$tols <- rbind(x$tols, temp$tols)
     
@@ -288,6 +293,7 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL, ptols =
     ## set up output objects
     accrate <- rep(NA, ngen)
     pars <- list(); out <- list(); weights <- list();
+    ESS <- list()
     
     ## extract ellipsis arguments
     args <- list(...)
@@ -305,7 +311,10 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL, ptols =
     
     if(exists("prevPars", where = args)) {
         if(!exists("prevWeights", where = args)){
-            stop("'prevweights' does not exist")
+            stop("'prevWeights' does not exist")
+        }
+        if(!exists("prevESS", where = args)){
+            stop("'prevESS' does not exist")
         }
         if(!exists("genstart", where = args)){
             stop("'genstart' does not exist")
@@ -313,6 +322,7 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL, ptols =
         ## set up dummy objects (removed at the end)
         pars[[1]] <- args$prevPars
         weights[[1]] <- args$prevWeights
+        ESS[[1]] <- args$prevESS
         tols <- rbind(rep(NA, ncol(tols)), tols)
         out[[1]] <- NA
         propCov <- cov(pars[[1]]) * 2
@@ -321,6 +331,7 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL, ptols =
         ## remove additional arguments
         args <- args[-match("prevPars", names(args))]
         args <- args[-match("prevWeights", names(args))]
+        args <- args[-match("prevESS", names(args))]
         args <- args[-match("genstart", names(args))]
     } else {
         init <- 1
@@ -376,6 +387,7 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL, ptols =
             ## extract relative components
             weights[[t]] <- map_dbl(temp, "weightsNew")
             weights[[t]] <- weights[[t]] / sum(weights[[t]])
+            ESS[[t]] <- 1 / sum(weights[[t]]^2)
             pars[[t]] <- map(temp, "pars")
             pars[[t]] <- do.call("rbind", pars[[t]])
             out[[t]] <- map(temp, "out")
@@ -408,10 +420,11 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL, ptols =
         out <- out[-1]
         tols <- tols[-1, , drop = F]
         weights <- weights[-1]
+        ESS <- ESS[-1]
     }
     
     ## output results
-    output <- list(pars = pars, output = out, weights = weights, accrate = accrate,
+    output <- list(pars = pars, output = out, weights = weights, ESS = ESS, accrate = accrate,
                    tols = tols, ptols = ptols, priors = orig_priors, data = data,
                    func = func, u = u, addargs = args)
     class(output) <- "ABCSMC"

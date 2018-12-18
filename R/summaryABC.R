@@ -26,15 +26,16 @@ print.ABCSMC <- function(x, ...) {
     cat(paste0("Consists of ", nrow(x$tols), " generations with ", nrow(x$priors), " parameters.\n"))
     
     ## print data information
-    cat("\nData:\n\n")
+    cat("\nData:\n")
     print(x$data, row.names = F)
     
     ## print tolerance information
     temp <- x$tols %>%
         as.data.frame() %>%
         mutate(Generation = 1:n()) %>%
-        select(Generation, everything())
-    cat("\n\nTolerances:\n\n")
+        select(Generation, everything()) %>%
+        mutate(ESS = do.call("c", x$ESS))
+    cat("\nTolerances:\n")
     print(temp, row.names = F)
     
     ## print prior information
@@ -47,7 +48,7 @@ print.ABCSMC <- function(x, ...) {
         mutate(temp = paste0(parnames, " ~ ", temp)) %>%
         select(temp)
     colnames(temp) <- ""
-    cat("\n\nPriors:\n")
+    cat("\nPriors:\n")
     print(temp, row.names = F, col.names = F, quote = F)
 }
 
@@ -110,7 +111,7 @@ summary.ABCSMC <- function(object, gen = NA, transfunc = NA) {
     postvar <- apply(postvar, 1, sum)
     
     ## return summary
-    postsum <- data.frame(Mean = postmn, SD = sqrt(postvar))
+    postsum <- data.frame(Mean = postmn, SD = sqrt(postvar), ESS = object$ESS[[length(object$ESS)]])
     rownames(postsum) <- parnames
     postsum
 }

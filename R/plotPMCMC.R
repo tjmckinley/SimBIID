@@ -38,6 +38,9 @@ plot.PMCMC <- function(x, type = c("post", "trace"), joint = F, transfunc = NA, 
     ## check ask
     checkInput(ask, c("vector", "logical"), 1)
     
+    ## extract levels
+    collev <- colnames(x$pars)
+    
     if(type == "post") { 
         p <- as.matrix(x$pars) %>% as.data.frame()
                 
@@ -58,6 +61,7 @@ plot.PMCMC <- function(x, type = c("post", "trace"), joint = F, transfunc = NA, 
             
             ## bind to current posterior samples
             p <- cbind(p, temp)
+            collev <- colnames(p)
         } else {
             if(!is.na(transfunc)) {
                 stop("'transfunc' incorrectly specified")
@@ -68,7 +72,7 @@ plot.PMCMC <- function(x, type = c("post", "trace"), joint = F, transfunc = NA, 
         if(!joint) {
              p <- p %>%
                 gather(Parameter, value) %>%
-                mutate(Parameter = factor(Parameter, levels = colnames(x$pars))) %>%
+                mutate(Parameter = factor(Parameter, levels = collev)) %>%
                 ggplot(aes(x = value)) +
                     geom_density() +
                     xlab("Parameter value") + ylab("Density") +

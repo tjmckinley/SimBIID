@@ -63,7 +63,7 @@ summary.PMCMC <- function(object, transfunc = NA) {
         temppars <- as.list(temppars)
         names(temppars) <- names(fargs)
         temp <- do.call("transfunc", temppars)
-        stopifnot(checkInput(temp, "data.frame", nrow = nrow(pars)))
+        checkInput(temp, "data.frame", nrow = nrow(pars))
         temp <- as.matrix(temp)
         
         ## bind to current posterior samples

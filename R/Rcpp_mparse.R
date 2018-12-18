@@ -236,6 +236,19 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, afterT
     
     ## add stopping criteria
     if(!is.null(stopCrit)) {
+        if(runFromR & tspan) {
+            retCrit <- "    List out1(2);"
+            retCrit <- c(retCrit, "    out1[0] = out(tspan.size(), _);")
+            retCrit <- c(retCrit, "    out1[1] = out(Range(0, tspan.size() - 1), Range(1, out.ncol() - 1));")
+            retCrit <- c(retCrit, "    return out1;")
+            if(!is.null(stopCrit)){
+                tempind <- grep("return out;", stopCrit)
+                temp <- gsub("return out;", "", stopCrit[tempind])
+                tretCrit <- gsub("    ", "", retCrit)
+                tretCrit <- paste0(temp, tretCrit)
+                stopCrit <- c(stopCrit[c(1:(tempind - 1))], tretCrit, stopCrit[(tempind + 1):length(stopCrit)])
+            }
+        }
         currline <- ratelines[1]
         Rcpp_code <- c(Rcpp_code[1:(currline - 1)], "", stopCrit, Rcpp_code[(currline + 1):length(Rcpp_code)])
         ratelines <- ratelines[-1] + length(stopCrit)

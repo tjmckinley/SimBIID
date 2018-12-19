@@ -25,6 +25,8 @@
 #' @import RcppArmadillo 
 #' @import RcppXPtrUtils
 #' @import SimInf
-#' @useDynLib SimBIID
+#' @importFrom Rcpp evalCpp
+#' @exportPattern "^[[:alpha:]]+"
+#' @useDynLib SimBIID, .registration = TRUE
 NULL
 

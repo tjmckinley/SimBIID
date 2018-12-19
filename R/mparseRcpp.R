@@ -256,9 +256,3 @@ mparseRcpp <- function(
     class(output) <- "SimBIID_model"
     output
 }
-
-## print function for SimBIID_model object
-#' @export
-print.SimBIID_model <- function(x, ...) {
-    writeLines(x$code)
-}

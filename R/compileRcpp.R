@@ -23,7 +23,6 @@ compileRcpp <- function(model) {
     writeLines(model$code, filename)
     
     ## compile into external pointer or function
-    Rcpp_object <- NULL
     source(filename)
     
     ## return pointer or function

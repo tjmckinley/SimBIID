@@ -18,6 +18,7 @@
 #' @import ggplot2
 #' @import tidyr
 #' @import mvtnorm
+#' @import grDevices
 #' @import RColorBrewer
 #' @import coda 
 #' @import Rcpp 

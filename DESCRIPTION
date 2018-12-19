@@ -15,6 +15,7 @@ Imports:
     ggplot2,
     tidyr,
     mvtnorm,
+    grDevices,
     RColorBrewer,
     Rcpp,
     RcppArmadillo,

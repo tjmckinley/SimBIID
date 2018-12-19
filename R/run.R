@@ -6,16 +6,14 @@
 #'              for which \code{summary()} and \code{plot()} generics 
 #'              are provided.
 #'
-#' @export
-#'
-#' @param model: An object of class \code{SimBIID_model}.
-#' @param pars: A named vector of parameters.
-#' @param tstart: The time at which to start the simulation.
-#' @param tstop: The time at which to stop the simulation.
-#' @param u: A named vector of initial states.
-#' @param tspan: A numeric vector containing the times at which to 
+#' @param model An object of class \code{SimBIID_model}.
+#' @param pars A named vector of parameters.
+#' @param tstart The time at which to start the simulation.
+#' @param tstop The time at which to stop the simulation.
+#' @param u A named vector of initial states.
+#' @param tspan A numeric vector containing the times at which to 
 #'               save the states of the system.
-#' @param nrep: Specifies the number of simulations to run.
+#' @param nrep Specifies the number of simulations to run.
 #' @param parallel  A \code{logical} determining whether to use parallel processing or not.
 #' @param mc.cores  Number of cores to use if using parallel processing.
 #'
@@ -30,6 +28,8 @@
 #'             These contain time series counts for the simulations. Note that this will
 #'             only be returned if \code{tspan = T} in the original \code{SimBIID_model} object.}
 #'         } 
+#' 
+#' @export
 #' 
 
 run <- function(

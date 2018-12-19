@@ -15,7 +15,8 @@
 #'
 #' @return A plot of the ABC posterior distributions for different generations, or the distributions
 #'         of the simulated summary measures for different generations.
-#'         
+#' 
+#' @method plot ABCSMC        
 #' @export
 
 plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, transfunc = NA, ...) {
@@ -59,7 +60,7 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
                     set_names(pnames)
                 }, pnames = pnames) %>%
                 bind_rows(.id = "Generation") %>%
-                filter(Generation %in% gen) %>%
+                dplyr::filter(Generation %in% gen) %>%
                 mutate(Generation = factor(Generation, levels = gen))
                 
         ## check for transformations if required
@@ -89,7 +90,7 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
         
         ## plot posteriors
         if(!joint) {
-             p <- p %>%
+            p <- p %>%
                 gather(Parameter, value, -Generation) %>%
                 ggplot(aes(x = value, fill = Generation)) +
                     geom_density(alpha = 0.8) +
@@ -99,7 +100,7 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
          } else {
             p <- GGally::ggpairs(p, mapping = aes(colour = Generation), 
                 columns = 2:ncol(p),
-                diag = list(continuous = wrap("densityDiag", alpha = 0.8)),
+                diag = list(continuous = GGally::wrap("densityDiag", alpha = 0.8)),
                 lower = list(continuous = "density"),
                 upper = list(continuous = "blank"),
                 legend = c(1, 1))
@@ -127,7 +128,7 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
                 set_names(onames)
             }, onames = onames) %>%
             bind_rows(.id = "Generation") %>%
-            filter(Generation %in% gen) %>%
+            dplyr::filter(Generation %in% gen) %>%
             mutate(Generation = factor(Generation, levels = gen))
             
         if(length(transfunc) != 1){
@@ -157,7 +158,7 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
         } else {
             p <- GGally::ggpairs(p, mapping = aes(colour = Generation), 
                 columns = 2:ncol(p),
-                diag = list(continuous = wrap("densityDiag", alpha = 0.8)),
+                diag = list(continuous = GGally::wrap("densityDiag", alpha = 0.8)),
                 lower = list(continuous = "density"),
                 upper = list(continuous = "blank"),
                 legend = c(1, 1))

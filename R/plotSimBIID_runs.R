@@ -13,7 +13,8 @@
 #'
 #' @return A plot of individual simulations and/or summaries of repeated simulations 
 #'         extracted from \code{SimBIID_runs} object.
-#'         
+#'  
+#' @method plot SimBIID_runs       
 #' @export
 
 plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums"), 
@@ -88,7 +89,7 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
                 gather(output, value, -rep, -t) %>%
                 mutate(output = factor(output, levels = which[-match(c("rep", "t"), which)]))
             for(i in rep1) {
-                temp <- filter(repSums, rep == i)
+                temp <- dplyr::filter(repSums, rep == i)
                 p <- p + geom_line(aes(x = t, y = value), data = temp)
             }
         } else {
@@ -116,7 +117,7 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
                ggplot(aes(x = t)) +
                    xlab("Time") + ylab("Counts")
            for(i in unique(p1$pair)){
-                temp <- filter(p1, pair == i)
+                temp <- dplyr::filter(p1, pair == i)
                 p <- p + geom_ribbon(aes(ymin = lci, ymax = uci), 
                      data = temp, alpha = 0.2)
            }
@@ -125,12 +126,12 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
            if(!is.na(rep[1])){
                rep1 <- rep
                repSums <- x$runs %>%
-                   filter(rep %in% rep1) %>%
+                   dplyr::filter(rep %in% rep1) %>%
                    select(!!which) %>%
                    gather(output, value, -rep, -t) %>%
                    mutate(output.y = factor(output, levels = levels(p1$output.y)))
                for(i in rep1){
-                   temp <- filter(repSums, rep == i)
+                   temp <- dplyr::filter(repSums, rep == i)
                    p <- p + geom_line(aes(x = t, y = value), data = temp)
                }
            }

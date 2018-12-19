@@ -8,24 +8,24 @@ run(model, pars, tstart, tstop, u, tspan, nrep = 1, parallel = F,
   mc.cores = NA)
 }
 \arguments{
+\item{model}{An object of class \code{SimBIID_model}.}
+
+\item{pars}{A named vector of parameters.}
+
+\item{tstart}{The time at which to start the simulation.}
+
+\item{tstop}{The time at which to stop the simulation.}
+
+\item{u}{A named vector of initial states.}
+
+\item{tspan}{A numeric vector containing the times at which to 
+save the states of the system.}
+
+\item{nrep}{Specifies the number of simulations to run.}
+
 \item{parallel}{A \code{logical} determining whether to use parallel processing or not.}
 
 \item{mc.cores}{Number of cores to use if using parallel processing.}
-
-\item{model:}{An object of class \code{SimBIID_model}.}
-
-\item{pars:}{A named vector of parameters.}
-
-\item{tstart:}{The time at which to start the simulation.}
-
-\item{tstop:}{The time at which to stop the simulation.}
-
-\item{u:}{A named vector of initial states.}
-
-\item{tspan:}{A numeric vector containing the times at which to 
-save the states of the system.}
-
-\item{nrep:}{Specifies the number of simulations to run.}
 }
 \value{
 An object of class \code{SimBIID_run}, essentially a list 

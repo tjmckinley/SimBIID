@@ -4,8 +4,8 @@
 \alias{plot.SimBIID_runs}
 \title{Plots \code{SimBIID_runs} objects}
 \usage{
-plot.SimBIID_runs(x, which = c("all", "t"), type = c("runs", "sums"),
-  rep = NA, quant = 0.9, ...)
+\method{plot}{SimBIID_runs}(x, which = c("all", "t"), type = c("runs",
+  "sums"), rep = NA, quant = 0.9, ...)
 }
 \arguments{
 \item{x}{An \code{SimBIID_runs} object.}

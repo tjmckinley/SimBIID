@@ -16,6 +16,7 @@
 #' @return A plot of the (approximate) posterior distributions from the particle MCMC algorithm,
 #'         or corresponding trace plots.
 #'         
+#' @method plot PMCMC
 #' @export 
 
 plot.PMCMC <- function(x, type = c("post", "trace"), joint = F, transfunc = NA, ask = T, ...) {
@@ -80,7 +81,7 @@ plot.PMCMC <- function(x, type = c("post", "trace"), joint = F, transfunc = NA, 
                     facet_wrap(~ Parameter, scales = "free")
          } else {
             p <- GGally::ggpairs(p,
-                diag = list(continuous = wrap("densityDiag", alpha = 0.8)),
+                diag = list(continuous = GGally::wrap("densityDiag", alpha = 0.8)),
                 lower = list(continuous = "density"),
                 upper = list(continuous = "blank"))
          }

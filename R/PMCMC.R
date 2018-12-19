@@ -208,6 +208,17 @@ PMCMC.default <- function(
     if(class(func) != "XPtr" & class(func) != "SimBIID_model"){
         stop("'func' not a 'SimBIID_model' object or an 'XPtr' object")
     }
+    
+    ## check u
+    checkInput(u, c("vector", "numeric"), int = T, gte = 0)
+    checkInput(sum(u), "numeric", int = T, gt = 1)
+    if(class(func) == "SimBIID_model") {
+        checkInput(u, length = length(funcorig$compartments))
+        if(!identical(names(u), funcorig$compartments)) {
+            stop("'names(u)' does not match 'func$compartments'")
+        }
+    }
+    
     if(class(func) == "XPtr"){
         checkXPtr(func, "SEXP", c("NumericVector", "double", "double", "IntegerVector",
            "IntegerVector"))
@@ -251,15 +262,6 @@ PMCMC.default <- function(
         
         ## compile model
         func <- compileRcpp(func)
-    }
-    
-    ## check u
-    checkInput(u, c("vector", "numeric"), length(model$compartments), int = T, gte = 0)
-    checkInput(sum(u), "numeric", int = T, gt = 1)
-    if(class(func) == "SimBIID_model") {
-        if(!identical(names(u), model$compartments)) {
-            stop("'names(u)' does not match 'func$compartments'")
-        }
     }
     
     ## check proposal variances

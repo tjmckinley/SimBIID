@@ -4,21 +4,19 @@
 #' Does not have full functionality of \code{mparse}. Currently only supports
 #' simulations on a single node.
 #'
-#' @export
-#'
-#' @param transitions: character vector containing transitions on the form \code{"X ->
+#' @param transitions character vector containing transitions on the form \code{"X ->
 #'          ... -> Y"}. The left (right) side is the initial (final)
 #'          state and the propensity is written in between the
 #'          \code{->}-signs. The special symbol \code{@} is reserved for the empty
 #'          set. For example, \code{transitions = c("S -> k1*S*I -> I", "I ->
 #'          k2*I -> R")} expresses a SIR model.
 #'
-#' @param compartments: contains the names of the involved compartments, for
+#' @param compartments contains the names of the involved compartments, for
 #'          example, \code{compartments = c("S", "I", "R")}.
 #'
-#' @param pars: a \code{character} vector containing the names of the parameters.
+#' @param pars a \code{character} vector containing the names of the parameters.
 #' 
-#' @param obsProcess: \code{data.frame} determining the observation process. Columns must be in the order:
+#' @param obsProcess \code{data.frame} determining the observation process. Columns must be in the order:
 #'                    \code{dataNames}, \code{dist}, \code{p1}, \code{p2}. \code{dataNames} is a \code{character}
 #'                    denoting the relevant compartment name to place the observation process onto; \code{dist} 
 #'                    is a \code{character} specifying the distribution of the observation process (must be one of 
@@ -28,22 +26,22 @@
 #'                    case of \code{"unif"}, \code{NA} in the case of \code{"pois"}, and \code{prob} in the case of 
 #'                    \code{"binom"}).
 #' 
-#' @param stopCrit: A \code{character} vector including additional stopping criteria for rejecting
+#' @param stopCrit A \code{character} vector including additional stopping criteria for rejecting
 #'                  simulations early. These will be inserted within \code{if(CRIT){out[0] = 0; return out;}} statements
 #'                  within the underlying Rcpp code, which a return value of 0 corresponds to rejecting
 #'                  the simulation. Variables in \code{CRIT} must match either those in \code{compartments}
 #'                  and/or \code{addVars}.
 #' 
-#' @param addVars: a \code{character} vector where the names specify the additional variables to be added to the 
+#' @param addVars a \code{character} vector where the names specify the additional variables to be added to the 
 #'                 function call. These can be used to specify variables that can be used for 
 #'                 e.g. additional stopping criteria.
 #'                  
-#' @param tspan: A \code{logical} determining whether to return time series counts or not.
+#' @param tspan A \code{logical} determining whether to return time series counts or not.
 #' 
-#' @param afterTstar: A \code{character} containing code to insert after each new event time is
+#' @param afterTstar A \code{character} containing code to insert after each new event time is
 #'                    generated. 
 #'                  
-#' @param runFromR: \code{logical} determining whether code is to be compiled to run directly in R,
+#' @param runFromR \code{logical} determining whether code is to be compiled to run directly in R,
 #'                  or whether to be compiled as an \code{XPtr} object for use in Rcpp.
 #'
 #' @return An object of class \code{SimBIID_model}, which is essentially a \code{list} 
@@ -62,6 +60,9 @@
 #'         }
 #'         This can be compiled into an \code{XPtr} or \code{function} object
 #'         using \code{compileRcpp()}.
+#'
+#' @export
+#' 
 
 mparseRcpp <- function(
     transitions = NULL, 

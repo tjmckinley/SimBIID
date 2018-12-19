@@ -6,14 +6,12 @@
 #'
 #' @export
 #'
-#' @param model: An object of class \code{SimBIID_model}.
+#' @param model An object of class \code{SimBIID_model}.
 #'
 #' @return An object of class \code{XPtr} that points to the compiled function, or
 #'         an R \code{function} object for calling directly from R.
 
-compileRcpp <- function(
-    model = NULL
-) {
+compileRcpp <- function(model) {
     if(missing(model)) {
         stop("'model' object missing")
     }
@@ -25,6 +23,7 @@ compileRcpp <- function(
     writeLines(model$code, filename)
     
     ## compile into external pointer or function
+    Rcpp_object <- NULL
     source(filename)
     
     ## return pointer or function

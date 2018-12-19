@@ -4,10 +4,10 @@
 \alias{compileRcpp}
 \title{Compiles \code{SimBIID_model} object}
 \usage{
-compileRcpp(model = NULL)
+compileRcpp(model)
 }
 \arguments{
-\item{model:}{An object of class \code{SimBIID_model}.}
+\item{model}{An object of class \code{SimBIID_model}.}
 }
 \value{
 An object of class \code{XPtr} that points to the compiled function, or

@@ -2,17 +2,18 @@
 #'
 #' @description Summary method for \code{PMCMC} objects.
 #'
-#' @export
-#'
 #' @param object    A \code{PMCMC} object.
 #' @param transfunc Is a \code{function} object where the arguments to the function must
 #'                  match all or a subset of the parameters in the model. This function needs 
 #'                  to return a \code{data.frame} object with columns containing the transformed
 #'                  parameters.
+#' @param ...       Not used here.
 #'
 #' @return          A \code{summary.mcmc} object.
 #'
 #' @rdname summaryPMCMC
+#'
+#' @export
 
 print.PMCMC <- function(x, ...) {
     ## check object is a PMCMC object
@@ -40,7 +41,7 @@ print.PMCMC <- function(x, ...) {
 #' @rdname summaryPMCMC
 #' @export
 
-summary.PMCMC <- function(object, transfunc = NA) {
+summary.PMCMC <- function(object, transfunc = NA, ...) {
     
     ## check object is a PMCMC object
     if(class(object) != "PMCMC"){

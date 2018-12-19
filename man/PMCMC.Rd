@@ -9,17 +9,19 @@
 PMCMC(x, ...)
 
 \method{PMCMC}{PMCMC}(x, niter = 1000, nprintsum = 100, adapt = T,
-  adaptmixprop = 0.05, nupdate = 100)
+  adaptmixprop = 0.05, nupdate = 100, ...)
 
 \method{PMCMC}{default}(x, priors, func, u, npart = 100, iniPars = NA,
   fixpars = F, niter = 1000, nprintsum = 100, adapt = T,
-  propVar = NA, adaptmixprop = 0.05, nupdate = 100)
+  propVar = NA, adaptmixprop = 0.05, nupdate = 100, ...)
 }
 \arguments{
 \item{x}{A \code{PMCMC} object, or a \code{data.frame} containing time series count data, 
 with the first column called \code{time}, followed by columns of time-series counts. 
 The time-series counts columns must be in the order of the `counts` object in the
 `func` function (see below).}
+
+\item{...}{Not used here.}
 
 \item{niter}{An integer specifying the number of iterations to run the MCMC.}
 

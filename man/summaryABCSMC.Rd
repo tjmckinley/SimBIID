@@ -7,9 +7,11 @@
 \usage{
 \method{print}{ABCSMC}(x, ...)
 
-summary.ABCSMC(object, gen = NA, transfunc = NA)
+summary.ABCSMC(object, gen = NA, transfunc = NA, ...)
 }
 \arguments{
+\item{...}{Not used here.}
+
 \item{object}{An \code{ABCSMC} object.}
 
 \item{gen}{The generation of ABC that you want to extract. If left missing then

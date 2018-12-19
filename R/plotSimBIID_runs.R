@@ -2,8 +2,6 @@
 #'
 #' @description Plot method for \code{SimBIID_runs} objects.
 #'
-#' @export
-#'
 #' @param x     An \code{SimBIID_runs} object.
 #' @param which A character vector of states to plot. Can be \code{"all"} to plot all
 #'              states (and final event times), or \code{"t"} to plot final event times.
@@ -11,12 +9,15 @@
 #'             summaries (\code{"sums"}).
 #' @param rep An integer vector of simulation runs to plot.
 #' @param quant A vector of quantiles (> 0.5) to plot if \code{type == "runs"}.
+#' @param ...           Not used here.
 #'
 #' @return A plot of individual simulations and/or summaries of repeated simulations 
 #'         extracted from \code{SimBIID_runs} object.
+#'         
+#' @export
 
 plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums"), 
-                              rep = NA, quant = 0.9) {
+                              rep = NA, quant = 0.9, ...) {
     ## check x
     if(class(x) != "SimBIID_runs"){
         stop("'x' is not a SimBIID_runs object")

@@ -5,7 +5,7 @@
 \title{Plots \code{ABCSMC} objects}
 \usage{
 plot.ABCSMC(x, type = c("post", "output"), gen = NA, joint = F,
-  transfunc = NA)
+  transfunc = NA, ...)
 }
 \arguments{
 \item{x}{An \code{ABCSMC} object.}
@@ -21,6 +21,8 @@ Takes the value \code{"output"} if you want to plot the simulated outputs.}
 match all or a subset of the parameters in the model. This function needs 
 to return a \code{data.frame} object with columns containing the transformed
 parameters.}
+
+\item{...}{Not used here.}
 }
 \value{
 A plot of the ABC posterior distributions for different generations, or the distributions

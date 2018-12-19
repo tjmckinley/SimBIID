@@ -44,10 +44,10 @@ ABCRef <- function(npart, priors, pars, func, sumNames, parallel = F, mc.cores =
     }
     checkInput(parallel, c("vector", "logical"), 1)
     if(parallel) {
-        if(!require(parallel)) {
+        if(!requireNamespace("parallel", quietly = TRUE)) {
             stop("Must have 'parallel' package installed to use parallelisation")
         }
-        nc <- detectCores()
+        nc <- parallel::detectCores()
         nc <- ifelse(is.na(nc), 1, nc)
         if(!is.na(mc.cores[1])) {
             checkInput(mc.cores, "numeric", 1, int = T)
@@ -95,10 +95,9 @@ ABCRef <- function(npart, priors, pars, func, sumNames, parallel = F, mc.cores =
     
     ## check priors
     if(!missing(priors)){
-        if(!all(sort(match(colnames(priors), c("parnames", "dist", "p1", "p2"))) - 1:4 == 0)){
+        if(!identical(colnames(priors), c("parnames", "dist", "p1", "p2"))){
             stop("colnames(priors) must be: 'parnames', 'dist', 'p1' and 'p2'")
         }
-        priors <- select(priors, parnames, dist, p1, p2)
         checkInput(priors$parnames, "character")
         checkInput(priors$dist, "character")
         checkInput(priors$p1, "numeric")
@@ -166,7 +165,7 @@ ABCRef <- function(npart, priors, pars, func, sumNames, parallel = F, mc.cores =
     if(!parallel) {
         temp <- lapply(1:npart, runRef, priors = priors, func = func, func_args = fargs)
     } else  {
-        temp <- mclapply(1:npart, runRef, priors = priors, func = func, func_args = fargs, 
+        temp <- parallel::mclapply(1:npart, runRef, priors = priors, func = func, func_args = fargs, 
                          mc.cores = mc.cores)
     }
     
@@ -189,7 +188,7 @@ ABCRef <- function(npart, priors, pars, func, sumNames, parallel = F, mc.cores =
         if(!parallel) {
             temp <- lapply(1:npart, runRef, priors = priors, func = func)
         } else  {
-            temp <- mclapply(1:npart, runRef, priors = priors, func = func, mc.cores = mc.cores)
+            temp <- parallel::mclapply(1:npart, runRef, priors = priors, func = func, mc.cores = mc.cores)
         }
         ## extract relative components
         out <- c(out, map(temp, "out"))

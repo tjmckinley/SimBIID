@@ -3,13 +3,15 @@
 #' Package implements various simulation-based inference routines for infectious
 #' disease models.
 #'
-#' Package provides some code to run the ABC-SMC algorithm of Toni et al. (2009)
-#' and the Alive Particle Filter based particle MCMC algorithm (Jasra et al., 2013;
-#' Drovandi et al., 2016). Also provides functions to plot the outputs.
+#' Package provides some code to run simulations of state-space models, and then
+#' use these in the ABC-SMC algorithm of Toni et al. (2009)
+#' and the bootstrap particle filter based particle MCMC algorithm (Andrieu et al., 2010). 
+#' Also provides functions to plot and summarise the outputs.
 #'
 #' @docType package
 #' @name SimBIID-package
 #' @author TJ McKinley <t.mckinley@@exeter.ac.uk>
+#' @import stats
 #' @import dplyr
 #' @import purrr
 #' @import tibble

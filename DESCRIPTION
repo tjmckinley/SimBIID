@@ -5,9 +5,10 @@ Version: 1.0
 Date: 2018-12-03
 Author: TJ McKinley
 Maintainer: TJ McKinley <t.mckinley@exeter.ac.uk>
-Description: Implements various simulation-based inference routines for infectious disease models
+Description: Implements various simulation-based inference routines for infectious disease models.
 License: GPL (>= 2)
 Imports:
+    stats,
     dplyr,
     purrr,
     tibble,

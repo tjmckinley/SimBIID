@@ -2,8 +2,6 @@
 #'
 #' @description Plot method for \code{ABCSMC} objects.
 #'
-#' @export
-#'
 #' @param x     An \code{ABCSMC} object.
 #' @param type  Takes the value \code{"post"} if you want to plot posterior distributions.
 #'              Takes the value \code{"output"} if you want to plot the simulated outputs.
@@ -13,11 +11,14 @@
 #'                  match all or a subset of the parameters in the model. This function needs 
 #'                  to return a \code{data.frame} object with columns containing the transformed
 #'                  parameters.
+#' @param ... Not used here.
 #'
 #' @return A plot of the ABC posterior distributions for different generations, or the distributions
 #'         of the simulated summary measures for different generations.
+#'         
+#' @export
 
-plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, transfunc = NA) {
+plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, transfunc = NA, ...) {
     
     ## check x
     if(class(x) != "ABCSMC"){
@@ -38,7 +39,7 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
     ## check joint
     checkInput(joint, c("vector", "logical"), 1)
     if(joint) {
-        if(!require(GGally)) {
+        if(!requireNamespace("GGally", quietly = TRUE)) {
             stop("'GGally' package required for joint distribution plots")
         }
     }
@@ -50,7 +51,7 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
         fillCols <- fillCols[as.numeric(gen)]
         
         ## get parameter names
-        pnames <- priors$parnames
+        pnames <- x$priors$parnames
         
         p <- x$pars %>%
                 map(~{
@@ -96,7 +97,7 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
                     scale_fill_manual(values = fillCols) +
                     facet_wrap(~ Parameter, scales = "free")
          } else {
-            p <- ggpairs(p, mapping = aes(colour = Generation), 
+            p <- GGally::ggpairs(p, mapping = aes(colour = Generation), 
                 columns = 2:ncol(p),
                 diag = list(continuous = wrap("densityDiag", alpha = 0.8)),
                 lower = list(continuous = "density"),
@@ -154,7 +155,7 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
                     facet_wrap(~ Output, scales = "free") +
                     geom_vline(aes(xintercept = value), data = dat, linetype = 2, colour = "red", size = 1.5)
         } else {
-            p <- ggpairs(p, mapping = aes(colour = Generation), 
+            p <- GGally::ggpairs(p, mapping = aes(colour = Generation), 
                 columns = 2:ncol(p),
                 diag = list(continuous = wrap("densityDiag", alpha = 0.8)),
                 lower = list(continuous = "density"),

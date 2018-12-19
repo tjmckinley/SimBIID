@@ -69,7 +69,7 @@ ABCSMC <- function(x, ...) {
 #' @rdname ABCSMC
 #' @export
 
-ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = F, mc.cores = NA) {
+ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = F, mc.cores = NA, ...) {
     
     ## check inputs
     if(class(x) != "ABCSMC"){
@@ -171,10 +171,10 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL, ptols =
     ## check inputs
     checkInput(parallel, c("vector", "logical"), 1)
     if(parallel) {
-        if(!require(parallel)) {
+        if(!requireNamespace("parallel", quietly = TRUE)) {
             stop("Must have 'parallel' package installed to use parallelisation")
         }
-        nc <- detectCores()
+        nc <- parallel::detectCores()
         nc <- ifelse(is.na(nc), 1, nc)
         if(!is.na(mc.cores[1])) {
             checkInput(mc.cores, "numeric", 1, int = T)
@@ -375,7 +375,7 @@ ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL, ptols =
                     u = u,
                     func = func, func_args = fargs)
             } else  {
-                temp <- mclapply(1:npart, runProp,
+                temp <- parallel::mclapply(1:npart, runProp,
                     t = t, priors = priors, 
                     prevWeights = tempWeights, prevPars = tempPars, 
                     propCov = propCov, tols = tols[t, ], data = data, 

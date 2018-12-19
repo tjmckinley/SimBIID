@@ -5,7 +5,7 @@
 \title{Plots \code{PMCMC} objects}
 \usage{
 plot.PMCMC(x, type = c("post", "trace"), joint = F, transfunc = NA,
-  ask = T)
+  ask = T, ...)
 }
 \arguments{
 \item{x}{A \code{PMCMC} object.}
@@ -21,6 +21,8 @@ to return a \code{data.frame} object with columns containing the transformed
 parameters.}
 
 \item{ask}{Should the user ask before moving onto next trace plot.}
+
+\item{...}{Not used here.}
 }
 \value{
 A plot of the (approximate) posterior distributions from the particle MCMC algorithm,

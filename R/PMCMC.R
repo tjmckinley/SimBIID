@@ -39,6 +39,7 @@
 #'                      \code{diag(nrow(priors)) * (0.1 ^ 2) / nrow(priors)}.
 #' @param adaptmixprop  Mixing proportion for adaptive proposal.
 #' @param nupdate       Controls when to start adaptive update.
+#' @param ...           Not used here.
 #'
 #' @details             Function runs a particle MCMC algorithm using a bootstrap particle filter for a given model. 
 #'                      If running with \code{fixpars = T} then this runs \code{niter} simulations
@@ -78,7 +79,7 @@ PMCMC <- function(x, ...) {
 
 PMCMC.PMCMC <- function(x, niter = 1000, nprintsum = 100, 
                         adapt = T, adaptmixprop = 0.05, 
-                        nupdate = 100) {
+                        nupdate = 100, ...) {
     ## check object
     if(class(x) != "PMCMC") {
         stop("'x' not a PMCMC object")
@@ -121,7 +122,7 @@ PMCMC.default <- function(
     x, priors, func, u, npart = 100,
     iniPars = NA, fixpars = F, 
     niter = 1000, nprintsum = 100, 
-    adapt = T, propVar = NA, adaptmixprop = 0.05, nupdate = 100
+    adapt = T, propVar = NA, adaptmixprop = 0.05, nupdate = 100, ...
 ) {
     
     ## check inputs are present
@@ -157,7 +158,6 @@ PMCMC.default <- function(
     if(!identical(colnames(priors), c("parnames", "dist", "p1", "p2"))) {
         stop("'priors' must have column names: 'parnames', 'dist', 'p1', 'p2'")
     }
-    priors <- select(priors, parnames, dist, p1, p2)
     checkInput(priors$parnames, "character")
     checkInput(priors$dist, "character")
     checkInput(priors$p1, "numeric")

@@ -7,9 +7,11 @@
 \usage{
 \method{print}{PMCMC}(x, ...)
 
-summary.PMCMC(object, transfunc = NA)
+summary.PMCMC(object, transfunc = NA, ...)
 }
 \arguments{
+\item{...}{Not used here.}
+
 \item{object}{A \code{PMCMC} object.}
 
 \item{transfunc}{Is a \code{function} object where the arguments to the function must

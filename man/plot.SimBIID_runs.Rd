@@ -5,7 +5,7 @@
 \title{Plots \code{SimBIID_runs} objects}
 \usage{
 plot.SimBIID_runs(x, which = c("all", "t"), type = c("runs", "sums"),
-  rep = NA, quant = 0.9)
+  rep = NA, quant = 0.9, ...)
 }
 \arguments{
 \item{x}{An \code{SimBIID_runs} object.}
@@ -19,6 +19,8 @@ summaries (\code{"sums"}).}
 \item{rep}{An integer vector of simulation runs to plot.}
 
 \item{quant}{A vector of quantiles (> 0.5) to plot if \code{type == "runs"}.}
+
+\item{...}{Not used here.}
 }
 \value{
 A plot of individual simulations and/or summaries of repeated simulations 

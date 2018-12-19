@@ -2,8 +2,6 @@
 #'
 #' @description Summary method for \code{ABCSMC} objects.
 #'
-#' @export
-#'
 #' @param object    An \code{ABCSMC} object.
 #' @param gen       The generation of ABC that you want to extract. If left missing then
 #'                  defaults to final generation.
@@ -11,10 +9,13 @@
 #'                  match all or a subset of the parameters in the model. This function needs 
 #'                  to return a \code{data.frame} object with columns containing the transformed
 #'                  parameters.
+#' @param ...           Not used here.
 #'
 #' @return          A \code{data.frame} with weighted posterior means and variances.
 #'
 #' @rdname summaryABCSMC
+#' 
+#' @export
 
 print.ABCSMC <- function(x, ...) {
     ## check object is a ABCSMC object
@@ -55,7 +56,7 @@ print.ABCSMC <- function(x, ...) {
 #' @rdname summaryABCSMC
 #' @export
 
-summary.ABCSMC <- function(object, gen = NA, transfunc = NA) {
+summary.ABCSMC <- function(object, gen = NA, transfunc = NA, ...) {
     
     ## check x is an ABCSMC object
     if(class(object) != "ABCSMC"){

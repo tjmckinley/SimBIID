@@ -94,10 +94,10 @@ run <- function(
     checkInput(nrep, "numeric", 1, int = T, gt = 0)
     checkInput(parallel, c("vector", "logical"), 1)
     if(parallel) {
-        if(!require(parallel)) {
+        if(!requireNamespace("parallel", quietly = TRUE)) {
             stop("Must have 'parallel' package installed to use parallelisation")
         }
-        nc <- detectCores()
+        nc <- parallel::detectCores()
         nc <- ifelse(is.na(nc), 1, nc)
         if(!is.na(mc.cores[1])) {
             checkInput(mc.cores, "numeric", 1, int = T)
@@ -125,11 +125,11 @@ run <- function(
         }
     } else {
         if(!missing(tspan)) {
-            sims <- mclapply(1:nrep, function(i, model, pars, tstart, tstop, u, tspan){
+            sims <- parallel::mclapply(1:nrep, function(i, model, pars, tstart, tstop, u, tspan){
                 model(pars, tstart, tstop, u, tspan)
             }, model = compModel, pars = pars, tstart = tstart, tstop = tstop, u = u, tspan = tspan, mc.cores = mc.cores)
         } else {
-            sims <- mclapply(1:nrep, function(i, model, pars, tstart, tstop, u){
+            sims <- parallel::mclapply(1:nrep, function(i, model, pars, tstart, tstop, u){
                 model(pars, tstart, tstop, u)
             }, model = compModel, pars = pars, tstart = tstart, tstop = tstop, u = u, mc.cores = mc.cores)
         }

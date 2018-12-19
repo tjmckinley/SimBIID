@@ -2,8 +2,6 @@
 #'
 #' @description Plot method for \code{PMCMC} objects.
 #'
-#' @export
-#'
 #' @param x             A \code{PMCMC} object.
 #' @param type          Takes the value \code{"post"} if you want to plot posterior distributions.
 #'                      Takes the value \code{"trace"} if you want to plot the trace plots.
@@ -13,11 +11,14 @@
 #'                      to return a \code{data.frame} object with columns containing the transformed
 #'                      parameters.
 #' @param ask           Should the user ask before moving onto next trace plot.
+#' @param ...           Not used here.
 #'
 #' @return A plot of the (approximate) posterior distributions from the particle MCMC algorithm,
 #'         or corresponding trace plots.
+#'         
+#' @export 
 
-plot.PMCMC <- function(x, type = c("post", "trace"), joint = F, transfunc = NA, ask = T) {
+plot.PMCMC <- function(x, type = c("post", "trace"), joint = F, transfunc = NA, ask = T, ...) {
     
     ## check x
     if(class(x) != "PMCMC"){
@@ -31,7 +32,7 @@ plot.PMCMC <- function(x, type = c("post", "trace"), joint = F, transfunc = NA, 
     ## check joint
     checkInput(joint, c("vector", "logical"), 1)
     if(joint) {
-        if(!require(GGally)) {
+        if(!requireNamespace("GGally", quietly = TRUE)) {
             stop("'GGally' package required for joint distribution plots")
         }
     }
@@ -78,7 +79,7 @@ plot.PMCMC <- function(x, type = c("post", "trace"), joint = F, transfunc = NA, 
                     xlab("Parameter value") + ylab("Density") +
                     facet_wrap(~ Parameter, scales = "free")
          } else {
-            p <- ggpairs(p,
+            p <- GGally::ggpairs(p,
                 diag = list(continuous = wrap("densityDiag", alpha = 0.8)),
                 lower = list(continuous = "density"),
                 upper = list(continuous = "blank"))

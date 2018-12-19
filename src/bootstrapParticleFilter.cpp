@@ -1,4 +1,4 @@
-#include "functions.hpp"
+#include "functions.h"
 
 // bootstrap particle filter
 double bootstrapPartFilter (int N, arma::vec pars, IntegerMatrix state, IntegerMatrix stateNew, 

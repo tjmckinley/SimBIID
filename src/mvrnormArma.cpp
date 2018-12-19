@@ -1,4 +1,4 @@
-#include "functions.hpp"
+#include "functions.h"
 
 //function to draw from a multivariate normal
 arma::mat mvrnormArma(int n, arma::vec mu, arma::mat cholSigma)

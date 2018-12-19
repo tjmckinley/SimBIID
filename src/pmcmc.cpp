@@ -1,4 +1,4 @@
-#include "functions.hpp"
+#include "functions.h"
 
 // a Metropolis-Hastings PMCMC algorithm for fitting time series models
 List PMCMC_cpp (NumericMatrix dataset, NumericMatrix priors, CharacterVector parnames, 

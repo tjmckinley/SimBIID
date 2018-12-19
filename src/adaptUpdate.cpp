@@ -1,4 +1,4 @@
-#include "functions.hpp"
+#include "functions.h"
 
 //function to calculate variance-covariance matrix from posterior samples
 void calcPost(int i, int npars, 

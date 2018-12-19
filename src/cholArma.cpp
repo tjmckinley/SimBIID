@@ -1,4 +1,4 @@
-#include "functions.hpp"
+#include "functions.h"
 
 // function to compute Cholesky decomposition and to deal with
 // cases where it fails

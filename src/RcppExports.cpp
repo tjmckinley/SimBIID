@@ -6,6 +6,21 @@
 
 using namespace Rcpp;
 
+// bootstrapPartFilterState
+List bootstrapPartFilterState(int N, NumericMatrix pars, NumericMatrix dataset, IntegerVector iniStates, SEXP func_);
+RcppExport SEXP _SimBIID_bootstrapPartFilterState(SEXP NSEXP, SEXP parsSEXP, SEXP datasetSEXP, SEXP iniStatesSEXP, SEXP func_SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type pars(parsSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type dataset(datasetSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type iniStates(iniStatesSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type func_(func_SEXP);
+    rcpp_result_gen = Rcpp::wrap(bootstrapPartFilterState(N, pars, dataset, iniStates, func_));
+    return rcpp_result_gen;
+END_RCPP
+}
 // PMCMC_cpp
 List PMCMC_cpp(NumericMatrix dataset, NumericMatrix priors, CharacterVector parnames, NumericVector iniPars, NumericMatrix propVar_R, int niter, int npart, double scale, int nprintsum, int nupdate, int fixpars, int adapt, IntegerVector iniStates, SEXP func_);
 RcppExport SEXP _SimBIID_PMCMC_cpp(SEXP datasetSEXP, SEXP priorsSEXP, SEXP parnamesSEXP, SEXP iniParsSEXP, SEXP propVar_RSEXP, SEXP niterSEXP, SEXP npartSEXP, SEXP scaleSEXP, SEXP nprintsumSEXP, SEXP nupdateSEXP, SEXP fixparsSEXP, SEXP adaptSEXP, SEXP iniStatesSEXP, SEXP func_SEXP) {
@@ -32,6 +47,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_SimBIID_bootstrapPartFilterState", (DL_FUNC) &_SimBIID_bootstrapPartFilterState, 5},
     {"_SimBIID_PMCMC_cpp", (DL_FUNC) &_SimBIID_PMCMC_cpp, 14},
     {NULL, NULL, 0}
 };

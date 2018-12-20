@@ -43,6 +43,11 @@ void adaptUpdate(int i, int npars,
 double bootstrapPartFilter (int N, arma::vec pars, IntegerMatrix state, IntegerMatrix stateNew, 
                             NumericVector weights, NumericVector weightsNew, NumericMatrix dataset, SEXP func_);
 
+// bootstrap particle filter, returns states
+// [[Rcpp::export]]
+List bootstrapPartFilterState (int N, NumericMatrix pars, NumericMatrix dataset, 
+                                        IntegerVector iniStates, SEXP func_);
+
 // a Metropolis-Hastings PMCMC algorithm for fitting time series models
 
 // [[Rcpp::export]]

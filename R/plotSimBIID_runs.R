@@ -144,6 +144,6 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
             p <- p + geom_vline(xintercept = x$bootEnd, linetype = "dashed", colour = "blue")
         }
     }
-    print(p)
+    p
 }
     

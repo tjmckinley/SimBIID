@@ -172,6 +172,6 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
         }
             
      }
-     print(p)
+     p
 }
     

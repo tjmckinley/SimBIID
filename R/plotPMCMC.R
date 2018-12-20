@@ -85,7 +85,7 @@ plot.PMCMC <- function(x, type = c("post", "trace"), joint = F, transfunc = NA, 
                 lower = list(continuous = "density"),
                 upper = list(continuous = "blank"))
          }
-         print(p)
+         return(p)
      } else {
         plot(x$pars, density = F, ask = ask)
      }

@@ -17,7 +17,7 @@ PMCMC(x, ...)
 }
 \arguments{
 \item{x}{A \code{PMCMC} object, or a \code{data.frame} containing time series count data, 
-with the first column called \code{time}, followed by columns of time-series counts. 
+with the first column called \code{t}, followed by columns of time-series counts. 
 The time-series counts columns must be in the order of the `counts` object in the
 `func` function (see below).}
 

@@ -28,7 +28,7 @@ predict.PMCMC <- function(object, tspan, npart = 50, ...) {
     }
     
     ## check stop
-    checkInput(tspan, c("vector", "numeric"), gt = max(object$data$time))
+    checkInput(tspan, c("vector", "numeric"), gt = max(object$data$t))
     tspan <- sort(tspan)
     
     ## check npart
@@ -86,7 +86,7 @@ predict.PMCMC <- function(object, tspan, npart = 50, ...) {
     out <- list()
     outsums <- list()
     for(i in 1:nrow(pars)) {
-        out[[i]] <- func(pars[i, ], max(object$data$time), max(tspan), iniStates[i, ], tspan)
+        out[[i]] <- func(pars[i, ], max(object$data$t), max(tspan), iniStates[i, ], tspan)
         outsums[[i]] <- out[[i]][[1]]
         out[[i]] <- out[[i]][[2]]
         outsums[[i]] <- as.data.frame(matrix(outsums[[i]], nrow = 1))
@@ -105,7 +105,7 @@ predict.PMCMC <- function(object, tspan, npart = 50, ...) {
         bind_rows(.id = "rep")
     
     ## bind as output list and return
-    out <- list(sums = outsums, runs = out, bootEnd = max(object$data$time))
+    out <- list(sums = outsums, runs = out, bootEnd = max(object$data$t))
     class(out) <- "SimBIID_runs"
     out
 }

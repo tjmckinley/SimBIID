@@ -14,13 +14,13 @@ bootStates <- function(dataset, func, pars, u, npart = 50, ...) {
     
     ## check data set
     checkInput(dataset, "data.frame")
-    if(colnames(dataset)[1] != "time"){
-        stop("First column of 'data' must be 'time'")
+    if(colnames(dataset)[1] != "t"){
+        stop("First column of 'data' must be 't'")
     }
     if(ncol(dataset) < 2) {
         stop("Must have at least one count column in 'data'")
     }
-    checkInput(dataset$time, "numeric")
+    checkInput(dataset$t, "numeric")
     for(j in 2:ncol(dataset)) {
         checkInput(dataset[, j, drop = T], "numeric", int = T)
     }

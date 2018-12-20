@@ -6,7 +6,7 @@
 #' @export
 #'
 #' @param x 		    A \code{PMCMC} object, or a \code{data.frame} containing time series count data, 
-#'                      with the first column called \code{time}, followed by columns of time-series counts. 
+#'                      with the first column called \code{t}, followed by columns of time-series counts. 
 #'                      The time-series counts columns must be in the order of the `counts` object in the
 #'                      `func` function (see below).
 #' @param priors        A \code{data.frame} containing columns \code{parnames}, \code{dist}, \code{p1} and 
@@ -142,13 +142,13 @@ PMCMC.default <- function(
     ## check data set
     data <- x
     checkInput(data, "data.frame")
-    if(colnames(data)[1] != "time"){
-        stop("First column of 'data' must be 'time'")
+    if(colnames(data)[1] != "t"){
+        stop("First column of 'data' must be 't'")
     }
     if(ncol(data) < 2) {
         stop("Must have at least one count column in 'data'")
     }
-    checkInput(data$time, "numeric")
+    checkInput(data$t, "numeric")
     for(j in 2:ncol(data)) {
         checkInput(data[, j, drop = T], "numeric", int = T)
     }   

@@ -22,7 +22,7 @@ summaries (\code{"sums"}).}
 \item{quant}{A vector of quantiles (> 0.5) to plot if \code{type == "runs"}.}
 
 \item{data}{A \code{data.frame} containing time series count data, 
-with the first column called \code{time}, followed by columns of time-series counts.}
+with the first column called \code{t}, followed by columns of time-series counts.}
 
 \item{matchData}{A character vector containing matches between the columns of \code{data} and
 the columns of the model runs. Each entry must be of the form e.g. \code{"SD = SR"},

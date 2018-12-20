@@ -105,7 +105,7 @@ predict.PMCMC <- function(object, tspan, npart = 50, ...) {
         bind_rows(.id = "rep")
     
     ## bind as output list and return
-    out <- list(sums = outsums, runs = out)
+    out <- list(sums = outsums, runs = out, bootEnd = max(object$data$time))
     class(out) <- "SimBIID_runs"
     out
 }

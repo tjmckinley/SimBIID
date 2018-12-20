@@ -139,6 +139,10 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
                facet_wrap(~ output.y) +
                labs(title = paste0("Intervals = ", paste0(paste0(rev(quant[, 2]) * 100, "%"), collapse = ", ")))
         }
+        ## add bootstrap end indicator if required
+        if(!is.na(x$bootEnd)){
+            p <- p + geom_vline(xintercept = x$bootEnd, linetype = "dashed", colour = "blue")
+        }
     }
     print(p)
 }

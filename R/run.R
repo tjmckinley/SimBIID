@@ -27,6 +27,8 @@
 #'             \code{t}, \code{u*} (see help file for \code{SimBIID_model} for more details).
 #'             These contain time series counts for the simulations. Note that this will
 #'             only be returned if \code{tspan = T} in the original \code{SimBIID_model} object.}
+#'             \item{bootEnd:}{ a time point denoting when bootstrapped estimates end and predictions
+#'             begin (for \code{predict.PMCMC()} method). }
 #'         } 
 #' 
 #' @export
@@ -158,7 +160,7 @@ run <- function(
         runs <- as.data.frame(sims)
     }
     ## return list of simulated outputs
-    out <- list(sums = sums, runs = runs)
+    out <- list(sums = sums, runs = runs, bootEnd = NA)
     class(out) <- "SimBIID_runs"
     out
 }

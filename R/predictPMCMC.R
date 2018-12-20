@@ -58,10 +58,10 @@ predict.PMCMC <- function(object, tspan, npart = 50, ...) {
     ## generate model
     func <- object$func
     if(!func$tspan){
-        warning("For predictions 'SimBIID_model' object will have 'tspan' set to T")
+        cat("For predictions 'SimBIID_model' object will have 'tspan' set to T\n")
     }
     if(!is.null(func$obsProcess[1])){
-        warning("For predictions, 'SimBIID_model' must have NULL 'obsProcess'")
+        cat("For predictions, 'obsProcess' will be removed from 'SimBIID_model' simulations\n")
     }
     if(!is.null(func$addVars[1])){
         stop("'SimBIID_model' can't have non-NULL 'addVars'")

@@ -5,7 +5,8 @@
 \title{Plots \code{SimBIID_runs} objects}
 \usage{
 \method{plot}{SimBIID_runs}(x, which = c("all", "t"), type = c("runs",
-  "sums"), rep = NA, quant = 0.9, ...)
+  "sums"), rep = NA, quant = 0.9, data = NULL, matchData = NULL,
+  ...)
 }
 \arguments{
 \item{x}{An \code{SimBIID_runs} object.}
@@ -19,6 +20,14 @@ summaries (\code{"sums"}).}
 \item{rep}{An integer vector of simulation runs to plot.}
 
 \item{quant}{A vector of quantiles (> 0.5) to plot if \code{type == "runs"}.}
+
+\item{data}{A \code{data.frame} containing time series count data, 
+with the first column called \code{time}, followed by columns of time-series counts.}
+
+\item{matchData}{A character vector containing matches between the columns of \code{data} and
+the columns of the model runs. Each entry must be of the form e.g. \code{"SD = SR"},
+where \code{SD} is the name of the column in \code{data}, and \code{SR} is the name
+of the column in \code{x}.}
 
 \item{...}{Not used here.}
 }

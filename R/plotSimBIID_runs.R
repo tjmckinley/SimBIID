@@ -9,7 +9,13 @@
 #'             summaries (\code{"sums"}).
 #' @param rep An integer vector of simulation runs to plot.
 #' @param quant A vector of quantiles (> 0.5) to plot if \code{type == "runs"}.
-#' @param ...           Not used here.
+#' @param data A \code{data.frame} containing time series count data, 
+#'          with the first column called \code{time}, followed by columns of time-series counts.
+#' @param matchData A character vector containing matches between the columns of \code{data} and
+#'                  the columns of the model runs. Each entry must be of the form e.g. \code{"SD = SR"},
+#'                  where \code{SD} is the name of the column in \code{data}, and \code{SR} is the name
+#'                  of the column in \code{x}.
+#' @param ... Not used here.
 #'
 #' @return A plot of individual simulations and/or summaries of repeated simulations 
 #'         extracted from \code{SimBIID_runs} object.
@@ -18,7 +24,7 @@
 #' @export
 
 plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums"), 
-                              rep = NA, quant = 0.9, ...) {
+                              rep = NA, quant = 0.9, data = NULL, matchData = NULL, ...) {
     ## check x
     if(class(x) != "SimBIID_runs"){
         stop("'x' is not a SimBIID_runs object")
@@ -49,6 +55,56 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
     quant <- cbind(rev(1 - quant), rev(quant))
     quant1 <- sort(as.vector(quant))
     
+    ## check data
+    if(!is.null(data[1])){
+        if(is.null(matchData[1])){
+            stop("'matchData' must be provided if 'data' is provided")
+        }
+        checkInput(data, "data.frame")
+        if(colnames(data)[1] != "t"){
+            stop("First column of 'data' must be 't'")
+        }
+        if(ncol(data) < 2) {
+            stop("Must have at least one count column in 'data'")
+        }
+        checkInput(data$t, "numeric")
+        for(j in 2:ncol(data)) {
+            checkInput(data[, j, drop = T], "numeric", int = T)
+        }
+        ## check matchData
+        matchData <- strsplit(matchData, "=")
+        if(!all(sapply(matchData, length) == 2)){
+            stop("'matchData' not correctly specified")
+        }
+        ## trim whitespace
+        matchData <- lapply(matchData, trimws)
+        ## extract colnames of data
+        datNames <- sapply(matchData, function(x){
+            x[[1]]
+        })
+        if(!all(datNames %in% colnames(data))){
+            stop("Can't match data names in 'matchData' to 'data'")
+        }
+        ## extract colnames of sims
+        simNames <- sapply(matchData, function(x){
+            x[[2]]
+        })
+        if(!all(simNames %in% colnames(x$sums))){
+            stop("Can't match simulated data names in 'matchData' to 'x$runs'")
+        }
+        ## match to simulations
+        data <- data %>%
+            arrange(t) %>%
+            select_(.dots = c("t", datNames)) %>%
+            set_names(c("t", simNames)) %>%
+            gather(output, value, -t) %>%
+            mutate(output = factor(output, levels = which))
+    } else {
+        if(!is.null(matchData[1])){
+            stop("'data' must be provided if 'matchData' is provided")
+        }
+    }
+    
     ## plot final times and final epidemic sizes
     if(!is.data.frame(x$runs) | type == "sums"){
         if(nrow(x$sums) < 20){
@@ -71,6 +127,15 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
                 mutate(output = factor(output, levels = which))
             p <- p + geom_point(aes(x = value), data = repSums, y = 0, colour = "red", shape = 16)
         }
+        ## add observed data if specified
+        if(!is.null(data[1])){
+            if(nrow(data) > 1){
+                stop("Must have only 1 data point to plot if 'type = \"sums\"")
+            }
+            if(any(simNames %in% which)) {
+                p <- p + geom_point(aes(x = value), data = data, y = 0, shape = 16)
+            }
+        }   
     } else {
         ## produce plot
         which <- unique(c("rep", "t", which))
@@ -92,6 +157,12 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
                 temp <- dplyr::filter(repSums, rep == i)
                 p <- p + geom_line(aes(x = t, y = value), data = temp)
             }
+            ## add observed data if specified
+            if(!is.null(data[1])){
+                if(any(simNames %in% which)) {
+                    p <- p + geom_line(aes(x = t, y = value), data = data, linetype = "dashed")
+                }
+            }  
         } else {
             p <- x$runs %>%
                 select(!!which) %>%
@@ -138,6 +209,15 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
            p <- p + geom_line(aes(y = mean), colour = "red") +
                facet_wrap(~ output.y) +
                labs(title = paste0("Intervals = ", paste0(paste0(rev(quant[, 2]) * 100, "%"), collapse = ", ")))
+           
+           ## add observed data if specified
+           if(!is.null(data[1])){
+               data <- data %>%
+                   rename(output.y = output, mean = value)
+               if(any(simNames %in% which)) {
+                    p <- p + geom_line(aes(x = t, y = mean), data = data, linetype = "dashed")
+               }
+           }  
         }
         ## add bootstrap end indicator if required
         if(!is.na(x$bootEnd)){

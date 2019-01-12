@@ -6,7 +6,7 @@
 \usage{
 mparseRcpp(transitions = NULL, compartments = NULL, pars = NULL,
   obsProcess = NULL, addVars = NULL, stopCrit = NULL, tspan = F,
-  afterTstar = NULL, runFromR = T)
+  afterTstar = NULL, PF = F, runFromR = T)
 }
 \arguments{
 \item{transitions}{character vector containing transitions on the form \code{"X ->
@@ -46,6 +46,8 @@ and/or \code{addVars}.}
 \item{afterTstar}{A \code{character} containing code to insert after each new event time is
 generated.}
 
+\item{PF}{A \code{logical} determining whether to compile the code for use in a particle filter.}
+
 \item{runFromR}{\code{logical} determining whether code is to be compiled to run directly in R,
 or whether to be compiled as an \code{XPtr} object for use in Rcpp.}
 }
@@ -62,6 +64,7 @@ An object of class \code{SimBIID_model}, which is essentially a \code{list}
             \item{addVars:}{ copy of \code{addVars} argument;}
             \item{tspan:}{ copy of \code{tspan} argument;}
             \item{afterTstar:}{ copy of \code{afterTstar} argument;}
+            \item{PF:}{ copy of \code{PF} argument;}
             \item{runFromR:}{ copy of \code{runFromR} argument.}
         }
         This can be compiled into an \code{XPtr} or \code{function} object

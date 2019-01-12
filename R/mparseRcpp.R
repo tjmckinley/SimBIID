@@ -40,6 +40,8 @@
 #' 
 #' @param afterTstar A \code{character} containing code to insert after each new event time is
 #'                    generated. 
+#'                    
+#' @param PF A \code{logical} determining whether to compile the code for use in a particle filter.
 #'                  
 #' @param runFromR \code{logical} determining whether code is to be compiled to run directly in R,
 #'                  or whether to be compiled as an \code{XPtr} object for use in Rcpp.
@@ -56,6 +58,7 @@
 #'             \item{addVars:}{ copy of \code{addVars} argument;}
 #'             \item{tspan:}{ copy of \code{tspan} argument;}
 #'             \item{afterTstar:}{ copy of \code{afterTstar} argument;}
+#'             \item{PF:}{ copy of \code{PF} argument;}
 #'             \item{runFromR:}{ copy of \code{runFromR} argument.}
 #'         }
 #'         This can be compiled into an \code{XPtr} or \code{function} object
@@ -73,6 +76,7 @@ mparseRcpp <- function(
     stopCrit = NULL,
     tspan = F,
     afterTstar = NULL,
+    PF = F,
     runFromR = T
 ) {
     ## Check transitions
@@ -105,6 +109,18 @@ mparseRcpp <- function(
     ## check element names
     if (any(duplicated(c(compartments, pars)))) {
         stop("'pars' and 'compartments' have names in common.")
+    }
+    
+    ## check PF
+    checkInput(PF, "logical", 1)
+    if(PF & is.null(obsProcess[1])){
+        stop("Must have 'obsProcess' specified if 'PF = T'")
+    }
+    
+    ## check tspan
+    checkInput(tspan, "logical", 1)
+    if(tspan & PF) {
+        stop("'tspan' and 'PF' can't be specified together")
     }
     
     ## check obsProcess
@@ -146,20 +162,34 @@ mparseRcpp <- function(
                 compartments, NULL, pars, NULL)
             obsProcess$p2[i] <- temp[[1]]$propensity
             
-            if(obsProcess$dist[i] == "unif" | obsProcess$dist[i] == "binom" ){
-                obsProcess$compiled[i] <- paste0("out[0] += R::d", obsProcess$dist[i], 
-                    "(counts[", i - 1, "], ", obsProcess$p1[i], 
-                    ", ", obsProcess$p2[i], ", 1);")
+            if(PF) {
+                if(obsProcess$dist[i] == "unif" | obsProcess$dist[i] == "binom" ){
+                    obsProcess$compiled[i] <- paste0("out[0] += R::d", obsProcess$dist[i], 
+                        "(counts[", i - 1, "], ", obsProcess$p1[i], 
+                        ", ", obsProcess$p2[i], ", 1);")
+                } else {
+                    obsProcess$compiled[i] <- paste0("out[0] += R::d", obsProcess$dist[i], 
+                         "(counts[", i - 1, "], ", obsProcess$p1[i], 
+                         ", 1);")
+                }
+                ## merge observation processes
+                compObsProcess <- c("out[0] = 0.0;", obsProcess$compiled, 
+                                    "out[Range(1, u.size())] = as<NumericVector>(u);")
+                compObsProcess <- paste("    ", compObsProcess)
             } else {
-                obsProcess$compiled[i] <- paste0("out[0] += R::d", obsProcess$dist[i], 
-                     "(counts[", i - 1, "], ", obsProcess$p1[i], 
-                     ", 1);")
+                if(obsProcess$dist[i] == "unif" | obsProcess$dist[i] == "binom" ){
+                    obsProcess$compiled[i] <- paste0("R::r", obsProcess$dist[i], 
+                                                     "(", obsProcess$p1[i], 
+                                                     ", ", obsProcess$p2[i], ");")
+                } else {
+                    obsProcess$compiled[i] <- paste0("R::r", obsProcess$dist[i], 
+                                                     "(", obsProcess$p1[i], 
+                                                     ");")
+                }
+                ## merge observation processes
+                compObsProcess <- NULL
             }
         }
-        ## merge observation processes
-        compObsProcess <- c("out[0] = 0.0;", obsProcess$compiled, 
-            "out[Range(1, u.size())] = as<NumericVector>(u);")
-        compObsProcess <- paste("    ", compObsProcess)
     } else {
         compObsProcess <- NULL
     }
@@ -212,14 +242,6 @@ mparseRcpp <- function(
         stopCrit <- c(paste0(tn, "// early stopping criteria"), stopCrit)
     }
     
-    ## check tspan
-    checkInput(tspan, "logical", 1)
-    if(tspan) {
-        if(!is.null(obsProcess[1])) {
-            stop("'tspan' and 'obsProcess' can't be specified together")
-        }
-    }
-    
     ## check afterTstar
     if(!is.null(afterTstar)) {
         checkInput(afterTstar, "character", 1)
@@ -235,7 +257,7 @@ mparseRcpp <- function(
     )
 
     ## write Rcpp code to file
-    Rcpp_code <- Rcpp_mparse(transitions1, compObsProcess, addVars, stopCrit, tspan, afterTstar, runFromR)
+    Rcpp_code <- Rcpp_mparse(transitions1, compObsProcess, obsProcess, addVars, stopCrit, tspan, afterTstar, runFromR)
     
     ## replace "gdata" with "pars"
     Rcpp_code <- gsub("gdata", "pars", Rcpp_code)
@@ -251,6 +273,7 @@ mparseRcpp <- function(
         addVars = addVars,
         tspan = tspan,
         afterTstar = afterTstar,
+        PF = PF,
         runFromR = runFromR
     )
     class(output) <- "SimBIID_model"

@@ -1,6 +1,6 @@
 ## Cpp code: Generate Rcpp code for mparse
 ## (based on idea in SimInf_mparse in SimInf package)
-Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, afterTstar, runFromR) {
+Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, tspan, afterTstar, runFromR) {
     
     ## read source code
     Rcpp_code <- readLines(system.file("", "simFunction.R", package = "SimBIID"))
@@ -73,9 +73,17 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, afterT
     if(is.null(matchCrit)){
         ## initialise tspan outputs
         if(tspan){
-            outsize <- paste0(paste(rep(" ", 4), collapse = ""), "NumericMatrix out(tspan.size() + 1, u.size() + 2);")
+            if(!is.data.frame(obsProcess)){
+                outsize <- paste0(paste(rep(" ", 4), collapse = ""), "NumericMatrix out(tspan.size() + 1, u.size() + 2);")
+            } else {
+                outsize <- paste0(paste(rep(" ", 4), collapse = ""), "NumericMatrix out(tspan.size() + 1, u.size() + ", nrow(obsProcess) + 2, ");")
+            }
         } else {
-            outsize <- paste0(paste(rep(" ", 4), collapse = ""), "NumericVector out(u.size() + 2);")
+            if(!is.data.frame(obsProcess)){
+                outsize <- paste0(paste(rep(" ", 4), collapse = ""), "NumericVector out(u.size() + 2);")
+            } else {
+                outsize <- paste0(paste(rep(" ", 4), collapse = ""), "NumericVector out(u.size() + ", nrow(obsProcess) + 2, ");")
+            }
         }
     } else {
         outsize <- paste0(paste(rep(" ", 4), collapse = ""), "NumericVector out(u.size() + 1);")
@@ -120,6 +128,13 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, afterT
         upTspan <- c(upTspan, paste0(tempSpace, "for(i = 0; i < u.size(); i++) {"))
         upTspan <- c(upTspan, paste0(tempSpace, "    out(k, i + 2) = (double) u[i];"))
         upTspan <- c(upTspan, paste0(tempSpace, "}"))
+        if(is.data.frame(obsProcess)){
+            upTspan <- c(upTspan, paste0(tempSpace, "for(i = 0; i < ", nrow(obsProcess), "; i++) {"))
+            for(i in 1:nrow(obsProcess)){
+                upTspan <- c(upTspan, paste0(tempSpace, "    out(k, i + 2 + u.size()) = ", obsProcess$compiled[i], ";"))
+            }
+            upTspan <- c(upTspan, paste0(tempSpace, "}"))
+        }
         upTspan <- c(upTspan, paste0(tempSpace, "k++;"))
         tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
         upTspan <- c(upTspan, paste0(tempSpace, "}"))
@@ -263,6 +278,11 @@ Rcpp_mparse <- function(transitions, matchCrit, addVars, stopCrit, tspan, afterT
                                 tempSpace, "out[0] = (totrate == 0.0 ? 1:0);\n",
                                 tempSpace, "out[1] = t;\n",
                                 tempSpace, "out[Range(2, u.size() + 1)] = as<NumericVector>(u);")
+            if(is.data.frame(obsProcess)){
+                for(i in 1:nrow(obsProcess)){
+                    matchCrit <- paste0(matchCrit, "\n", tempSpace, "out[u.size() + 2 + ", i - 1, "] = ", obsProcess$compiled[i])
+                }
+            }
         } else {
             matchCrit <- paste0(tempSpace, "// set output\n",
                                 tempSpace, "while(k < tspan.size()) {\n",

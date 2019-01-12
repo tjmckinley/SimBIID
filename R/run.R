@@ -140,7 +140,11 @@ run <- function(
     if(missing(tspan)) {
         sims <- do.call("rbind", sims)
         sims <- cbind(1:nrow(sims), sims)
-        colnames(sims) <- c("rep", "completed", "t", model$compartments)
+        tempnames <- c("rep", "completed", "t", model$compartments)
+        if(is.data.frame(model$obsProcess)) {
+            tempnames <- c(tempnames, model$obsProcess$dataNames)
+        }
+        colnames(sims) <- tempnames
         sums <- as.data.frame(sims)
         runs <- NA
     } else {
@@ -156,7 +160,11 @@ run <- function(
             x <- cbind(rep(i, nrow(x)), x)
             x
         }, x = sims))
-        colnames(sims) <- c("rep", "t", model$compartments)
+        tempnames <- c("rep", "t", model$compartments)
+        if(is.data.frame(model$obsProcess)) {
+            tempnames <- c(tempnames, model$obsProcess$dataNames)
+        }
+        colnames(sims) <- tempnames
         runs <- as.data.frame(sims)
     }
     ## return list of simulated outputs

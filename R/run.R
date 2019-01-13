@@ -152,7 +152,11 @@ run <- function(
             x[[1]]
         }))
         sums <- cbind(1:nrow(sums), sums)
-        colnames(sums) <- c("rep", "completed", "t", model$compartments)
+        tempnames <- c("rep", "completed", "t", model$compartments)
+        if(is.data.frame(model$obsProcess)) {
+            tempnames <- c(tempnames, model$obsProcess$dataNames)
+        }
+        colnames(sums) <- tempnames
         sums <- as.data.frame(sums)
         
         sims <- do.call("rbind", lapply(1:length(sims), function(i, x){

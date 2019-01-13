@@ -129,11 +129,9 @@ Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, t
         upTspan <- c(upTspan, paste0(tempSpace, "    out(k, i + 2) = (double) u[i];"))
         upTspan <- c(upTspan, paste0(tempSpace, "}"))
         if(is.data.frame(obsProcess)){
-            upTspan <- c(upTspan, paste0(tempSpace, "for(i = 0; i < ", nrow(obsProcess), "; i++) {"))
             for(i in 1:nrow(obsProcess)){
-                upTspan <- c(upTspan, paste0(tempSpace, "    out(k, i + 2 + u.size()) = ", obsProcess$compiled[i], ";"))
+                upTspan <- c(upTspan, paste0(tempSpace, "out(k, u.size() + ", i - 1 + 2, ") = ", obsProcess$compiled[i]))
             }
-            upTspan <- c(upTspan, paste0(tempSpace, "}"))
         }
         upTspan <- c(upTspan, paste0(tempSpace, "k++;"))
         tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
@@ -280,7 +278,7 @@ Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, t
                                 tempSpace, "out[Range(2, u.size() + 1)] = as<NumericVector>(u);")
             if(is.data.frame(obsProcess)){
                 for(i in 1:nrow(obsProcess)){
-                    matchCrit <- paste0(matchCrit, "\n", tempSpace, "out[u.size() + 2 + ", i - 1, "] = ", obsProcess$compiled[i])
+                    matchCrit <- paste0(matchCrit, "\n", tempSpace, "out[u.size() + ", i - 1 + 2, "] = ", obsProcess$compiled[i])
                 }
             }
         } else {
@@ -290,15 +288,26 @@ Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, t
                                 tempSpace, "    out(k, 1) = tspan[k];\n",
                                 tempSpace, "    for(i = 0; i < u.size(); i++) {\n",
                                 tempSpace, "        out(k, i + 2) = (double) u[i];\n",
-                                tempSpace, "    }\n",
-                                tempSpace, "    k++;\n",
+                                tempSpace, "    }")
+            if(is.data.frame(obsProcess)){
+                for(i in 1:nrow(obsProcess)){
+                    matchCrit <- paste0(matchCrit, "\n", tempSpace, "    out(k, u.size() + ", i - 1 + 2, ") = ", obsProcess$compiled[i])
+                }
+            }
+            matchCrit <- paste0(matchCrit, "\n", tempSpace, "    k++;\n",
                                 tempSpace, "}\n")
-            matchCrit <- c(matchCrit, paste0("",
+            matchCrit <- paste0(matchCrit,
                                 tempSpace, "out(tspan.size(), 0) = (totrate == 0.0 ? 1:0);\n",
                                 tempSpace, "out(tspan.size(), 1) = t;\n",
                                 tempSpace, "for(i = 0; i < u.size(); i++) {\n",
                                 tempSpace, tempSpace, "out(tspan.size(), i + 2) = (double) u[i];\n",
-                                tempSpace, "}"))
+                                tempSpace, "}")
+            if(is.data.frame(obsProcess)){
+                for(i in 1:nrow(obsProcess)){
+                    matchCrit <- paste0(matchCrit, "\n", tempSpace, 
+                                        "out(tspan.size(), u.size() + ", i - 1 + 2, ") = (out(tspan.size(), 1) == out(tspan.size() - 1, 1) ? out(tspan.size() - 1, u.size() + ", i - 1 + 2, "):", gsub(";", "", obsProcess$compiled[i]), ");")
+                }
+            }
         }
     }
     currline <- ratelines[1]

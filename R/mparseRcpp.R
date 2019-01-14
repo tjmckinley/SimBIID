@@ -137,6 +137,10 @@ mparseRcpp <- function(
         ## set up compiled column
         obsProcess$compiled <- NA
         
+        if(any(obsProcess$dataNames %in% compartments)){
+            stop("'obsProcess$dataNames' matches one or more 'compartments'. Change to unique names.")
+        }
+        
         for(i in 1:nrow(obsProcess)){
             ## check for missing inputs
             if(obsProcess$dist[i] == "unif" | obsProcess$dist[i] == "binom" ){

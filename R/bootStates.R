@@ -34,7 +34,7 @@ bootStates <- function(dataset, func, pars, u, npart = 50, ...) {
     
     ## checks on function / input
     if(func$tspan){
-        warning("'SimBIID_model' object will have 'tspan' set to F")
+        warning("'SimBIID_model' object will have 'tspan' set to F for particle filter\n")
     }
     if(is.null(func$obsProcess[1])){
         stop("'SimBIID_model' must have non-NULL 'obsProcess'")
@@ -64,14 +64,15 @@ bootStates <- function(dataset, func, pars, u, npart = 50, ...) {
         stopCrit = NULL,
         tspan = F,
         afterTstar = NULL,
+        PF = T,
         runFromR = F
     )
     
     ## compile model
-    func <- compileRcpp(func)
+    compfunc <- compileRcpp(func)
     
     ## run function
-    output <- bootstrapPartFilterState(npart, pars, dataset, u, func)
+    output <- bootstrapPartFilterState(npart, pars, dataset, u, compfunc)
     output <- lapply(1:length(output), function(i, x, time){
         x <- x[[i]]
         x <- cbind(rep(i, nrow(x)), time, x)
@@ -79,7 +80,31 @@ bootStates <- function(dataset, func, pars, u, npart = 50, ...) {
     }, x = output, time = dataset[, 1])
     output <- do.call("rbind", output)
     colnames(output) <- c("rep", "t", names(u))
+    output <- as.data.frame(output)
     
+    ## add observation process sampling if required
+    if(is.data.frame(func$obsProcess)){
+        obsProcess <- func$obsProcess
+        ntime <- nrow(output[output$rep == 1, ])
+        for(i in 1:nrow(obsProcess)){
+            if(obsProcess$dist[i] == "unif" | obsProcess$dist[i] == "binom" ){
+                obsProcess$compiled[i] <- paste0("r", obsProcess$dist[i], 
+                                                 "(", ntime, ", ", obsProcess$p1[i], ", ", obsProcess$p2[i], ")")
+            } else {
+                obsProcess$compiled[i] <- paste0("r", obsProcess$dist[i], 
+                                                 "(", ntime, ", ", obsProcess$p1[i], ")")
+            }
+        }
+        for(j in 1:nrow(obsProcess)){
+            eval(parse(text = paste0("output$", obsProcess$dataNames, " <- NA")))
+        }
+        for(i in 1:nrow(pars)){
+            for(j in 1:nrow(obsProcess)){
+                temp <- with(c(output[output$rep == i, ], pars[i, ]), eval(parse(text = obsProcess$compiled[j])))
+                eval(parse(text = paste0("output$", obsProcess$dataNames, "[output$rep == ", i, "] <- temp")))
+            }
+        }
+    }
     ## return output
     output
 }

@@ -41,18 +41,14 @@ predict.PMCMC <- function(object, tspan, npart = 50, ...) {
         as.matrix()
     
     ## run bootstrap filter to get states at each time point of the dataset
-    prevStates <- bootStates(object$data, object$func, pars, object$u, npart) 
-    
-    ## convert to data frame
-    prevStates <- prevStates %>%
-        as.data.frame()
+    prevStates <- bootStates(object$data, object$func, pars, object$u, npart)
     
     ## extract final states
     iniStates <- prevStates %>%
         group_by(rep) %>%
         slice(n()) %>%
         ungroup() %>%
-        select(-rep, -t) %>%
+        select(one_of(object$func$compartments)) %>%
         as.matrix()
     
     ## generate model
@@ -60,9 +56,9 @@ predict.PMCMC <- function(object, tspan, npart = 50, ...) {
     if(!func$tspan){
         cat("For predictions 'SimBIID_model' object will have 'tspan' set to T\n")
     }
-    if(!is.null(func$obsProcess[1])){
-        cat("For predictions, 'obsProcess' will be removed from 'SimBIID_model' simulations\n")
-    }
+    # if(!is.null(func$obsProcess[1])){
+    #     cat("For predictions, 'obsProcess' will be removed from 'SimBIID_model' simulations\n")
+    # }
     if(!is.null(func$addVars[1])){
         stop("'SimBIID_model' can't have non-NULL 'addVars'")
     }
@@ -73,26 +69,35 @@ predict.PMCMC <- function(object, tspan, npart = 50, ...) {
         transitions = func$transitions,
         compartments = func$compartments,
         pars = func$pars,
-        obsProcess = NULL,
+        obsProcess = func$obsProcess,
         addVars = NULL,
         stopCrit = NULL,
         tspan = T,
         afterTstar = NULL,
+        PF = F,
         runFromR = T
     )
-    func <- compileRcpp(func)
+    compfunc <- compileRcpp(func)
     
     ## use run method to produce forward predictions
     out <- list()
     outsums <- list()
     for(i in 1:nrow(pars)) {
-        out[[i]] <- func(pars[i, ], max(object$data$t), max(tspan), iniStates[i, ], tspan)
+        out[[i]] <- compfunc(pars[i, ], max(object$data$t), max(tspan), iniStates[i, ], tspan)
         outsums[[i]] <- out[[i]][[1]]
         out[[i]] <- out[[i]][[2]]
         outsums[[i]] <- as.data.frame(matrix(outsums[[i]], nrow = 1))
         out[[i]] <- as.data.frame(out[[i]])
-        colnames(outsums[[i]]) <- c("completed", "t", colnames(iniStates))
-        colnames(out[[i]]) <- c("t", colnames(iniStates))
+        tempnames <- c("completed", "t", colnames(iniStates))
+        if(is.data.frame(func$obsProcess)) {
+            tempnames <- c(tempnames, func$obsProcess$dataNames)
+        }
+        colnames(outsums[[i]]) <- tempnames
+        tempnames <- c("t", colnames(iniStates))
+        if(is.data.frame(func$obsProcess)) {
+            tempnames <- c(tempnames, func$obsProcess$dataNames)
+        }
+        colnames(out[[i]]) <- tempnames
     }
     ## bind to prevStates
     out <- out %>%

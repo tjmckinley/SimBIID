@@ -94,9 +94,13 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
         }
         ## match to simulations
         data <- data %>%
-            arrange(t) %>%
-            select_(.dots = c("t", datNames)) %>%
-            set_names(c("t", simNames)) %>%
+            arrange(t) 
+        data1 <- select(data, t)
+        for(j in 1:length(datNames)) {
+            data1 <- cbind(data1, data[, match(datNames[j], colnames(data))]) %>%
+                set_names(c("t", simNames[1:j])) 
+        }
+        data <- data1 %>%
             gather(output, value, -t) %>%
             mutate(output = factor(output, levels = which))
     } else {

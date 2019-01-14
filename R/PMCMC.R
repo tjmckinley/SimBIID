@@ -225,7 +225,7 @@ PMCMC.default <- function(
     } else {
         ## check model
         if(func$tspan){
-            warning("'SimBIID_model' object will have 'tspan' set to F")
+            warning("'SimBIID_model' object will have 'tspan' set to F\n")
         }
         if(is.null(func$obsProcess[1])){
             stop("'SimBIID_model' must have non-NULL 'obsProcess'")
@@ -257,6 +257,7 @@ PMCMC.default <- function(
             stopCrit = NULL,
             tspan = F,
             afterTstar = NULL,
+            PF = T,
             runFromR = F
         )
         

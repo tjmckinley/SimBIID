@@ -21,7 +21,6 @@
 #'                  In this latter case the output from the function must be a vector with length equal to 
 #'                  \code{ncol(data)} and with entries in the same order as the columns of \code{data}.
 #' @param u         A named vector of initial states.
-#' @param npart     An integer specifying the number of particles.
 #' @param tols 		A \code{vector} or \code{matrix} of tolerances, with the number of rows defining
 #'                  the number of generations required, and columns defining the summary statistics
 #'                  to match to. If a \code{vector}, then the length determines the summary statistics.
@@ -29,6 +28,7 @@
 #' @param ptols     The proportion of simulated outcomes at each generation to use to derive adaptive 
 #'                  tolerances.
 #' @param ngen      The number of generations of ABC-SMC to run.
+#' @param npart     An integer specifying the number of particles.
 #' @param parallel  A \code{logical} determining whether to use parallel processing or not.
 #' @param mc.cores  Number of cores to use if using parallel processing.
 #' @param ...       Further arguments to pass to \code{func}. (Not used if extending runs.)
@@ -151,8 +151,8 @@ ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = F, 
 #' @rdname ABCSMC
 #' @export
 
-ABCSMC.default <- function(x, priors, func, u, npart = 100, tols = NULL, ptols = NULL,
-                           ngen = 1, parallel = F, mc.cores = NA, ...) {
+ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
+                           ngen = 1, npart = 100, parallel = F, mc.cores = NA, ...) {
     
     ## check missing arguments
     if(missing(x)){

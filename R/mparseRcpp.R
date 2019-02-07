@@ -18,7 +18,7 @@
 #' 
 #' @param obsProcess \code{data.frame} determining the observation process. Columns must be in the order:
 #'                    \code{dataNames}, \code{dist}, \code{p1}, \code{p2}. \code{dataNames} is a \code{character}
-#'                    denoting the relevant compartment name to place the observation process onto; \code{dist} 
+#'                    denoting the name of the variable that will be output from the observation process; \code{dist} 
 #'                    is a \code{character} specifying the distribution of the observation process (must be one of 
 #'                    \code{"unif"}, \code{"pois"} or \code{"binom"} at the current time); \code{p1} is the first parameter 
 #'                    (the lower bound in the case of \code{"unif"}, the rate in the case of \code{"pois"}, or the \code{size} 

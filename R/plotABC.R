@@ -148,9 +148,22 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
             
         if(!joint) {
             p <- p %>%
-                gather(Output, value, -Generation) %>%
+                gather(Output, value, -Generation)
+            ## add noise if all values identical, else plot
+            ## doesn't render properly 
+            ident <- p %>% 
+                group_by(Generation, Output) %>%
+                summarise(nident = length(unique(value))) %>%
+                dplyr::filter(nident == 1)
+            if(nrow(ident) > 0){
+                p <- full_join(p, ident, by = c("Generation", "Output"))
+            } else {
+                p <- mutate(p, nident = NA)
+            }
+            p <- dplyr::filter(p, is.na(nident)) %>% 
                 ggplot(aes(x = value, fill = Generation)) +
                     geom_density(alpha = 0.8) +
+                    geom_density(data = dplyr::filter(p, !is.na(nident)), alpha = 0.8, adjust = 0.0001) +
                     xlab("Output") + ylab("Density") +
                     scale_fill_manual(values = fillCols) +
                     facet_wrap(~ Output, scales = "free") +

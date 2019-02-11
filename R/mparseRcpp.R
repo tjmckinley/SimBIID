@@ -20,11 +20,11 @@
 #'                    \code{dataNames}, \code{dist}, \code{p1}, \code{p2}. \code{dataNames} is a \code{character}
 #'                    denoting the name of the variable that will be output from the observation process; \code{dist} 
 #'                    is a \code{character} specifying the distribution of the observation process (must be one of 
-#'                    \code{"unif"}, \code{"pois"} or \code{"binom"} at the current time); \code{p1} is the first parameter 
-#'                    (the lower bound in the case of \code{"unif"}, the rate in the case of \code{"pois"}, or the \code{size} 
-#'                    in the case of \code{"binom"}); and finally \code{p2} is the second parameter (the upper bound in the
-#'                    case of \code{"unif"}, \code{NA} in the case of \code{"pois"}, and \code{prob} in the case of 
-#'                    \code{"binom"}).
+#'                    \code{"unif"}, \code{"pois"}, \code{"norm"} or \code{"binom"} at the current time); \code{p1} is the first parameter 
+#'                    (the lower bound in the case of \code{"unif"}, the rate in the case of \code{"pois"}, the mean in the case of 
+#'                    \code{"norm"} or the \code{size} in the case of \code{"binom"}); and finally \code{p2} is the second parameter 
+#'                    (the upper bound in the case of \code{"unif"}, \code{NA} in the case of \code{"pois"}, the standard deviation in 
+#'                    the case of \code{"norm"}, and \code{prob} in the case of \code{"binom"}).
 #' 
 #' @param stopCrit A \code{character} vector including additional stopping criteria for rejecting
 #'                  simulations early. These will be inserted within \code{if(CRIT){out[0] = 0; return out;}} statements
@@ -129,7 +129,7 @@ mparseRcpp <- function(
         checkInput(obsProcess, "data.frame", ncol = 4, naAllow = T)
         checkInput(colnames(obsProcess), inSet = c("dataNames", "dist", "p1", "p2"))
         # checkInput(obsProcess$dataNames, "character", inSet = compartments)
-        checkInput(obsProcess$dist, "character", inSet = c("unif", "pois", "binom"))
+        checkInput(obsProcess$dist, "character", inSet = c("unif", "pois", "norm", "binom"))
         checkInput(obsProcess$p1, "character")
         if(!all(is.na(obsProcess$p2))){
             checkInput(obsProcess$p2, "character", naAllow = T)
@@ -143,7 +143,7 @@ mparseRcpp <- function(
         
         for(i in 1:nrow(obsProcess)){
             ## check for missing inputs
-            if(obsProcess$dist[i] == "unif" | obsProcess$dist[i] == "binom" ){
+            if(obsProcess$dist[i] != "pois"){
                 if(any(is.na(obsProcess[i, 3:4]))){
                     stop(paste0("'obsProcess' parameters can't be missing for '", obsProcess$dist[i], "'"))
                 }
@@ -167,7 +167,7 @@ mparseRcpp <- function(
             obsProcess$p2[i] <- temp[[1]]$propensity
             
             if(PF) {
-                if(obsProcess$dist[i] == "unif" | obsProcess$dist[i] == "binom" ){
+                if(obsProcess$dist[i] != "pois"){
                     obsProcess$compiled[i] <- paste0("out[0] += R::d", obsProcess$dist[i], 
                         "(counts[", i - 1, "], ", obsProcess$p1[i], 
                         ", ", obsProcess$p2[i], ", 1);")
@@ -181,7 +181,7 @@ mparseRcpp <- function(
                                     "out[Range(1, u.size())] = as<NumericVector>(u);")
                 compObsProcess <- paste("    ", compObsProcess)
             } else {
-                if(obsProcess$dist[i] == "unif" | obsProcess$dist[i] == "binom" ){
+                if(obsProcess$dist[i] != "pois"){
                     obsProcess$compiled[i] <- paste0("R::r", obsProcess$dist[i], 
                                                      "(", obsProcess$p1[i], 
                                                      ", ", obsProcess$p2[i], ");")

@@ -25,11 +25,11 @@ example, \code{compartments = c("S", "I", "R")}.}
 \code{dataNames}, \code{dist}, \code{p1}, \code{p2}. \code{dataNames} is a \code{character}
 denoting the name of the variable that will be output from the observation process; \code{dist} 
 is a \code{character} specifying the distribution of the observation process (must be one of 
-\code{"unif"}, \code{"pois"} or \code{"binom"} at the current time); \code{p1} is the first parameter 
-(the lower bound in the case of \code{"unif"}, the rate in the case of \code{"pois"}, or the \code{size} 
-in the case of \code{"binom"}); and finally \code{p2} is the second parameter (the upper bound in the
-case of \code{"unif"}, \code{NA} in the case of \code{"pois"}, and \code{prob} in the case of 
-\code{"binom"}).}
+\code{"unif"}, \code{"pois"}, \code{"norm"} or \code{"binom"} at the current time); \code{p1} is the first parameter 
+(the lower bound in the case of \code{"unif"}, the rate in the case of \code{"pois"}, the mean in the case of 
+\code{"norm"} or the \code{size} in the case of \code{"binom"}); and finally \code{p2} is the second parameter 
+(the upper bound in the case of \code{"unif"}, \code{NA} in the case of \code{"pois"}, the standard deviation in 
+the case of \code{"norm"}, and \code{prob} in the case of \code{"binom"}).}
 
 \item{addVars}{a \code{character} vector where the names specify the additional variables to be added to the 
 function call. These can be used to specify variables that can be used for 

@@ -12,7 +12,7 @@ double bootstrapPartFilter (int N, arma::vec pars, IntegerMatrix state, IntegerM
     // func_ is simulation function
     
     // initialise variables
-    int j, k, t, r;
+    int j, k, l, m, t, r;
     double totWeight = 0.0, u = 0.0, maxWeight = 0.0, cumWeight = 0.0;
     
     // initialise log-likelihood
@@ -34,7 +34,8 @@ double bootstrapPartFilter (int N, arma::vec pars, IntegerMatrix state, IntegerM
     }
     
     // loop over time series
-    for(t = 0; t < (dataset.nrow() - 1); t++){
+    t = 0;
+    while(t < (dataset.nrow() - 1) && R_finite(LL) != 0){
         
         // set data
         for(k = 0; k < counts.size(); k++) {
@@ -63,7 +64,7 @@ double bootstrapPartFilter (int N, arma::vec pars, IntegerMatrix state, IntegerM
             }
             // set new weight (on log-scale)
             weightsNew[k] = out[0];
-            // Rprintf("count = %d wn[%d] = %f ", counts[0], k, weightsNew[k]);
+            // Rprintf("count = %d stateNew = %d wn[%d] = %f\n", counts[0], stateNew(k, 1), k, weightsNew[k]);
             // Rprintf("w = %f\n", R::dpois(counts[0], 1e-5, 1));
             // for(j = 0; j < 4; j++) {
             //     Rprintf("u[%d] = %d ", j, stateNew(k, j));
@@ -75,15 +76,49 @@ double bootstrapPartFilter (int N, arma::vec pars, IntegerMatrix state, IntegerM
         state = clone(stateNew);
         weights = clone(weightsNew);
         
-        // normalise weights
-        maxWeight = max(weights);
-        weightsNew = exp(weights - maxWeight);
-        totWeight = maxWeight + log(sum(weightsNew));
-        weights = exp(weights - totWeight);
-        // Rprintf("sum = %f max = %f tot = %f\n", sumWeight, maxWeight, totWeight);
+        if(any(is_finite(weights))){
+            l = 0;
+            while(R_finite(weights[l]) == 0){
+                l++;
+            }
+            if(l >= weights.size()){
+                stop("Error in bootstrap particle filter - too many non-finite weights");
+            }
+            // normalise weights
+            maxWeight = weights[l];
+            for(m = l; m < weights.size(); m++){
+                if(R_finite(weights[m]) != 0){
+                    maxWeight = (maxWeight > weights[m] ? maxWeight:weights[m]);
+                }
+            }
+            totWeight = 0.0;
+            for(m = 0; m < weights.size(); m++){
+                if(R_finite(weights[m]) != 0){
+                    weightsNew[m] = exp(weightsNew[m] - maxWeight);
+                    totWeight += weightsNew[m];
+                }
+            }
+            totWeight = maxWeight + log(totWeight);
+            for(m = 0; m < weights.size(); m++){
+                if(R_finite(weights[m]) == 0){
+                    weights[m] = 0.0;
+                } else {
+                    weights[m] = exp(weights[m] - totWeight);
+                }
+                // Rprintf("weights[%d] = %f\n", m, weights[m]);
+            }
+            // Rprintf("max = %f tot = %f totsum = %f\n", maxWeight, totWeight, sum(weights));
+            // getchar();
+            
+            // update log-likelihood
+            LL += totWeight - log(N);
+        } else {
+            LL = NA_REAL;
+            // Rprintf("LL = %f\n", LL);
+        }
         
-        // update log-likelihood
-        LL += totWeight - log(N);
+        // increment time step
+        t++;
     }
     // return log-likelihood
     return(LL);

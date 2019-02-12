@@ -9,7 +9,7 @@ List bootstrapPartFilterState (int N, NumericMatrix pars, NumericMatrix dataset,
     // func_ is simulation function
     
     // initialise variables
-    int i, j, k, t, r;
+    int i, j, k, l, m, t, r;
     double totWeight = 0.0, u = 0.0, maxWeight = 0.0, cumWeight = 0.0;
     
     // extract function pointer
@@ -106,11 +106,40 @@ List bootstrapPartFilterState (int N, NumericMatrix pars, NumericMatrix dataset,
                 }
             }
             
-            // normalise weights
-            maxWeight = max(weights);
-            weightsNew = exp(weights - maxWeight);
-            totWeight = maxWeight + log(sum(weightsNew));
-            weights = exp(weights - totWeight);
+            if(any(is_finite(weights))){
+                l = 0;
+                while(R_finite(weights[l]) == 0){
+                    l++;
+                }
+                if(l >= weights.size()){
+                    stop("Error in bootstrap particle filter - too many non-finite weights");
+                }
+                // normalise weights
+                maxWeight = weights[l];
+                for(m = l; m < weights.size(); m++){
+                    if(R_finite(weights[m]) != 0){
+                        maxWeight = (maxWeight > weights[m] ? maxWeight:weights[m]);
+                    }
+                }
+                totWeight = 0.0;
+                for(m = 0; m < weights.size(); m++){
+                    if(R_finite(weights[m]) != 0){
+                        weightsNew[m] = exp(weightsNew[m] - maxWeight);
+                        totWeight += weightsNew[m];
+                    }
+                }
+                totWeight = maxWeight + log(totWeight);
+                for(m = 0; m < weights.size(); m++){
+                    if(R_finite(weights[m]) == 0){
+                        weights[m] = 0.0;
+                    } else {
+                        weights[m] = exp(weights[m] - totWeight);
+                    }
+                    // Rprintf("weights[%d] = %f\n", m, weights[m]);
+                }
+            } else {
+                stop("No non-zero weights\n");
+            }
         }
         
         // resample trajectory based on final weights

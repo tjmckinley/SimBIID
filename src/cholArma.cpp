@@ -4,7 +4,6 @@
 // cases where it fails
 arma::mat cholArma(arma::mat sigma, double *scale)
 {
-    int ncols = sigma.n_cols;
     bool success = false;
     int j = 0, k = 0;
     arma::mat cholSigma (sigma.n_rows, sigma.n_cols);

@@ -52,7 +52,7 @@ void adaptUpdate(int i, int npars,
                   arma::mat *meanmat1, NumericVector posterior, 
                   arma::mat *propcov)
 {
-    int j, k, m;
+    int j, k;
 
     //recursively update mean and covariance matrix
     for(j = 0; j < npars; j++) {

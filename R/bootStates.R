@@ -87,7 +87,7 @@ bootStates <- function(dataset, func, pars, u, npart = 50, ...) {
         obsProcess <- func$obsProcess
         ntime <- nrow(output[output$rep == 1, ])
         for(i in 1:nrow(obsProcess)){
-            if(obsProcess$dist[i] == "unif" | obsProcess$dist[i] == "binom" ){
+            if(obsProcess$dist[i] != "pois"){
                 obsProcess$compiled[i] <- paste0("r", obsProcess$dist[i], 
                                                  "(", ntime, ", ", obsProcess$p1[i], ", ", obsProcess$p2[i], ")")
             } else {

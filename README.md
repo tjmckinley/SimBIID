@@ -6,11 +6,29 @@ Package provides some code to run simulations of state-space models, and then us
 
 ## Installation
 
-The package uses `Rcpp`, which requires the installation of the correct C++ compilers. Please see Sections 2.1.1, 2.1.2 or 2.1.3 here:
+The package depends on the `Rcpp` and `RcppArmadillo` packages, which require the installation of the correct C++ compilers. The guidance below is taken from Sections 2.1.1, 2.1.2 or 2.1.3 here:
 
 https://teuder.github.io/rcpp4everyone_en/020_install.html
 
-Once the compilers have been installed, then using the `devtools` package, you can run:
+### Windows
+
+Install [Rtools](https://cran.r-project.org/bin/windows/Rtools/index.html).
+
+### Mac
+
+Install Xcode command line tools. Execute the command `xcode-select --install` in a Terminal.
+
+You might also need to install the gfortran libraries from:
+
+https://cran.r-project.org/bin/macosx/tools/gfortran-6.1.pkg
+
+### Linux
+
+Install gcc and related packages.
+
+In Ubuntu Linux, execute the command `sudo apt-get install r-base-dev` in a Terminal.
+
+Once the compilers have been installed, then instal the `devtools` package in R and run:
 
 ```
 library(devtools)

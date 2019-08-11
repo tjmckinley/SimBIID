@@ -65,6 +65,9 @@ predict.PMCMC <- function(object, tspan, npart = 50, ...) {
     if(!is.null(func$stopCrit[1])){
         stop("'SimBIID_model' can't have non-NULL 'stopCrit'")
     }
+    if(func$incidence) {
+        func$compartments <- func$compartments[-grep("_inc$", func$compartments)]
+    }
     func <- mparseRcpp(
         transitions = func$transitions,
         compartments = func$compartments,
@@ -73,6 +76,7 @@ predict.PMCMC <- function(object, tspan, npart = 50, ...) {
         addVars = NULL,
         stopCrit = NULL,
         tspan = T,
+        incidence = func$incidence,
         afterTstar = NULL,
         PF = F,
         runFromR = T

@@ -247,6 +247,9 @@ PMCMC.default <- function(
         if(!identical(orig_priors$parnames, func$pars)){
             stop("'pars' do not match 'priors'")
         }
+        if(func$incidence) {
+            func$compartments <- func$compartments[-grep("_inc$", func$compartments)]
+        }
         ## generate model
         func <- mparseRcpp(
             transitions = func$transitions,
@@ -256,6 +259,7 @@ PMCMC.default <- function(
             addVars = NULL,
             stopCrit = NULL,
             tspan = F,
+            incidence = func$incidence,
             afterTstar = NULL,
             PF = T,
             runFromR = F

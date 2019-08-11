@@ -6,7 +6,7 @@
 \usage{
 mparseRcpp(transitions = NULL, compartments = NULL, pars = NULL,
   obsProcess = NULL, addVars = NULL, stopCrit = NULL, tspan = F,
-  afterTstar = NULL, PF = F, runFromR = T)
+  incidence = F, afterTstar = NULL, PF = F, runFromR = T)
 }
 \arguments{
 \item{transitions}{character vector containing transitions on the form \code{"X ->
@@ -43,6 +43,8 @@ and/or \code{addVars}.}
 
 \item{tspan}{A \code{logical} determining whether to return time series counts or not.}
 
+\item{incidence}{A \code{logical} specifying whether to return incidence curves in addition to counts.}
+
 \item{afterTstar}{A \code{character} containing code to insert after each new event time is
 generated.}
 
@@ -63,6 +65,7 @@ An object of class \code{SimBIID_model}, which is essentially a \code{list}
             \item{stopCrit:}{ copy of \code{stopCrit} argument;}
             \item{addVars:}{ copy of \code{addVars} argument;}
             \item{tspan:}{ copy of \code{tspan} argument;}
+            \item{incidence:}{ copy of \code{incidence} argument;}
             \item{afterTstar:}{ copy of \code{afterTstar} argument;}
             \item{PF:}{ copy of \code{PF} argument;}
             \item{runFromR:}{ copy of \code{runFromR} argument.}

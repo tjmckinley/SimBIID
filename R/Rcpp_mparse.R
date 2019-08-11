@@ -1,6 +1,6 @@
 ## Cpp code: Generate Rcpp code for mparse
 ## (based on idea in SimInf_mparse in SimInf package)
-Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, tspan, afterTstar, runFromR) {
+Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, tspan, incidence, afterTstar, runFromR) {
     
     ## read source code
     Rcpp_code <- readLines(system.file("", "simFunction.R", package = "SimBIID"))
@@ -66,8 +66,24 @@ Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, t
         upRates <- c(upRates, temp)
     }
     upRates <- c(upRates, "    totrate = sum(rates);")
+    
+    ## reset incidence if using particle filter
+    if(incidence & !is.null(matchCrit)) {
+        resetInc <- c("", paste0(paste(rep(" ", 4), collapse = ""), "if(tstart > 0.0) {"))
+        resetInc <- c(resetInc, paste0(paste(rep(" ", 8), collapse = ""), "for(i = (int) (u.size() / 2); i < u.size(); i++) {"))
+        resetInc <- c(resetInc, paste0(paste(rep(" ", 12), collapse = ""), "u[i] = 0;"))
+        resetInc <- c(resetInc, paste0(paste(rep(" ", 8), collapse = ""), "}"))
+        resetInc <- c(resetInc, paste0(paste(rep(" ", 4), collapse = ""), "}"))
+        nupRates <- length(upRates)
+        upRates <- c(upRates, resetInc)
+    }
+    
     Rcpp_code <- c(Rcpp_code[1:currline], upRates, Rcpp_code[(currline + 1):length(Rcpp_code)])
     ratelines <- ratelines + length(upRates)
+    
+    if(incidence & !is.null(matchCrit)) {
+        upRates <- upRates[1:nupRates]
+    }
     
     ## update output size
     if(is.null(matchCrit)){
@@ -128,6 +144,11 @@ Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, t
         upTspan <- c(upTspan, paste0(tempSpace, "for(i = 0; i < u.size(); i++) {"))
         upTspan <- c(upTspan, paste0(tempSpace, "    out(k, i + 2) = (double) u[i];"))
         upTspan <- c(upTspan, paste0(tempSpace, "}"))
+        if(incidence) {
+            upTspan <- c(upTspan, paste0(tempSpace, "for(i = u.size() / 2; i < u.size(); i++) {"))
+            upTspan <- c(upTspan, paste0(tempSpace, "    u[i] = 0;"))
+            upTspan <- c(upTspan, paste0(tempSpace, "}"))
+        }
         if(is.data.frame(obsProcess)){
             for(i in 1:nrow(obsProcess)){
                 upTspan <- c(upTspan, paste0(tempSpace, "out(k, u.size() + ", i - 1 + 2, ") = ", obsProcess$compiled[i]))
@@ -181,6 +202,10 @@ Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, t
         }
         if(length(temp) > 0) {
             upStates <- c(upStates, paste0(tempSpace, "u[", temp - 1, "]++;"))
+            ## add incidence curve if required
+            if(incidence) {
+                upStates <- c(upStates, paste0(tempSpace, "u[", length(transitions) + temp, "]++;"))
+            }
         }
         tempnSpace <- tempnSpace - 4
         tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
@@ -289,6 +314,12 @@ Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, t
                                 tempSpace, "    for(i = 0; i < u.size(); i++) {\n",
                                 tempSpace, "        out(k, i + 2) = (double) u[i];\n",
                                 tempSpace, "    }")
+            if(incidence) {
+                matchCrit <- paste0(matchCrit, "\n",
+                                tempSpace, "    for(i = u.size() / 2; i < u.size(); i++) {\n",
+                                tempSpace, "        u[i] = 0;\n",
+                                tempSpace, "    }")
+            }
             if(is.data.frame(obsProcess)){
                 for(i in 1:nrow(obsProcess)){
                     matchCrit <- paste0(matchCrit, "\n", tempSpace, "    out(k, u.size() + ", i - 1 + 2, ") = ", obsProcess$compiled[i])

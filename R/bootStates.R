@@ -54,6 +54,9 @@ bootStates <- function(dataset, func, pars, u, npart = 50, ...) {
         stop("'names(u)' does not match 'func$compartments'")
     }
     
+    if(func$incidence) {
+        func$compartments <- func$compartments[-grep("_inc$", func$compartments)]
+    }
     ## generate model
     func <- mparseRcpp(
         transitions = func$transitions,
@@ -63,6 +66,7 @@ bootStates <- function(dataset, func, pars, u, npart = 50, ...) {
         addVars = NULL,
         stopCrit = NULL,
         tspan = F,
+        incidence = func$incidence,
         afterTstar = NULL,
         PF = T,
         runFromR = F

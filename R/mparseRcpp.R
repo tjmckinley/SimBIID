@@ -37,6 +37,8 @@
 #'                 e.g. additional stopping criteria.
 #'                  
 #' @param tspan A \code{logical} determining whether to return time series counts or not.
+#'
+#' @param incidence A \code{logical} specifying whether to return incidence curves in addition to counts.
 #' 
 #' @param afterTstar A \code{character} containing code to insert after each new event time is
 #'                    generated. 
@@ -57,6 +59,7 @@
 #'             \item{stopCrit:}{ copy of \code{stopCrit} argument;}
 #'             \item{addVars:}{ copy of \code{addVars} argument;}
 #'             \item{tspan:}{ copy of \code{tspan} argument;}
+#'             \item{incidence:}{ copy of \code{incidence} argument;}
 #'             \item{afterTstar:}{ copy of \code{afterTstar} argument;}
 #'             \item{PF:}{ copy of \code{PF} argument;}
 #'             \item{runFromR:}{ copy of \code{runFromR} argument.}
@@ -75,6 +78,7 @@ mparseRcpp <- function(
     addVars = NULL,
     stopCrit = NULL,
     tspan = F,
+    incidence = F,
     afterTstar = NULL,
     PF = F,
     runFromR = T
@@ -121,6 +125,18 @@ mparseRcpp <- function(
     checkInput(tspan, "logical", 1)
     if(tspan & PF) {
         stop("'tspan' and 'PF' can't be specified together")
+    }
+    
+    ## check incidence
+    checkInput(incidence, "logical", 1)
+    ## if returning incidence curves, then check names etc.
+    if(incidence) {
+        if(length(grep('_inc$', compartments)) > 0) {
+            stop("If returning 'incidence' curves, then can't have compartment\nnames ending in '_inc'")
+        }
+        
+        ## create incidence compartments if required
+        compartments <- c(compartments, paste0(compartments, "_inc"))
     }
     
     ## check obsProcess
@@ -261,7 +277,7 @@ mparseRcpp <- function(
     )
 
     ## write Rcpp code to file
-    Rcpp_code <- Rcpp_mparse(transitions1, compObsProcess, obsProcess, addVars, stopCrit, tspan, afterTstar, runFromR)
+    Rcpp_code <- Rcpp_mparse(transitions1, compObsProcess, obsProcess, addVars, stopCrit, tspan, incidence, afterTstar, runFromR)
     
     ## replace "gdata" with "pars"
     Rcpp_code <- gsub("gdata", "pars", Rcpp_code)
@@ -276,6 +292,7 @@ mparseRcpp <- function(
         stopCrit = stopCrit,
         addVars = addVars,
         tspan = tspan,
+        incidence = incidence,
         afterTstar = afterTstar,
         PF = PF,
         runFromR = runFromR

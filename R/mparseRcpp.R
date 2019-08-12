@@ -207,12 +207,12 @@ mparseRcpp <- function(
                 }
             }
             ## parse character and map to compartments and parameters
-            temp <- SimInf:::parse_transitions(
+            temp <- parse_transitions(
                 paste0(compartments[1], " -> ", obsProcess$p1[i], " -> ", compartments[1]), 
                 compartments, NULL, pars, NULL)
             obsProcess$p1[i] <- temp[[1]]$propensity
             
-            temp <- SimInf:::parse_transitions(
+            temp <- parse_transitions(
                 paste0(compartments[1], " -> ", obsProcess$p2[i], " -> ", compartments[1]),
                 compartments, NULL, pars, NULL)
             obsProcess$p2[i] <- temp[[1]]$propensity
@@ -263,7 +263,7 @@ mparseRcpp <- function(
         tn1 <- paste(rep(" ", 16), collapse = "")
         ## parse to link to compartments and parameters
         stopCrit <- lapply(stopCrit, function(x, compartments, pars) {
-            temp <- SimInf:::parse_transitions(
+            temp <- parse_transitions(
                 paste0(compartments[1], " -> ", x, " -> ", compartments[1]), 
                 compartments, NULL, pars, NULL)
             temp[[1]]$propensity
@@ -307,7 +307,7 @@ mparseRcpp <- function(
     checkInput(runFromR, "logical", 1)
 
     ## Parse transitions
-    transitions1 <- SimInf:::parse_transitions(
+    transitions1 <- parse_transitions(
         transitions, compartments, NULL, pars, NULL
     )
 

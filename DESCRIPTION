@@ -22,8 +22,7 @@ Imports:
     Rcpp (>= 1.0.2),
     RcppArmadillo (>= 0.9.600.4.0),
     RcppXPtrUtils (>= 0.1.1),
-    coda (>= 0.19.3),
-    SimInf (>= 6.3.0)
+    coda (>= 0.19.3)
 Suggests:
     parallel (>= 3.5.2),
     GGally (>= 1.4.0)

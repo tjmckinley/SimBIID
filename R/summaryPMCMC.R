@@ -32,7 +32,7 @@
 #'     dist = "pois",
 #'     p1 = "R + 1e-5",
 #'     p2 = NA,
-#'     stringsAsFactors = F
+#'     stringsAsFactors = FALSE
 #' )
 #' 
 #' ## set up model (no need to specify tspan
@@ -55,7 +55,7 @@
 #' priors <- data.frame(
 #'     parnames = c("beta", "gamma", "gamma1"), 
 #'     dist = rep("unif", 3), 
-#'     stringsAsFactors = F)
+#'     stringsAsFactors = FALSE)
 #' priors$p1 <- c(0, 0, 0)
 #' priors$p2 <- c(5, 5, 5)
 #' 

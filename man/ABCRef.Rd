@@ -82,13 +82,20 @@ simRef <- function(pars, model) {
 priors <- data.frame(
     parnames = c("beta", "gamma"), 
     dist = rep("gamma", 2), 
-    stringsAsFactors = F
+    stringsAsFactors = FALSE
 )
 priors$p1 <- c(10, 10)
 priors$p2 <- c(10^4, 10^2)
 
 ## produce reference table by sampling from priors
-refTable <- ABCRef(100, priors, func = simRef, sumNames = c("finaltime", "finalsize"))
+## (add additional arguments to 'func' at the end)
+refTable <- ABCRef(
+    npart = 100, 
+    priors = priors, 
+    func = simRef, 
+    sumNames = c("finaltime", "finalsize"),
+    model = model
+)
 refTable
 
 }

@@ -51,7 +51,7 @@ model <- mparseRcpp(
     transitions = transitions, 
     compartments = compartments,
     pars = pars,
-    tspan = T
+    tspan = TRUE
 )
 
 ## run 100 replicate simulations and
@@ -65,10 +65,10 @@ sims <- run(
     tspan = seq(1, 100, length.out = 10),
     nrep = 100
 )
-plot(sims, quant = c(0.5, 0.75, 0.9))
+plot(sims, quant = c(0.55, 0.75, 0.9))
 
 ## add replicate 1 to plot
-plot(sims, quant = c(0.5, 0.75, 0.9), rep = 1)
+plot(sims, quant = c(0.55, 0.75, 0.9), rep = 1)
 
 }
 \seealso{

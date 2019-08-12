@@ -71,7 +71,7 @@ simSIR <- function(pars, data, tols, u, model) {
 priors <- data.frame(
     parnames = c("beta", "gamma"), 
     dist = rep("gamma", 2), 
-    stringsAsFactors = F
+    stringsAsFactors = FALSE
 )
 priors$p1 <- c(10, 10)
 priors$p2 <- c(10^4, 10^2)
@@ -105,7 +105,6 @@ post <- ABCSMC(
     ptol = 0.2, 
     ngen = 2, 
     npart = 50,
-    parallel = T, 
     model = model
 )
 post

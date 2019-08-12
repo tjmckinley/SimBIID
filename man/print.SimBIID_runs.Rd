@@ -30,7 +30,7 @@ model <- mparseRcpp(
     transitions = transitions, 
     compartments = compartments,
     pars = pars,
-    tspan = T
+    tspan = TRUE
 )
 
 ## run 100 replicate simulations and

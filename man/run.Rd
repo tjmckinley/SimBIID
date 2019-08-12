@@ -37,7 +37,7 @@ An object of class \code{SimBIID_run}, essentially a list
             \item{runs:}{ a \code{data.frame()} object, containing columns: \code{run},
             \code{t}, \code{u*} (see help file for \code{SimBIID_model} for more details).
             These contain time series counts for the simulations. Note that this will
-            only be returned if \code{tspan = T} in the original \code{SimBIID_model} object.}
+            only be returned if \code{tspan = TRUE} in the original \code{SimBIID_model} object.}
             \item{bootEnd:}{ a time point denoting when bootstrapped estimates end and predictions
             begin (for \code{predict.PMCMC()} method). }
         }
@@ -81,7 +81,7 @@ model <- mparseRcpp(
     transitions = transitions, 
     compartments = compartments,
     pars = pars,
-    tspan = T
+    tspan = TRUE
 )
 sims <- run(
     model = model,

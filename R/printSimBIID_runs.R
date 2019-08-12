@@ -49,26 +49,26 @@ print.SimBIID_runs <- function(x, ...) {
     if(nrow(x$sums) == 1){
         cat("\nOutput at final time point:\n")
         x$sums %>%
-            select(-rep) %>%
-            as.tibble() %>%
+            dplyr::select(-rep) %>%
+            as_tibble() %>%
             print()
         if(is.data.frame(x$runs)) {
             cat("\nTime-series counts:\n")
             x$runs %>%
-                select(-rep) %>%
+                dplyr::select(-rep) %>%
                 as.tibble() %>%
                 print()
         }
     } else {
         cat("\nSummaries of outputs at final time point:\n")
         x$sums %>%
-            select(-rep) %>%
+            dplyr::select(-rep) %>%
             summary() %>%
             print()
         # if(is.data.frame(x$runs)) {
         #     cat("\nSummaries of time-series counts:\n")
         #     x$runs %>%
-        #         select(-rep) %>%
+        #         dplyr::select(-rep) %>%
         #         gather(output, value, -t) %>%
         #         group_by(t, output) %>%
         #         summarise(list(enframe(c(mean(value), quantile(value, probs = c(0.025, 0.25, 0.5, 0.75, 0.975)))))) %>%

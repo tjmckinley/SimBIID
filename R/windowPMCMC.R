@@ -97,13 +97,13 @@ window.PMCMC <- function(x, ...) {
         stop("'x' is not a PMCMC object")
     }
     
-    #extract 'mcmc' object
+    ## extract 'mcmc' object
     y <- x$pars
     
-    #extract subset
+    ## extract subset
     y <- window(y, ...)
     
-    #generate new 'bayesLog' x
+    ## generate new PMCMC object
     x$pars <- y
     x
 }

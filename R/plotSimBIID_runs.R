@@ -131,7 +131,7 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
         ## match to simulations
         data <- data %>%
             arrange(t) 
-        data1 <- select(data, t)
+        data1 <- dplyr::select(data, t)
         for(j in 1:length(datNames)) {
             data1 <- cbind(data1, data[, match(datNames[j], colnames(data))]) %>%
                 set_names(c("t", simNames[1:j])) 
@@ -151,7 +151,7 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
             stop("Can't plot summary of final sizes and times for n < 20 replicates")
         }
         p <- x$sums %>%
-            select(!!which) %>%
+            dplyr::select(!!which) %>%
             gather(output, value) %>%
             mutate(output = factor(output, levels = which)) %>%
             ggplot(aes(x = value)) +
@@ -162,7 +162,7 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
             rep1 <- rep
             repSums <- x$sums %>%
                 slice(rep1) %>%
-                select(!!which) %>%
+                dplyr::select(!!which) %>%
                 gather(output, value) %>%
                 mutate(output = factor(output, levels = which))
             p <- p + geom_point(aes(x = value), data = repSums, y = 0, colour = "red", shape = 16)
@@ -190,7 +190,7 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
             ## add individual simulations if required
             rep1 <- unique(x$runs$rep)
             repSums <- x$runs %>%
-                select(!!which) %>%
+                dplyr::select(!!which) %>%
                 gather(output, value, -rep, -t) %>%
                 mutate(output = factor(output, levels = which[-match(c("rep", "t"), which)]))
             for(i in rep1) {
@@ -205,10 +205,10 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
             }  
         } else {
             p <- x$runs %>%
-                select(!!which) %>%
+                dplyr::select(!!which) %>%
                 gather(output, value, -rep, -t) %>%
                 group_by(output, t) %>%
-                summarise(median = median(value), value = list(enframe(quantile(value, probs = quant1)))) %>%
+                summarise(median = stats::median(value), value = list(enframe(stats::quantile(value, probs = quant1)))) %>%
                 unnest() 
             p1 <- quant %>%
                 as.data.frame() %>%
@@ -218,7 +218,7 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
                 mutate(name = 100 * name) %>%
                 mutate(name = paste0(name, "%")) %>%
                 inner_join(p, by = "name") %>%
-                select(-name) %>%
+                dplyr::select(-name) %>%
                 spread(output.x, value) %>%
                 mutate(output.y = factor(output.y, levels = which[-match(c("rep", "t"), which)])) %>%
                 mutate(pair = as.character(quant[pair, 2]))
@@ -238,7 +238,7 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
                rep1 <- rep
                repSums <- x$runs %>%
                    dplyr::filter(rep %in% rep1) %>%
-                   select(!!which) %>%
+                   dplyr::select(!!which) %>%
                    gather(output, value, -rep, -t) %>%
                    mutate(output.y = factor(output, levels = levels(p1$output.y)))
                for(i in rep1){

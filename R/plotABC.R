@@ -148,7 +148,7 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
     
     if(type == "post") {
         ## generate colorRamp
-        getPalette <- colorRampPalette(brewer.pal(9, "YlOrRd"))
+        getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(9, "YlOrRd"))
         fillCols <- getPalette(length(x$pars))
         fillCols <- fillCols[as.numeric(gen)]
         
@@ -215,7 +215,7 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
          }
      } else {
         ## generate colorRamp
-        getPalette <- colorRampPalette(brewer.pal(9, "YlGnBu"))
+        getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(9, "YlGnBu"))
         fillCols <- getPalette(length(x$pars))
         fillCols <- fillCols[as.numeric(gen)]
         

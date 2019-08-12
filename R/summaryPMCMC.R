@@ -122,7 +122,7 @@ summary.PMCMC <- function(object, transfunc = NA, ...) {
         ## bind to current posterior samples
         pars <- cbind(pars, temp)
     }
-    summary(as.mcmc(pars))
+    summary(coda::as.mcmc(pars))
 }
     
     

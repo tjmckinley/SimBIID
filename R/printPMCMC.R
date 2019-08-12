@@ -106,7 +106,7 @@ print.PMCMC <- function(x, ...) {
         mutate(temp = ifelse(dist == "gamma", paste0("G(shape = ", p1, ", rate = ", p2, ")"), temp)) %>%
         mutate(temp = ifelse(dist == "norm", paste0("N(mean = ", p1, ", sd = ", p2, ")"), temp)) %>%
         mutate(temp = paste0(parnames, " ~ ", temp)) %>%
-        select(temp)
+        dplyr::select(temp)
     colnames(temp) <- ""
     cat("\nPriors:\n")
     print(temp, row.names = F, col.names = F, quote = F)

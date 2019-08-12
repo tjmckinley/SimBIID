@@ -190,7 +190,7 @@ PMCMC.PMCMC <- function(x, niter = 1000, nprintsum = 100,
     temp <- do.call("PMCMC.default", tempargs)
     
     ## combine with original runs
-    x$pars <- as.mcmc(rbind(as.matrix(x$pars), as.matrix(temp$pars)))
+    x$pars <- coda::as.mcmc(rbind(as.matrix(x$pars), as.matrix(temp$pars)))
     
     ## return new object
     x
@@ -301,7 +301,7 @@ PMCMC.default <- function(
     }
     
     if(class(func) == "XPtr"){
-        checkXPtr(func, "SEXP", c("NumericVector", "double", "double", "IntegerVector",
+        RcppXPtrUtils::checkXPtr(func, "SEXP", c("NumericVector", "double", "double", "IntegerVector",
            "IntegerVector"))
     } else {
         ## check model
@@ -390,7 +390,7 @@ PMCMC.default <- function(
     
     ## convert output into correct format
     colnames(output[[1]]) <- c(orig_priors$parnames, "logPost")
-    output[[1]] <- as.mcmc(output[[1]])
+    output[[1]] <- coda::as.mcmc(output[[1]])
     
     ## finalise output and set names
     output <- c(output[1], list(u), output[-1], list(data), list(orig_priors), list(funcorig))

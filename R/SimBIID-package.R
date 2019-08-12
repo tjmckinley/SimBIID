@@ -11,21 +11,16 @@
 #' @docType package
 #' @name SimBIID-package
 #' @author Trevelyan J. McKinley <t.mckinley@@exeter.ac.uk>
-#' @import stats
 #' @import dplyr
 #' @import purrr
 #' @import tibble
 #' @import ggplot2
 #' @import tidyr
-#' @import mvtnorm
-#' @import grDevices
-#' @import RColorBrewer
-#' @import coda 
 #' @import Rcpp 
-#' @import RcppArmadillo 
-#' @import RcppXPtrUtils
+#' @import RcppArmadillo
 #' @importFrom Rcpp evalCpp
 #' @importFrom graphics plot
+#' @importFrom stats window
 #' @useDynLib SimBIID, .registration = TRUE
 NULL
 

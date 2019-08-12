@@ -127,7 +127,7 @@ print.ABCSMC <- function(x, ...) {
     temp <- x$tols %>%
         as.data.frame() %>%
         mutate(Generation = 1:n()) %>%
-        select(Generation, everything()) %>%
+        dplyr::select(Generation, everything()) %>%
         mutate(ESS = do.call("c", x$ESS))
     cat("\nTolerances:\n")
     print(temp, row.names = F)
@@ -140,7 +140,7 @@ print.ABCSMC <- function(x, ...) {
         mutate(temp = ifelse(dist == "gamma", paste0("G(shape = ", p1, ", rate = ", p2, ")"), temp)) %>%
         mutate(temp = ifelse(dist == "norm", paste0("N(mean = ", p1, ", sd = ", p2, ")"), temp)) %>%
         mutate(temp = paste0(parnames, " ~ ", temp)) %>%
-        select(temp)
+        dplyr::select(temp)
     colnames(temp) <- ""
     cat("\nPriors:\n")
     print(temp, row.names = F, col.names = F, quote = F)

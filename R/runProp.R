@@ -12,7 +12,7 @@ runProp <- function(i, t, priors, prevWeights, prevPars, propCov, tols, data, u,
         } else {
             ## sample from previous generation
             k <- sample(1:length(prevWeights), 1, prob = prevWeights)
-            pars <- rmvnorm(1, 
+            pars <- mvtnorm::rmvnorm(1, 
                             mean = prevPars[k, ], 
                             sigma = propCov
             )
@@ -46,7 +46,7 @@ runProp <- function(i, t, priors, prevWeights, prevPars, propCov, tols, data, u,
             weightsNew[j] <- do.call(priors$ddist[j], list(pars[j], priors$p1[j], priors$p2[j]))
         }
         weightsNew <- prod(weightsNew) / sum(prevWeights * apply(prevPars, 1, function(x, pars, propCov) {
-            dmvnorm(pars, mean = x, sigma = propCov)
+            mvtnorm::dmvnorm(pars, mean = x, sigma = propCov)
         }, pars = pars, propCov = propCov))
     }
     list(pars = pars, out = out, weightsNew = weightsNew, accrate = accrate)

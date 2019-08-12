@@ -1,5 +1,9 @@
 # SimBIID
 
+<!-- badges: start -->
+[![Travis build status](https://travis-ci.org/tjmckinley/SimBIID.svg?branch=master)](https://travis-ci.org/tjmckinley/SimBIID)
+<!-- badges: end -->
+
 R package that implements various simulation-based inference routines for infectious disease models.
 
 Package provides some code to run simulations of state-space models, and then use these in the ABC-SMC algorithm of Toni et al. (2009) and the bootstrap particle filter based particle MCMC algorithm (Andrieu et al., 2010). Also provides functions to plot and summarise the outputs.

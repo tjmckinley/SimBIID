@@ -1,30 +1,32 @@
 Package: SimBIID
-Type: Package
 Title: Simulation-based inference methods for infectious disease models
-Version: 1.0
-Date: 2018-12-19
-Author: TJ McKinley
-Maintainer: TJ McKinley <t.mckinley@exeter.ac.uk>
-Description: Implements various simulation-based inference routines for infectious disease models.
+Version: 0.0.0.9000
+Date: 2019-08-11
+Authors@R: person("Trevelyan J.", "McKinley", email = "t.mckinley@exeter.ac.uk",
+                  role = c("aut", "cre"))
+Description: Package provides some code to run simulations of state-space models, and then
+    use these in the ABC-SMC algorithm of Toni et al. (2009) and the bootstrap particle 
+    filter based particle MCMC algorithm (Andrieu et al., 2010). Also provides functions 
+    to plot and summarise the outputs.
 License: GPL (>= 2)
 Imports:
-    stats,
-    dplyr,
-    purrr,
-    tibble,
-    ggplot2,
-    tidyr,
-    mvtnorm,
-    grDevices,
-    RColorBrewer,
-    Rcpp,
-    RcppArmadillo,
-    RcppXPtrUtils,
-    coda,
-    SimInf
+    stats (>= 3.5.2),
+    dplyr (>= 0.8.3),
+    purrr (>= 0.3.2),
+    tibble (>= 2.1.3),
+    ggplot2 (>= 3.2.0),
+    tidyr (>= 0.8.3),
+    mvtnorm (>= 1.0.11),
+    grDevices (>= 3.5.2),
+    RColorBrewer (>= 1.1.2),
+    Rcpp (>= 1.0.2),
+    RcppArmadillo (>= 0.9.600.4.0),
+    RcppXPtrUtils (>= 0.1.1),
+    coda (>= 0.19.3),
+    SimInf (>= 6.3.0)
 Suggests:
-    parallel,
-    GGally
+    parallel (>= 3.5.2),
+    GGally (>= 1.4.0)
 LinkingTo: 
     Rcpp,
     RcppArmadillo

@@ -1,7 +1,16 @@
 #' @title Runs ABC-SMC algorithm
 #'
-#' @description     Runs ABC-SMC algorithm of Toni et al. (2009) for fitting 
-#'                  infectious disease models to time series count data 
+#' @description Runs ABC-SMC algorithm of Toni et al. (2009) for fitting 
+#'     infectious disease models to time series count data. 
+#'     
+#' @details Runs ABC-SMC algorithm of Toni et al. (2009) for fitting 
+#'     infectious disease models to time series count data. Will sample initial 
+#'     particles from the specified prior distributions and then run a series
+#'     of generations of ABC-SMC. The generations can either be specified with
+#'     a set of fixed tolerances, or by setting the tolerances at each new generation
+#'     as a quantile of the tolerances of the accepted particles at the previous 
+#'     generation. Passing an \code{ABCSMC} object into the \code{ABCSMC()} function
+#'     acts as a continuation method, allowing further generations to be run.
 #'
 #' @export
 #'
@@ -61,6 +70,114 @@
 #' \item{\code{addargs}:}{ a copy of the \code{...} inputs.}
 #' }
 #' @rdname ABCSMC
+#' 
+#' @references Toni T, Welch D, Strelkowa N, Ipsen A and Stumpf MP (2009), 
+#'     "Approximate Bayesian computation scheme for parameter inference and 
+#'     model selection in dynamical systems", 
+#'     Journal of the Royal Society Interface, 6 (31), 187--202.
+#'     
+#' @references McKinley TJ, Cook AR and Deardon R (2009), "Inference in 
+#'     Epidemic Models without Likelihoods", International Journal of Biostatistics,
+#'     5 (1), Article 24.
+#'     
+#' @seealso \code{\link{print.ABCSMC}}, \code{\link{plot.ABCSMC}}, \code{\link{summary.ABCSMC}}
+#'     
+#' @examples 
+#' 
+#' ## set up SIR simulationmodel
+#' transitions <- c(
+#'     "S -> beta * S * I -> I", 
+#'     "I -> gamma * I -> R"
+#' )
+#' compartments <- c("S", "I", "R")
+#' pars <- c("beta", "gamma")
+#' model <- mparseRcpp(
+#'     transitions = transitions, 
+#'     compartments = compartments,
+#'     pars = pars
+#' )
+#' model <- compileRcpp(model)
+#' 
+#' ## generate function to run simulators
+#' ## and return summary statistics
+#' simSIR <- function(pars, data, tols, u, model) {
+#' 
+#'     ## run model
+#'     sims <- model(pars, 0, data[2] + tols[2], u)
+#'     
+#'     ## this returns a vector of the form:
+#'     ## completed (1/0), t, S, I, R (here)
+#'     if(sims[1] == 0) {
+#'         ## if simulation rejected
+#'         return(NA)
+#'     } else {
+#'         ## extract finaltime and finalsize
+#'         finaltime <- sims[2]
+#'         finalsize <- sims[5]
+#'     }
+#'     
+#'     ## return vector if match, else return NA
+#'     if(all(abs(c(finalsize, finaltime) - data) <= tols)){
+#'         return(c(finalsize, finaltime))
+#'     } else {
+#'         return(NA)
+#'     }
+#' }
+#' 
+#' ## set priors
+#' priors <- data.frame(
+#'     parnames = c("beta", "gamma"), 
+#'     dist = rep("gamma", 2), 
+#'     stringsAsFactors = F
+#' )
+#' priors$p1 <- c(10, 10)
+#' priors$p2 <- c(10^4, 10^2)
+#' 
+#' ## define the targeted summary statistics
+#' data <- c(
+#'     finalsize = 30, 
+#'     finaltime = 76
+#' )
+#' 
+#' ## set initial states (1 initial infection 
+#' ## in population of 120)
+#' iniStates <- c(S = 119, I = 1, R = 0)
+#' 
+#' ## set initial tolerances
+#' tols <- c(
+#'     finalsize = 50,
+#'     finaltime = 50
+#' )
+#' 
+#' ## run 2 generations of ABC-SMC
+#' ## setting tolerance to be 50th
+#' ## percentile of the accepted 
+#' ## tolerances at each generation
+#' post <- ABCSMC(
+#'     x = data, 
+#'     priors = priors, 
+#'     func = simSIR, 
+#'     u = iniStates, 
+#'     tols = tols, 
+#'     ptol = 0.2, 
+#'     ngen = 2, 
+#'     npart = 50,
+#'     parallel = T, 
+#'     model = model
+#' )
+#' post
+#' 
+#' ## run one further generation
+#' post <- ABCSMC(post, ptols = 0.5, ngen = 1)
+#' post
+#' summary(post)
+#' 
+#' ## plot posteriors
+#' plot(post)
+#' 
+#' ## plot outputs
+#' plot(post, "output")
+#' 
 
 ABCSMC <- function(x, ...) {
     UseMethod("ABCSMC")

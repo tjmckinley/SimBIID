@@ -1,6 +1,12 @@
 #' @title Produces ABC reference table
 #'
-#' @description Runs ABC reference table
+#' @description Produces ABC reference table.
+#' 
+#' @details Runs simulations for a large number of particles, either pre-specified or
+#'     sampled from the a set of given prior distributions. Returns a table of summary 
+#'     statistics for each particle. Useful for deciding on initial tolerances during an
+#'     ABC-SMC run, or for producing a reference table to use in the ABC with
+#'     Random Forests approach of Raynal et al. (2017).
 #'
 #' @export
 #'
@@ -26,6 +32,53 @@
 #'
 #' @return An \code{data.frame} object with \code{npart} rows, where the first \code{p} columns correspond to 
 #'         the proposed parameters, and the remaining columns correspond to the simulated outputs.
+#'         
+#' @references Raynal, L, Marin J-M, Pudlo P, Ribatet M, Robert CP and Estoup A. (2017), 
+#'     "ABC random forests for Bayesian parameter inference",  
+#'     arXiv1605.05537v4, https://arxiv.org/pdf/1605.05537
+#'         
+#' @examples 
+#' 
+#' ## set up SIR simulation model
+#' transitions <- c(
+#'     "S -> beta * S * I -> I", 
+#'     "I -> gamma * I -> R"
+#' )
+#' compartments <- c("S", "I", "R")
+#' pars <- c("beta", "gamma")
+#' model <- mparseRcpp(
+#'     transitions = transitions, 
+#'     compartments = compartments,
+#'     pars = pars
+#' )
+#' model <- compileRcpp(model)
+#' 
+#' ## generate function to run simulators
+#' ## and produce final epidemic size and time
+#' ## summary statistics
+#' simRef <- function(pars, model) {
+#'     ## run model over a 100 day period with
+#'     ## one initial infective in a population
+#'     ## of 120 individuals
+#'     sims <- model(pars, 0, 100, c(119, 1, 0))
+#'     
+#'     ## return vector of summary statistics
+#'     c(finaltime = sims[2], finalsize = sims[5])
+#' }
+#' 
+#' ## set priors
+#' priors <- data.frame(
+#'     parnames = c("beta", "gamma"), 
+#'     dist = rep("gamma", 2), 
+#'     stringsAsFactors = F
+#' )
+#' priors$p1 <- c(10, 10)
+#' priors$p2 <- c(10^4, 10^2)
+#' 
+#' ## produce reference table by sampling from priors
+#' refTable <- ABCRef(100, priors, func = simRef, sumNames = c("finaltime", "finalsize"))
+#' refTable
+#' 
 
 ABCRef <- function(npart, priors, pars, func, sumNames, parallel = F, mc.cores = NA, ...) {
     

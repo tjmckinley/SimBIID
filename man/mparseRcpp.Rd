@@ -75,6 +75,42 @@ An object of class \code{SimBIID_model}, which is essentially a \code{list}
 }
 \description{
 Parse custom model using \code{SimInf} style markup.
-Does not have full functionality of \code{mparse}. Currently only supports
-simulations on a single node.
+    Does not have full functionality of \code{mparse}. Currently only supports
+    simulations on a single node.
+}
+\details{
+Uses a \code{SimInf} style markup to create compartmental state-space
+    written using \code{Rcpp}. A helper \code{run} function exists to compile 
+    and run the model. Another helper function, \code{compileRcpp},
+    can compile the model to produce a function that can be run directly from R, 
+    or compiled into an external pointer (using the \code{RcppXPtrUtils} package).
+}
+\examples{
+
+## set up SIR simulation model
+transitions <- c(
+    "S -> beta * S * I -> I", 
+    "I -> gamma * I -> R"
+)
+compartments <- c("S", "I", "R")
+pars <- c("beta", "gamma")
+model <- mparseRcpp(
+    transitions = transitions, 
+    compartments = compartments,
+    pars = pars
+)
+
+## compile and run model
+sims <- run(
+    model = model,
+    pars = c(beta = 0.001, gamma = 0.1),
+    tstart = 0,
+    tstop = 100,
+    u = c(S = 119, I = 1, R = 0)
+)
+sims
+
+}
+\seealso{
+\code{\link{run}}, \code{\link{compileRcpp}}, \code{\link{print.SimBIID_model}}
 }

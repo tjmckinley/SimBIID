@@ -6,8 +6,42 @@
 #' @param ...           Not used here.
 #'
 #' @return Summary outputs printed to the screen.
+#'  
+#' @method print SimBIID_runs
+#' 
+#' @seealso \code{\link{mparseRcpp}}, \code{\link{plot.SimBIID_runs}}, \code{\link{run}}
 #' 
 #' @export
+#' 
+#' @examples 
+#' 
+#' ## set up SIR simulation model
+#' transitions <- c(
+#'     "S -> beta * S * I -> I", 
+#'     "I -> gamma * I -> R"
+#' )
+#' compartments <- c("S", "I", "R")
+#' pars <- c("beta", "gamma")
+#' model <- mparseRcpp(
+#'     transitions = transitions, 
+#'     compartments = compartments,
+#'     pars = pars,
+#'     tspan = T
+#' )
+#' 
+#' ## run 100 replicate simulations and
+#' ## plot outputs
+#' sims <- run(
+#'     model = model,
+#'     pars = c(beta = 0.001, gamma = 0.1),
+#'     tstart = 0,
+#'     tstop = 100,
+#'     u = c(S = 119, I = 1, R = 0),
+#'     tspan = seq(1, 100, length.out = 10),
+#'     nrep = 100
+#' )
+#' sims
+#' 
 
 print.SimBIID_runs <- function(x, ...) {
     cat(paste("'SimBIID_runs' object with n =", nrow(x$sums), "replicates.\n"))

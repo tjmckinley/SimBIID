@@ -15,5 +15,5 @@ and the bootstrap particle filter based particle MCMC algorithm (Andrieu et al.,
 Also provides functions to plot and summarise the outputs.
 }
 \author{
-TJ McKinley <t.mckinley@exeter.ac.uk>
+Trevelyan J. McKinley <t.mckinley@exeter.ac.uk>
 }

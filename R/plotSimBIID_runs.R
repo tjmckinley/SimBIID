@@ -20,8 +20,44 @@
 #' @return A plot of individual simulations and/or summaries of repeated simulations 
 #'         extracted from \code{SimBIID_runs} object.
 #'  
-#' @method plot SimBIID_runs       
+#' @method plot SimBIID_runs 
+#' 
+#' @seealso \code{\link{mparseRcpp}}, \code{\link{print.SimBIID_runs}}, \code{\link{run}} 
+#'      
 #' @export
+#' 
+#' @examples 
+#' 
+#' ## set up SIR simulation model
+#' transitions <- c(
+#'     "S -> beta * S * I -> I", 
+#'     "I -> gamma * I -> R"
+#' )
+#' compartments <- c("S", "I", "R")
+#' pars <- c("beta", "gamma")
+#' model <- mparseRcpp(
+#'     transitions = transitions, 
+#'     compartments = compartments,
+#'     pars = pars,
+#'     tspan = T
+#' )
+#' 
+#' ## run 100 replicate simulations and
+#' ## plot outputs
+#' sims <- run(
+#'     model = model,
+#'     pars = c(beta = 0.001, gamma = 0.1),
+#'     tstart = 0,
+#'     tstop = 100,
+#'     u = c(S = 119, I = 1, R = 0),
+#'     tspan = seq(1, 100, length.out = 10),
+#'     nrep = 100
+#' )
+#' plot(sims, quant = c(0.5, 0.75, 0.9))
+#' 
+#' ## add replicate 1 to plot
+#' plot(sims, quant = c(0.5, 0.75, 0.9), rep = 1)
+#' 
 
 plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums"), 
                               rep = NA, quant = 0.9, data = NULL, matchData = NULL, ...) {

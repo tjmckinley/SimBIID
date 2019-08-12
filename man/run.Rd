@@ -46,6 +46,68 @@ An object of class \code{SimBIID_run}, essentially a list
 Wrapper function that compiles (if necessary) and runs
              a \code{SimBIID_model} object. Returns results in a 
              user-friendly manner as a \code{SimBIID_run} object, 
-             for which \code{summary()} and \code{plot()} generics 
+             for which \code{print()} and \code{plot()} generics 
              are provided.
+}
+\examples{
+
+## set up SIR simulation model
+transitions <- c(
+    "S -> beta * S * I -> I", 
+    "I -> gamma * I -> R"
+)
+compartments <- c("S", "I", "R")
+pars <- c("beta", "gamma")
+model <- mparseRcpp(
+    transitions = transitions, 
+    compartments = compartments,
+    pars = pars
+)
+
+## compile and run model
+sims <- run(
+    model = model,
+    pars = c(beta = 0.001, gamma = 0.1),
+    tstart = 0,
+    tstop = 100,
+    u = c(S = 119, I = 1, R = 0)
+)
+sims
+
+## add tspan option to return
+## time series counts at different
+## time points
+model <- mparseRcpp(
+    transitions = transitions, 
+    compartments = compartments,
+    pars = pars,
+    tspan = T
+)
+sims <- run(
+    model = model,
+    pars = c(beta = 0.001, gamma = 0.1),
+    tstart = 0,
+    tstop = 100,
+    u = c(S = 119, I = 1, R = 0),
+    tspan = seq(1, 100, length.out = 10)
+)
+sims
+
+## run 100 replicate simulations and
+## plot outputs
+sims <- run(
+    model = model,
+    pars = c(beta = 0.001, gamma = 0.1),
+    tstart = 0,
+    tstop = 100,
+    u = c(S = 119, I = 1, R = 0),
+    tspan = seq(1, 100, length.out = 10),
+    nrep = 100
+)
+sims
+plot(sims)
+
+}
+\seealso{
+\code{\link{mparseRcpp}}, \code{\link{print.SimBIID_runs}}, \code{\link{plot.SimBIID_runs}}
 }

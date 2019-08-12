@@ -23,8 +23,9 @@
 #' @seealso \code{\link{ABCSMC}}, \code{\link{print.ABCSMC}}, \code{\link{summary.ABCSMC}}
 #'     
 #' @examples 
+#' \dontrun{
 #' 
-#' ## set up SIR simulationmodel
+#' ## set up SIR simulation model
 #' transitions <- c(
 #'     "S -> beta * S * I -> I", 
 #'     "I -> gamma * I -> R"
@@ -117,6 +118,7 @@
 #' 
 #' ## plot outputs
 #' plot(post, "output")
+#' }
 #' 
 
 plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, transfunc = NA, ...) {

@@ -14,7 +14,7 @@
 #' @export
 #' 
 #' @examples 
-#' 
+#' \dontrun{
 #' ## set up SIR simulation model
 #' transitions <- c(
 #'     "S -> beta * S * I -> I", 
@@ -41,6 +41,7 @@
 #'     nrep = 100
 #' )
 #' sims
+#' }
 #' 
 
 print.SimBIID_runs <- function(x, ...) {

@@ -26,7 +26,7 @@ A \code{data.frame} with weighted posterior means and variances.
 Summary method for \code{ABCSMC} objects.
 }
 \examples{
-
+\dontrun{
 ## set up SIR simulationmodel
 transitions <- c(
     "S -> beta * S * I -> I", 
@@ -120,6 +120,7 @@ plot(post)
 
 ## plot outputs
 plot(post, "output")
+}
 
 }
 \seealso{

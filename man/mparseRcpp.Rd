@@ -86,6 +86,7 @@ Uses a \code{SimInf} style markup to create compartmental state-space
     or compiled into an external pointer (using the \code{RcppXPtrUtils} package).
 }
 \examples{
+\dontrun{
 
 ## set up SIR simulation model
 transitions <- c(
@@ -109,6 +110,7 @@ sims <- run(
     u = c(S = 119, I = 1, R = 0)
 )
 sims
+}
 
 }
 \seealso{

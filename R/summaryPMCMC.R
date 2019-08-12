@@ -19,7 +19,7 @@
 #'     \code{\link{window.PMCMC}}
 #' 
 #' @examples 
-#' 
+#' \dontrun{
 #' ## set up data to pass to PMCMC
 #' flu_dat <- data.frame(
 #'     t = 1:14,
@@ -90,6 +90,7 @@
 #' 
 #' ## summarise posteriors
 #' summary(post)
+#' }
 #' 
 
 summary.PMCMC <- function(object, transfunc = NA, ...) {

@@ -18,7 +18,7 @@ Summary outputs printed to the screen.
 Print method for \code{SimBIID_runs} objects.
 }
 \examples{
-
+\dontrun{
 ## set up SIR simulation model
 transitions <- c(
     "S -> beta * S * I -> I", 
@@ -45,6 +45,7 @@ sims <- run(
     nrep = 100
 )
 sims
+}
 
 }
 \seealso{

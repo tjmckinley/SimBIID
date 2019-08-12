@@ -32,6 +32,7 @@ A plot of the (approximate) posterior distributions from the particle MCMC algor
 Plot method for \code{PMCMC} objects.
 }
 \examples{
+\dontrun{
 
 ## set up data to pass to PMCMC
 flu_dat <- data.frame(
@@ -103,6 +104,7 @@ post <- window(post, start = 5000)
 
 ## summarise posteriors
 summary(post)
+}
 
 }
 \seealso{

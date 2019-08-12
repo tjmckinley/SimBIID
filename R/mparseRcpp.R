@@ -78,6 +78,7 @@
 #' @seealso \code{\link{run}}, \code{\link{compileRcpp}}, \code{\link{print.SimBIID_model}}
 #' 
 #' @examples 
+#' \dontrun{
 #' 
 #' ## set up SIR simulation model
 #' transitions <- c(
@@ -101,6 +102,7 @@
 #'     u = c(S = 119, I = 1, R = 0)
 #' )
 #' sims
+#' }
 #' 
 
 mparseRcpp <- function(

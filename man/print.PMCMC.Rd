@@ -18,7 +18,7 @@ Summary outputs printed to the screen.
 Print method for \code{PMCMC} objects.
 }
 \examples{
-
+\dontrun{
 ## set up data to pass to PMCMC
 flu_dat <- data.frame(
     t = 1:14,
@@ -89,6 +89,7 @@ post <- window(post, start = 5000)
 
 ## summarise posteriors
 summary(post)
+}
 
 }
 \seealso{

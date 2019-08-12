@@ -24,6 +24,7 @@
 #'     \code{\link{window.PMCMC}}
 #' 
 #' @examples 
+#' \dontrun{
 #' 
 #' ## set up data to pass to PMCMC
 #' flu_dat <- data.frame(
@@ -95,6 +96,7 @@
 #' 
 #' ## summarise posteriors
 #' summary(post)
+#' }
 #' 
 
 plot.PMCMC <- function(x, type = c("post", "trace"), joint = F, transfunc = NA, ask = T, ...) {

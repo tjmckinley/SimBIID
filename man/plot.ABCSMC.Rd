@@ -32,8 +32,9 @@ A plot of the ABC posterior distributions for different generations, or the dist
 Plot method for \code{ABCSMC} objects.
 }
 \examples{
+\dontrun{
 
-## set up SIR simulationmodel
+## set up SIR simulation model
 transitions <- c(
     "S -> beta * S * I -> I", 
     "I -> gamma * I -> R"
@@ -126,6 +127,7 @@ plot(post)
 
 ## plot outputs
 plot(post, "output")
+}
 
 }
 \seealso{

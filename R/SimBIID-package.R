@@ -24,8 +24,8 @@
 #' @import Rcpp 
 #' @import RcppArmadillo 
 #' @import RcppXPtrUtils
-#' @import SimInf
 #' @importFrom Rcpp evalCpp
+#' @importFrom graphics plot
 #' @useDynLib SimBIID, .registration = TRUE
 NULL
 

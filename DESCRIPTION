@@ -8,7 +8,7 @@ Description: Package provides some code to run simulations of state-space models
     use these in the ABC-SMC algorithm of Toni et al. (2009) and the bootstrap particle 
     filter based particle MCMC algorithm (Andrieu et al., 2010). Also provides functions 
     to plot and summarise the outputs.
-License: GPL (>= 2)
+License: GPL (>= 3) + file LICENSE
 Imports:
     stats (>= 3.5.2),
     dplyr (>= 0.8.3),

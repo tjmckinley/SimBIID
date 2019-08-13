@@ -1,0 +1,17 @@
+An object of class: 'ABCSMC'
+Consists of 3 generations with 2 parameters.
+
+Data:
+finalsize finaltime 
+       30        76 
+
+Tolerances:
+ Generation finalsize finaltime      ESS
+          1        50 50.000000 50.00000
+          2        18 12.355820 40.67079
+          3        10  5.816974 40.54504
+
+Priors:
+                                   
+ beta ~ G(shape = 10, rate = 10000)
+  gamma ~ G(shape = 10, rate = 100)

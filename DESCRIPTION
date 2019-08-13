@@ -25,7 +25,8 @@ Imports:
     coda (>= 0.19.3)
 Suggests:
     parallel (>= 3.5.2),
-    GGally (>= 1.4.0)
+    GGally (>= 1.4.0),
+    testthat (>= 2.1.0)
 LinkingTo: 
     Rcpp,
     RcppArmadillo

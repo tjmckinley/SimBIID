@@ -1,0 +1,17 @@
+'SimBIID_runs' object with n = 1001 replicates.
+
+Summaries of outputs at final time point:
+   completed            t                S               I          
+ Min.   :0.0000   Min.   : 3.000   Min.   :  0.0   Min.   :  0.000  
+ 1st Qu.:0.0000   1st Qu.: 8.437   1st Qu.: 58.0   1st Qu.:  0.000  
+ Median :1.0000   Median :10.611   Median :192.0   Median :  0.000  
+ Mean   :0.7163   Mean   :10.544   Mean   :270.1   Mean   :  4.945  
+ 3rd Qu.:1.0000   3rd Qu.:14.000   3rd Qu.:420.0   3rd Qu.:  0.000  
+ Max.   :1.0000   Max.   :14.000   Max.   :761.0   Max.   :223.000  
+       R                R1             Robs        
+ Min.   :  0.00   Min.   :  0.0   Min.   :  0.000  
+ 1st Qu.:  0.00   1st Qu.:325.0   1st Qu.:  0.000  
+ Median :  0.00   Median :550.0   Median :  0.000  
+ Mean   :  9.38   Mean   :474.5   Mean   :  9.479  
+ 3rd Qu.:  1.00   3rd Qu.:667.0   3rd Qu.:  0.000  
+ Max.   :610.00   Max.   :809.0   Max.   :617.000  

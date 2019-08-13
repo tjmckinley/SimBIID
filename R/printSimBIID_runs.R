@@ -56,7 +56,7 @@ print.SimBIID_runs <- function(x, ...) {
             cat("\nTime-series counts:\n")
             x$runs %>%
                 dplyr::select(-rep) %>%
-                as.tibble() %>%
+                as_tibble() %>%
                 print()
         }
     } else {

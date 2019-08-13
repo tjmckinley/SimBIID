@@ -208,7 +208,7 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
                 dplyr::select(!!which) %>%
                 gather(output, value, -rep, -t) %>%
                 group_by(output, t) %>%
-                summarise(median = stats::median(value), value = list(enframe(stats::quantile(value, probs = quant1)))) %>%
+                summarise(med = stats::median(value), value = list(enframe(stats::quantile(value, probs = quant1)))) %>%
                 unnest() 
             p1 <- quant %>%
                 as.data.frame() %>%
@@ -246,16 +246,16 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
                    p <- p + geom_line(aes(x = t, y = value), data = temp)
                }
            }
-           p <- p + geom_line(aes(y = median), colour = "red") +
+           p <- p + geom_line(aes(y = med), colour = "red") +
                facet_wrap(~ output.y) +
                labs(title = paste0("Intervals = ", paste0(paste0(rev(quant[, 2]) * 100, "%"), collapse = ", ")))
            
            ## add observed data if specified
            if(!is.null(data[1])){
                data <- data %>%
-                   rename(output.y = output, median = value)
+                   rename(output.y = output, med = value)
                if(any(simNames %in% which)) {
-                    p <- p + geom_line(aes(x = t, y = median), data = data, linetype = "dashed")
+                    p <- p + geom_line(aes(x = t, y = med), data = data, linetype = "dashed")
                }
            }  
         }

@@ -1,5 +1,5 @@
 Package: SimBIID
-Title: Simulation-based inference methods for infectious disease models
+Title: Simulation-Based Inference Methods for Infectious Disease Models
 Version: 0.0.0.9000
 Date: 2019-08-11
 Authors@R: person("Trevelyan J.", "McKinley", email = "t.mckinley@exeter.ac.uk",

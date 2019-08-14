@@ -2,8 +2,11 @@
 
 language: R
 cache: packages
-addons:
-   apt:
-     packages:
-       - libgsl0-dev # for SimInf
-    
+warnings_are_errors: true
+
+matrix:
+  include:
+    - r: oldrel
+    - r: release
+    - r: devel
+    - os: osx

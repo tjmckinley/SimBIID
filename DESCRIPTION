@@ -4,8 +4,8 @@ Version: 0.0.0.9000
 Authors@R: person("Trevelyan J.", "McKinley", email = "t.mckinley@exeter.ac.uk",
                   role = c("aut", "cre"))
 Description: Package provides some code to run simulations of state-space models, and then
-    use these in the ABC-SMC algorithm of Toni et al. (2009) and the bootstrap particle 
-    filter based particle MCMC algorithm (Andrieu et al., 2010). Also provides functions 
+    use these in the ABC-SMC algorithm of Toni et al. (2009) and the bootstrap particle
+    filter based particle MCMC algorithm (Andrieu et al., 2010). Also provides functions
     to plot and summarise the outputs.
 License: GPL (>= 3)
 Imports:
@@ -26,7 +26,7 @@ Suggests:
     parallel (>= 3.5.2),
     GGally (>= 1.4.0),
     testthat (>= 2.1.0)
-LinkingTo: 
+LinkingTo:
     Rcpp,
     RcppArmadillo
 RoxygenNote: 6.1.1

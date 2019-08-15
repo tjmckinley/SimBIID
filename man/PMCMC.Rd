@@ -48,8 +48,8 @@ then this function must take the following arguments in order:
 \item{\code{NumericVector pars}:}{ a vector of parameters;}
 \item{\code{double tstart}:}{ the start time;}
 \item{\code{double tstop}:}{ the end time;}
-\item{\code{IntegerVector u}:}{ a vector of states;}
-\item{\code{IntegerVector counts}:}{ a vector of observed counts at \code{tstop}}.}}
+\item{\code{IntegerVector u}:}{ a vector of states at time \code{tstart};}
+\item{\code{IntegerVector counts}:}{ a vector of observed counts at \code{tstop}.}}}
 
 \item{u}{A named vector of initial states.}
 

@@ -26,8 +26,8 @@
 #'                      \item{\code{NumericVector pars}:}{ a vector of parameters;}
 #'                      \item{\code{double tstart}:}{ the start time;}
 #'                      \item{\code{double tstop}:}{ the end time;}
-#'                      \item{\code{IntegerVector u}:}{ a vector of states;}
-#'                      \item{\code{IntegerVector counts}:}{ a vector of observed counts at \code{tstop}}.}
+#'                      \item{\code{IntegerVector u}:}{ a vector of states at time \code{tstart};}
+#'                      \item{\code{IntegerVector counts}:}{ a vector of observed counts at \code{tstop}.}}
 #' @param u             A named vector of initial states.
 #' @param npart         An integer specifying the number of particles for the bootstrap particle filter.
 #' @param iniPars       A named vector of initial values for the parameters of the model. If left unspecified, 

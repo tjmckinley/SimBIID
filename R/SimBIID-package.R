@@ -17,7 +17,6 @@
 #' @import ggplot2
 #' @import tidyr
 #' @import Rcpp 
-#' @import RcppArmadillo
 #' @importFrom Rcpp evalCpp
 #' @importFrom graphics plot
 #' @importFrom stats window

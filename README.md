@@ -3,6 +3,8 @@
 <!-- badges: start -->
 [![Travis build status](https://travis-ci.org/tjmckinley/SimBIID.svg?branch=master)](https://travis-ci.org/tjmckinley/SimBIID)
 <!-- badges: end -->
+[![Lifecycle:experimental](https://img.shields.io/badge/lifecycle-experimental-blue.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![CRAN Status](https://www.r-pkg.org/badges/version/SimBIID)](https://cran.r-project.org/package=SimBIID)
 
 R package that implements various simulation-based inference routines for infectious disease models.
 

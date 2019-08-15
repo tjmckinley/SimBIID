@@ -11,23 +11,23 @@ Description: Package provides some code to run simulations of state-space models
     to plot and summarise the outputs.
 License: GPL (>= 3)
 Imports:
-    stats (>= 3.5.2),
-    dplyr (>= 0.8.3),
-    purrr (>= 0.3.2),
-    tibble (>= 2.1.3),
-    ggplot2 (>= 3.2.0),
-    tidyr (>= 0.8.3),
-    mvtnorm (>= 1.0.11),
-    grDevices (>= 3.5.2),
-    RColorBrewer (>= 1.1.2),
-    Rcpp (>= 1.0.2),
-    RcppArmadillo (>= 0.9.600.4.0),
-    RcppXPtrUtils (>= 0.1.1),
-    coda (>= 0.19.3)
+    stats,
+    dplyr,
+    purrr,
+    tibble,
+    ggplot2,
+    tidyr,
+    mvtnorm,
+    grDevices,
+    RColorBrewer,
+    Rcpp,
+    RcppArmadillo,
+    RcppXPtrUtils,
+    coda
 Suggests:
-    parallel (>= 3.5.2),
-    GGally (>= 1.4.0),
-    testthat (>= 2.1.0)
+    parallel,
+    GGally,
+    testthat
 LinkingTo:
     Rcpp,
     RcppArmadillo

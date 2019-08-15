@@ -10,6 +10,7 @@ Description: Package provides some code to run simulations of state-space models
     filter based particle MCMC algorithm (Andrieu et al., 2010). Also provides functions
     to plot and summarise the outputs.
 License: GPL (>= 3)
+Depends: R (>= 3.5)
 Imports:
     stats,
     dplyr,

@@ -19,7 +19,7 @@ Compiles an object of class \code{SimBIID_model} into an
              object of class \code{function} for calling directly from R.
 }
 \examples{
-
+\dontrun{
 ## set up SIR simulationmodel
 transitions <- c(
     "S -> beta * S * I -> I", 
@@ -46,6 +46,7 @@ pars <- c(beta = 0.001, gamma = 0.1)
 
 ## run compiled model
 model(pars, 0, 100, iniStates)
+}
 
 }
 \seealso{

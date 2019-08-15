@@ -50,7 +50,7 @@ Wrapper function that compiles (if necessary) and runs
              are provided.
 }
 \examples{
-
+\dontrun{
 ## set up SIR simulation model
 transitions <- c(
     "S -> beta * S * I -> I", 
@@ -106,7 +106,7 @@ sims <- run(
 )
 sims
 plot(sims)
-
+}
 }
 \seealso{
 \code{\link{mparseRcpp}}, \code{\link{print.SimBIID_runs}}, \code{\link{plot.SimBIID_runs}}

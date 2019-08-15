@@ -36,7 +36,7 @@
 #' @seealso \code{\link{mparseRcpp}}, \code{\link{print.SimBIID_runs}}, \code{\link{plot.SimBIID_runs}}
 #' 
 #' @examples 
-#' 
+#' \dontrun{
 #' ## set up SIR simulation model
 #' transitions <- c(
 #'     "S -> beta * S * I -> I", 
@@ -92,7 +92,7 @@
 #' )
 #' sims
 #' plot(sims)
-#' 
+#' }
 
 run <- function(
     model,

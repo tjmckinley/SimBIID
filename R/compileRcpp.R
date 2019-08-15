@@ -14,7 +14,7 @@
 #' @seealso \code{\link{mparseRcpp}}
 #'         
 #' @examples 
-#' 
+#' \dontrun{
 #' ## set up SIR simulationmodel
 #' transitions <- c(
 #'     "S -> beta * S * I -> I", 
@@ -41,6 +41,7 @@
 #' 
 #' ## run compiled model
 #' model(pars, 0, 100, iniStates)
+#' }
 #' 
 
 compileRcpp <- function(model) {

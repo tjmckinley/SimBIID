@@ -69,7 +69,8 @@ Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, t
     
     ## reset incidence if using particle filter
     if(incidence & !is.null(matchCrit)) {
-        resetInc <- c("", paste0(paste(rep(" ", 4), collapse = ""), "if(tstart > 0.0) {"))
+        resetInc <- c("", paste0(paste(rep(" ", 4), collapse = ""), "// reset incidence values if new time point"))
+        resetInc <- c(resetInc, paste0(paste(rep(" ", 4), collapse = ""), "if(tstart > 0.0) {"))
         resetInc <- c(resetInc, paste0(paste(rep(" ", 8), collapse = ""), "for(i = (int) (u.size() / 2); i < u.size(); i++) {"))
         resetInc <- c(resetInc, paste0(paste(rep(" ", 12), collapse = ""), "u[i] = 0;"))
         resetInc <- c(resetInc, paste0(paste(rep(" ", 8), collapse = ""), "}"))
@@ -164,7 +165,7 @@ Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, t
             checkTspan,
             "",
             paste0(tempSpace, "// update tspan"), 
-            paste0(tempSpace, "k = 0;"), 
+            paste0(tempSpace, "int k = 0;"), 
             upTspan, 
             Rcpp_code[(currline + 1):length(Rcpp_code)]
         )

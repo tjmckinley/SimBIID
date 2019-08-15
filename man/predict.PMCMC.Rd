@@ -22,7 +22,7 @@ A \code{SimBIID_runs} object.
 Predict method for \code{PMCMC} objects.
 }
 \examples{
-
+\dontrun{
 ## set up data to pass to PMCMC
 flu_dat <- data.frame(
     t = 1:14,
@@ -87,6 +87,7 @@ post_pred <- predict(
 
 ## plot predictions
 plot(post_pred, quant = c(0.6, 0.75, 0.95))
+}
 
 }
 \seealso{

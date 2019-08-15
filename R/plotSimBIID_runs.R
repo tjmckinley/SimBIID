@@ -27,7 +27,7 @@
 #' @export
 #' 
 #' @examples 
-#' 
+#' \dontrun{
 #' ## set up SIR simulation model
 #' transitions <- c(
 #'     "S -> beta * S * I -> I", 
@@ -57,6 +57,7 @@
 #' 
 #' ## add replicate 1 to plot
 #' plot(sims, quant = c(0.55, 0.75, 0.9), rep = 1)
+#' }
 #' 
 
 plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums"), 

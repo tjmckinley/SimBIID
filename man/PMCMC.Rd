@@ -100,7 +100,7 @@ Function runs a particle MCMC algorithm using a bootstrap particle filter for a 
                      \code{plot()}, \code{predict()} and \code{window()} methods.
 }
 \examples{
-
+\dontrun{
 ## set up data to pass to PMCMC
 flu_dat <- data.frame(
     t = 1:14,
@@ -171,6 +171,7 @@ post <- window(post, start = 5000)
 
 ## summarise posteriors
 summary(post)
+}
 
 }
 \references{

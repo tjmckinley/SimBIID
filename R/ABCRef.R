@@ -38,7 +38,7 @@
 #'     arXiv1605.05537v4, https://arxiv.org/pdf/1605.05537
 #'         
 #' @examples 
-#' 
+#' \dontrun{
 #' ## set up SIR simulation model
 #' transitions <- c(
 #'     "S -> beta * S * I -> I", 
@@ -85,6 +85,7 @@
 #'     model = model
 #' )
 #' refTable
+#' }
 #' 
 
 ABCRef <- function(npart, priors, pars, func, sumNames, parallel = F, mc.cores = NA, ...) {

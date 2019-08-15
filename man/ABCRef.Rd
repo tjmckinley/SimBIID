@@ -50,7 +50,7 @@ Runs simulations for a large number of particles, either pre-specified or
     Random Forests approach of Raynal et al. (2017).
 }
 \examples{
-
+\dontrun{
 ## set up SIR simulation model
 transitions <- c(
     "S -> beta * S * I -> I", 
@@ -97,6 +97,7 @@ refTable <- ABCRef(
     model = model
 )
 refTable
+}
 
 }
 \references{

@@ -17,7 +17,7 @@
 #'     \code{\link{window.PMCMC}}
 #' 
 #' @examples 
-#' 
+#' \dontrun{
 #' ## set up data to pass to PMCMC
 #' flu_dat <- data.frame(
 #'     t = 1:14,
@@ -82,6 +82,7 @@
 #' 
 #' ## plot predictions
 #' plot(post_pred, quant = c(0.6, 0.75, 0.95))
+#' }
 #' 
 
 predict.PMCMC <- function(object, tspan, npart = 50, ...) {

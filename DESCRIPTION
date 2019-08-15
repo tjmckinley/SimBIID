@@ -21,7 +21,6 @@ Imports:
     grDevices,
     RColorBrewer,
     Rcpp,
-    RcppArmadillo,
     RcppXPtrUtils,
     coda
 Suggests:

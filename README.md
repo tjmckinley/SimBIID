@@ -6,11 +6,13 @@
 [![CRAN Status](https://www.r-pkg.org/badges/version/SimBIID)](https://cran.r-project.org/package=SimBIID)
 <!-- badges: end -->
 
-R package that implements various simulation-based inference routines for infectious disease models.
+R package that implements various simulation-based inference routines for infectious disease models. At the current time it is mainly used for education purposes.
 
 Package provides some code to run simulations of state-space models, and then use these in the ABC-SMC algorithm of Toni et al. (2009) and the bootstrap particle filter based particle MCMC algorithm (Andrieu et al., 2010). Also provides functions to plot and summarise the outputs.
 
-## Install compilers
+A detailed vignette is provided at: [https://tjmckinley.github.io/SimBIID_tutorial/](https://tjmckinley.github.io/SimBIID_tutorial/)
+
+## To install development version of package
 
 The package depends on the `Rcpp` and `RcppArmadillo` packages, which require the installation of the correct C++ compilers. The guidance below is taken from Sections 2.1.1, 2.1.2 or 2.1.3 here:
 

@@ -5,7 +5,7 @@
 arma::mat cholArma(arma::mat sigma, double *scale)
 {
     bool success = false;
-    int j = 0, k = 0;
+    int j = 0;
     arma::mat cholSigma (sigma.n_rows, sigma.n_cols);
     while(success == false && j < 20) {
         success = arma::chol(cholSigma, sigma);

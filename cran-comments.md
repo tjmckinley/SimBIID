@@ -12,9 +12,15 @@ There were no ERRORs or WARNINGs.
 There was 1 NOTE:
 
 * Maintainer: 'Trevelyan J. McKinley <t.mckinley@exeter.ac.uk>'
-  New submission
-  
-This arises since it's a new submission to CRAN.
+   New submission
+     Andrieu (10:43)
+     al (9:51, 10:54)
+     SMC (9:26)
+     et (9:48, 10:51)
+   Possibly mis-spelled words in DESCRIPTION:
+   
+This arises since it's a new submission to CRAN, and the highlighted words
+are not mispelled.
 
 ## Downstream dependencies
 There are currently no downstream dependencies for this package.

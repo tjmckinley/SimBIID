@@ -233,7 +233,16 @@ PMCMC.default <- function(
     checkInput(data$t, "numeric")
     for(j in 2:ncol(data)) {
         checkInput(data[, j, drop = T], "numeric", int = T)
-    }   
+    }  
+    ## check time periods start at zero
+    if(data$t[1] <= 0) {
+        ## PROTECTS IN CASE INCIDENCE CURVES ARE SET IN SimBIID_model
+        ## (since it resets each time that tstart > 0.0)
+        stop("First time point in data set must be greater than zero for time being.")
+    }
+    ## append time zero to ensure bootstrap filter works
+    data <- rbind(data[1, ], data)
+    data[1, ] <- 0
     
     ## check priors 
     checkInput(priors, "data.frame", ncol = 4)
@@ -394,7 +403,7 @@ PMCMC.default <- function(
     output[[1]] <- coda::as.mcmc(output[[1]])
     
     ## finalise output and set names
-    output <- c(output[1], list(u), output[-1], list(data), list(orig_priors), list(funcorig))
+    output <- c(output[1], list(u), output[-1], list(data[-1, , drop = F]), list(orig_priors), list(funcorig))
     names(output) <- c("pars", "u", "accrate", "npart", "time", "propVar", "data", "priors", "func")
         
     ## export class and object

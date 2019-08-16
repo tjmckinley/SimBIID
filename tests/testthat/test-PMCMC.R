@@ -51,7 +51,7 @@ test_that("PMCMC works", {
         func = model,
         u = iniStates,
         npart = 75,
-        niter = 10000,
+        niter = 5000,
         nprintsum = 1000
     )
     ## file to save results
@@ -61,7 +61,7 @@ test_that("PMCMC works", {
 
     ## run predictions forward in time
     post_pred <- predict(
-        window(post, start = 2000, thin = 8),
+        window(post, start = 2000, thin = 3),
         tspan = 4:14
     )
     ## file to save results

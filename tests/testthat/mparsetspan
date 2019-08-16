@@ -2,7 +2,7 @@ Rcpp_object <- Rcpp::cppFunction('List simFunction(NumericVector pars, double ts
 
     // initialise variables
     double tstar = 0.0, u_tmp = 0.0, totrate = 0.0, cumrate = 0.0;
-    int i, j, k, l;
+    int i = 0;
     
     // initialise time and rates of the system
     double t = tstart;
@@ -48,7 +48,7 @@ Rcpp_object <- Rcpp::cppFunction('List simFunction(NumericVector pars, double ts
     }
 
     // update tspan
-    k = 0;
+    int k = 0;
     while(tspan[k] < t && k < tspan.size()) {
         out(k, 0) = NA_REAL;
         out(k, 1) = tspan[k];

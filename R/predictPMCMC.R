@@ -110,7 +110,7 @@ predict.PMCMC <- function(object, tspan, npart = 50, ...) {
     ## extract parameters and remove extraneous columns
     pars <- as.matrix(object$pars) %>%
         as.data.frame() %>%
-        select_(.dots = object$func$pars) %>%
+        select(one_of(object$func$pars)) %>%
         as.matrix()
     
     ## run bootstrap filter to get states at each time point of the dataset

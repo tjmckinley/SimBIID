@@ -36,7 +36,7 @@ Install gcc and related packages.
 
 In Ubuntu Linux, execute the command `sudo apt-get install r-base-dev` in a Terminal.
 
-## Install package
+### Install package
 
 Once the compilers have been installed, then install the `devtools` package in R and run:
 

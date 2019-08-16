@@ -5,3 +5,9 @@
 ^cran-comments.md$
 ^README.md$
 ^NEWS.md$
+^SimBIID-Ex_i386.Rout$
+^SimBIID-Ex_x64.Rout$
+^examples_i386$
+^examples_x64$
+^tests_i386$
+^tests_x64$

@@ -9,7 +9,7 @@
 #' \describe{
 #'   \item{time}{days from 1st January 1995}
 #'   \item{clin_signs}{number of new clinical cases at each day}
-#'   \item{removal}{number of new removals at each day}
+#'   \item{removals}{number of new removals at each day}
 #' }
 #' @source Khan AS et al. (1999), "The reemergence of Ebola Hemorrhagic Fever, Democratic Republic of Congo, 1995,"
 #'    The Journal of Infectious Diseases, 179, 76--86.

@@ -127,7 +127,7 @@ predict.PMCMC <- function(object, tspan, npart = 50, ...) {
     ## generate model
     func <- object$func
     if(!func$tspan){
-        cat("For predictions 'SimBIID_model' object will have 'tspan' set to T\n")
+        message("For predictions 'SimBIID_model' object will have 'tspan' set to T\n")
     }
     # if(!is.null(func$obsProcess[1])){
     #     cat("For predictions, 'obsProcess' will be removed from 'SimBIID_model' simulations\n")

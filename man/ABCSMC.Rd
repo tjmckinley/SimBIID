@@ -83,18 +83,18 @@ An \code{ABCSMC} object, essentially a \code{list} containing:
 }
 }
 \description{
-Runs ABC-SMC algorithm of Toni et al. (2009) for fitting 
+Runs the Approximate Bayesian Computation Sequential Monte Carlo 
+    (ABC-SMC) algorithm of Toni et al. (2009) for fitting 
     infectious disease models to time series count data.
 }
 \details{
-Runs ABC-SMC algorithm of Toni et al. (2009) for fitting 
-    infectious disease models to time series count data. Will sample initial 
-    particles from the specified prior distributions and then run a series
-    of generations of ABC-SMC. The generations can either be specified with
-    a set of fixed tolerances, or by setting the tolerances at each new generation
-    as a quantile of the tolerances of the accepted particles at the previous 
-    generation. Passing an \code{ABCSMC} object into the \code{ABCSMC()} function
-    acts as a continuation method, allowing further generations to be run.
+Samples initial particles from the specified prior distributions and 
+    then runs a series of generations of ABC-SMC. The generations can either be 
+    specified with a set of fixed tolerances, or by setting the tolerances at 
+    each new generation as a quantile of the tolerances of the accepted particles 
+    at the previous generation. Passing an \code{ABCSMC} object into the 
+    \code{ABCSMC()} function acts as a continuation method, allowing further 
+    generations to be run.
 }
 \examples{
 \donttest{

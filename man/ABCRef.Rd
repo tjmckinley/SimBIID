@@ -40,14 +40,15 @@ An \code{data.frame} object with \code{npart} rows, where the first \code{p} col
         the proposed parameters, and the remaining columns correspond to the simulated outputs.
 }
 \description{
-Produces ABC reference table.
+Produces reference table of simulated outcomes for use in various
+    Approximate Bayesian Computation (ABC) algorithms.
 }
 \details{
 Runs simulations for a large number of particles, either pre-specified or
     sampled from the a set of given prior distributions. Returns a table of summary 
     statistics for each particle. Useful for deciding on initial tolerances during an
-    ABC-SMC run, or for producing a reference table to use in the ABC with
-    Random Forests approach of Raynal et al. (2017).
+    \code{\link{ABC-SMC}} run, or for producing a reference table to use in e.g. the 
+    ABC with Random Forests approach of Raynal et al. (2017).
 }
 \examples{
 \donttest{

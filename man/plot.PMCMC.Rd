@@ -25,8 +25,8 @@ parameters.}
 \item{...}{Not used here.}
 }
 \value{
-A plot of the (approximate) posterior distributions from the particle MCMC algorithm,
-        or corresponding trace plots.
+A plot of the (approximate) posterior distributions obtained from fitting a particle 
+     Markov chain Monte Carlo algorithm, or provides corresponding trace plots.
 }
 \description{
 Plot method for \code{PMCMC} objects.

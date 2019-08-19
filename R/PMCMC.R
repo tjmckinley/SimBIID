@@ -1,7 +1,8 @@
 #' @title Runs particle MCMC algorithm
 #'
-#' @description Runs particle MCMC algorithm using bootstrap particle filter for fitting 
-#'              infectious disease models to time series count data.
+#' @description Runs particle Markov chain Monte Carlo (PMCMC) algorithm using 
+#'      a bootstrap particle filter for fitting infectious disease models to 
+#'      time series count data.
 #'
 #' @details             Function runs a particle MCMC algorithm using a bootstrap particle filter for a given model. 
 #'                      If running with \code{fixpars = T} then this runs \code{niter} simulations

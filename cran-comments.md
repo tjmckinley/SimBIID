@@ -35,11 +35,10 @@ There was 1 NOTE:
 * Maintainer: 'Trevelyan J. McKinley <t.mckinley@exeter.ac.uk>'
 
    New submission
-     Andrieu (10:43)
-     al (9:51, 10:54)
-     SMC (9:26)
-     et (9:48, 10:51)
+   
    Possibly mis-spelled words in DESCRIPTION:
+    PMCMC (14:6)
+    SMC (12:83)
    
 This arises since it's a new submission to CRAN, and the highlighted words
 are not mispelled.

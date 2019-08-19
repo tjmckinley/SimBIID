@@ -4,7 +4,10 @@ Version: 0.1.0
 Authors@R: c(person("Trevelyan J.", "McKinley", email = "t.mckinley@exeter.ac.uk",
                 role = c("aut", "cre")),
              person("Stefan", "Widgren", role = "aut", email = "stefan.widgren@gmail.com", 
-                comment = "Author of 'mparse.R'."))
+                comment = "Author of 'R/mparse.R'"),
+            person("Pavol", "Bauer", role = "cph", comment = 'R/mparse.R'),
+            person("Robin", "Eriksson", role = "cph", comment = 'R/mparse.R'),
+            person("Stefan", "Engblom", role = "cph", comment = 'R/mparse.R'))
 Description: Package provides some code to run simulations of state-space models, and then
     use these in the Approximate Bayesian Computation Sequential Monte Carlo (ABC-SMC) 
     algorithm, and a bootstrap particle filter based particle Markov Chain Monte Carlo 

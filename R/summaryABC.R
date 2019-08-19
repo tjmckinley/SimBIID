@@ -20,7 +20,7 @@
 #' @seealso \code{\link{ABCSMC}}, \code{\link{print.ABCSMC}}, \code{\link{plot.ABCSMC}}
 #'     
 #' @examples 
-#' \dontrun{
+#' \donttest{
 #' ## set up SIR simulationmodel
 #' transitions <- c(
 #'     "S -> beta * S * I -> I", 

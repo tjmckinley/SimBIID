@@ -19,7 +19,7 @@ Compiles an object of class \code{SimBIID_model} into an
              object of class \code{function} for calling directly from R.
 }
 \examples{
-\dontrun{
+\donttest{
 ## set up SIR simulationmodel
 transitions <- c(
     "S -> beta * S * I -> I", 

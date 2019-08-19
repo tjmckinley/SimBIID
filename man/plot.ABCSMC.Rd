@@ -32,7 +32,7 @@ A plot of the ABC posterior distributions for different generations, or the dist
 Plot method for \code{ABCSMC} objects.
 }
 \examples{
-\dontrun{
+\donttest{
 
 ## set up SIR simulation model
 transitions <- c(

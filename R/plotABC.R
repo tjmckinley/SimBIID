@@ -23,7 +23,7 @@
 #' @seealso \code{\link{ABCSMC}}, \code{\link{print.ABCSMC}}, \code{\link{summary.ABCSMC}}
 #'     
 #' @examples 
-#' \dontrun{
+#' \donttest{
 #' 
 #' ## set up SIR simulation model
 #' transitions <- c(

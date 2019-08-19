@@ -24,7 +24,7 @@
 #'     \code{\link{window.PMCMC}}
 #' 
 #' @examples 
-#' \dontrun{
+#' \donttest{
 #' 
 #' ## set up data to pass to PMCMC
 #' flu_dat <- data.frame(

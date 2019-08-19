@@ -50,7 +50,7 @@ Runs simulations for a large number of particles, either pre-specified or
     Random Forests approach of Raynal et al. (2017).
 }
 \examples{
-\dontrun{
+\donttest{
 ## set up SIR simulation model
 transitions <- c(
     "S -> beta * S * I -> I", 

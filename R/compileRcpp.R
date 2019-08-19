@@ -14,7 +14,7 @@
 #' @seealso \code{\link{mparseRcpp}}
 #'         
 #' @examples 
-#' \dontrun{
+#' \donttest{
 #' ## set up SIR simulationmodel
 #' transitions <- c(
 #'     "S -> beta * S * I -> I", 

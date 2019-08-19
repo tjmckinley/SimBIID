@@ -18,7 +18,7 @@ Summary outputs printed to the screen.
 Print method for \code{ABCSMC} objects.
 }
 \examples{
-\dontrun{
+\donttest{
 ## set up SIR simulationmodel
 transitions <- c(
     "S -> beta * S * I -> I", 

@@ -97,7 +97,7 @@ Runs ABC-SMC algorithm of Toni et al. (2009) for fitting
     acts as a continuation method, allowing further generations to be run.
 }
 \examples{
-\dontrun{
+\donttest{
 ## set up SIR simulationmodel
 transitions <- c(
     "S -> beta * S * I -> I", 

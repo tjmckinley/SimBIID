@@ -36,7 +36,7 @@
 #' @references Raynal, L, Marin J-M, Pudlo P, Ribatet M, Robert CP and Estoup A. (2017) <ArXiv:1605.05537>
 #'         
 #' @examples 
-#' \dontrun{
+#' \donttest{
 #' ## set up SIR simulation model
 #' transitions <- c(
 #'     "S -> beta * S * I -> I", 

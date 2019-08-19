@@ -39,7 +39,7 @@ A plot of individual simulations and/or summaries of repeated simulations
 Plot method for \code{SimBIID_runs} objects.
 }
 \examples{
-\dontrun{
+\donttest{
 ## set up SIR simulation model
 transitions <- c(
     "S -> beta * S * I -> I", 

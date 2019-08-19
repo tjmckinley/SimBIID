@@ -78,7 +78,7 @@
 #' @seealso \code{\link{run}}, \code{\link{compileRcpp}}, \code{\link{print.SimBIID_model}}
 #' 
 #' @examples 
-#' \dontrun{
+#' \donttest{
 #' 
 #' ## set up SIR simulation model
 #' transitions <- c(

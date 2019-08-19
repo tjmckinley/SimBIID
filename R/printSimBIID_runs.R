@@ -14,7 +14,7 @@
 #' @export
 #' 
 #' @examples 
-#' \dontrun{
+#' \donttest{
 #' ## set up SIR simulation model
 #' transitions <- c(
 #'     "S -> beta * S * I -> I", 

@@ -4,7 +4,7 @@
 \alias{run}
 \title{Runs \code{SimBIID_model} object}
 \usage{
-run(model, pars, tstart, tstop, u, tspan, nrep = 1, parallel = F,
+run(model, pars, tstart, tstop, u, tspan, nrep = 1, parallel = FALSE,
   mc.cores = NA)
 }
 \arguments{

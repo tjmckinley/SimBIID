@@ -39,7 +39,7 @@ test_that("mparse/run works", {
         transitions = transitions,
         compartments = compartments,
         pars = pars,
-        incidence = T
+        incidence = TRUE
     )
     ## file to save results
     tmp <- "mparseinc"
@@ -66,7 +66,7 @@ test_that("mparse/run works", {
         transitions = transitions,
         compartments = compartments,
         pars = pars,
-        tspan = T
+        tspan = TRUE
     )
     ## file to save results
     tmp <- "mparsetspan"
@@ -94,8 +94,8 @@ test_that("mparse/run works", {
         transitions = transitions,
         compartments = compartments,
         pars = pars,
-        incidence = T,
-        tspan = T
+        incidence = TRUE,
+        tspan = TRUE
     )
     ## file to save results
     tmp <- "mparseinctspan"

@@ -181,7 +181,7 @@ ABCSMC <- function(x, ...) {
 #' @rdname ABCSMC
 #' @export
 
-ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = F, mc.cores = NA, ...) {
+ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = FALSE, mc.cores = NA, ...) {
     
     ## check inputs
     if(class(x) != "ABCSMC"){
@@ -217,7 +217,7 @@ ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = F, 
             stop("New tolerances not less than original tolerances")
         }
     } else {
-        checkInput(ngen, c("vector", "numeric"), 1, int = T, gt = 0)
+        checkInput(ngen, c("vector", "numeric"), 1, int = TRUE, gt = 0)
         checkInput(ptols, c("vector", "numeric"), 1, gt = 0, lt = 1)
         tols <- apply(abs(t(x$output[[length(x$output)]]) - x$data), 1, stats::quantile, probs = ptols)
         tols <- ifelse(tols < 0, 0, tols)
@@ -264,7 +264,7 @@ ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = F, 
 #' @export
 
 ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
-                           ngen = 1, npart = 100, parallel = F, mc.cores = NA, ...) {
+                           ngen = 1, npart = 100, parallel = FALSE, mc.cores = NA, ...) {
     
     ## check missing arguments
     if(missing(x)){
@@ -289,7 +289,7 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
         nc <- parallel::detectCores()
         nc <- ifelse(is.na(nc), 1, nc)
         if(!is.na(mc.cores[1])) {
-            checkInput(mc.cores, "numeric", 1, int = T)
+            checkInput(mc.cores, "numeric", 1, int = TRUE)
             mc.cores <- min(nc, mc.cores)
         } else {
             mc.cores <- nc
@@ -297,7 +297,7 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
         parallel <- (mc.cores > 1)
         cat(paste0("Number of cores: ", mc.cores, "\n"))
     }
-    checkInput(npart, "numeric", 1, int = T, gt = 1)
+    checkInput(npart, "numeric", 1, int = TRUE, gt = 1)
     checkInput(priors, "data.frame", ncol = 4)
     checkInput(func, "function", 1)
     data <- x
@@ -311,7 +311,7 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
         stop("Must have at least one of 'tols' or 'ptols'")
     }
     if(!is.null(ptols[1])){
-        checkInput(ngen, c("vector", "numeric"), 1, int = T, gt = 0)
+        checkInput(ngen, c("vector", "numeric"), 1, int = TRUE, gt = 0)
         checkInput(ptols, c("vector", "numeric"), 1, gt = 0, lt = 1)
         if(!is.vector(tols)){
             stop("'tols' must be a named vector if 'ptols' is set")
@@ -360,8 +360,8 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
         stop("First four arguments of 'func' must be: 'pars', 'data', 'tols' and 'u'")
     }
     ## check u
-    checkInput(u, c("vector", "numeric"), int = T, gte = 0)
-    checkInput(sum(u), "numeric", int = T, gt = 1)
+    checkInput(u, c("vector", "numeric"), int = TRUE, gte = 0)
+    checkInput(sum(u), "numeric", int = TRUE, gt = 1)
     
     ## check priors
     if(!identical(colnames(priors), c("parnames", "dist", "p1", "p2"))){
@@ -374,21 +374,21 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
     if(!all(priors$dist %in% c("unif", "norm", "gamma"))){
         stop("'priors' must be of form: 'unif', 'norm' or 'gamma'")
     }
-    temp <- priors[priors$dist == "unif", , drop = F]
+    temp <- priors[priors$dist == "unif", , drop = FALSE]
     if(nrow(temp) > 0) {
         ## check uniform bounds correct
-        if(!all(apply(temp[, 3:4, drop = F], 1, diff) > 0)){
+        if(!all(apply(temp[, 3:4, drop = FALSE], 1, diff) > 0)){
             stop("Priors: uniform bounds in wrong order")
         }
     }
-    temp <- priors[priors$dist == "norm", , drop = F]
+    temp <- priors[priors$dist == "norm", , drop = FALSE]
     if(nrow(temp) > 0) {
         ## check normal hyperparameters correct
         if(!all(temp$p2 > 0)){
             stop("Priors: normal variances must be > 0")
         }
     }
-    temp <- priors[priors$dist == "gamma", , drop = F]
+    temp <- priors[priors$dist == "gamma", , drop = FALSE]
     if(nrow(temp) > 0) {
         ## check gamma bounds correct
         if(!all(temp$p1 > 0) | !all(temp$p2 > 0)){
@@ -467,7 +467,7 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
                 tols[t, ] <- apply(abs(t(out[[t - 1]]) - data), 1, stats::quantile, probs = ptols)
                 tols[t, ] <- ifelse(tols[t, ] < 0, 0, tols[t, ])
                 if(all(tols[t, ] == tols[t - 1, ])){
-                    tols <- tols[1:(t - 1), , drop = F]
+                    tols <- tols[1:(t - 1), , drop = FALSE]
                     runind <- F
                     warning("Tolerances same as previous generation, so now stopping algorithm.")
                 }
@@ -530,7 +530,7 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
     if(init > 1) {
         pars <- pars[-1]
         out <- out[-1]
-        tols <- tols[-1, , drop = F]
+        tols <- tols[-1, , drop = FALSE]
         weights <- weights[-1]
         ESS <- ESS[-1]
     }

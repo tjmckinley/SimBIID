@@ -83,11 +83,11 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
     }
     ## check rep
     if(!is.na(rep[1])){
-        checkInput(rep, c("vector", "numeric"), inSet = x$sums$rep, int = T)
+        checkInput(rep, c("vector", "numeric"), inSet = x$sums$rep, int = TRUE)
     }
     ## check quant
     checkInput(quant, c("vector", "numeric"))
-    checkInput(format(quant, drop0trailing = T), inSet = format(seq(0.55, 0.95, by = 0.05), drop0trailing = T))
+    checkInput(format(quant, drop0trailing = TRUE), inSet = format(seq(0.55, 0.95, by = 0.05), drop0trailing = TRUE))
     quant <- sort(quant)
     quant <- cbind(rev(1 - quant), rev(quant))
     quant1 <- sort(as.vector(quant))
@@ -106,7 +106,7 @@ plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums")
         }
         checkInput(data$t, "numeric")
         for(j in 2:ncol(data)) {
-            checkInput(data[, j, drop = T], "numeric", int = T)
+            checkInput(data[, j, drop = TRUE], "numeric", int = TRUE)
         }
         ## check matchData
         matchData <- strsplit(matchData, "=")

@@ -105,7 +105,7 @@ predict.PMCMC <- function(object, tspan, npart = 50, ...) {
     tspan <- sort(tspan)
     
     ## check npart
-    checkInput(npart, c("vector", "numeric"), 1, int = T, gt = 0)
+    checkInput(npart, c("vector", "numeric"), 1, int = TRUE, gt = 0)
     
     ## extract parameters and remove extraneous columns
     pars <- as.matrix(object$pars) %>%
@@ -151,8 +151,8 @@ predict.PMCMC <- function(object, tspan, npart = 50, ...) {
         tspan = TRUE,
         incidence = func$incidence,
         afterTstar = NULL,
-        PF = F,
-        runFromR = T
+        PF = FALSE,
+        runFromR = TRUE
     )
     compfunc <- compileRcpp(func)
     

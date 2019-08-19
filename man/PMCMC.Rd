@@ -8,11 +8,11 @@
 \usage{
 PMCMC(x, ...)
 
-\method{PMCMC}{PMCMC}(x, niter = 1000, nprintsum = 100, adapt = T,
+\method{PMCMC}{PMCMC}(x, niter = 1000, nprintsum = 100, adapt = TRUE,
   adaptmixprop = 0.05, nupdate = 100, ...)
 
 \method{PMCMC}{default}(x, priors, func, u, npart = 100, iniPars = NA,
-  fixpars = F, niter = 1000, nprintsum = 100, adapt = T,
+  fixpars = FALSE, niter = 1000, nprintsum = 100, adapt = TRUE,
   propVar = NA, adaptmixprop = 0.05, nupdate = 100, ...)
 }
 \arguments{
@@ -67,14 +67,14 @@ as (initial) proposal matrix. If left unspecified then defaults to
 }
 \value{
 If the code throws an error, then it returns a missing value (\code{NA}). If 
-        \code{fixpars = T} it returns a list of length 2 containing:
+        \code{fixpars = TRUE} it returns a list of length 2 containing:
 \itemize{
      \item{\code{output}:}{ a matrix with two columns. The first contains the simulated
          log-likelihood, and the second is a binary indicator relating to whether the
          simulation was 'skipped' or not (1 = skipped, 0 = not skipped);}
      \item{\code{pars}:}{ a vector of parameters used for the simulations.}
 }
-If \code{fixpars = F}, the routine returns a \code{PMCMC} object, essentially a 
+If \code{fixpars = FALSE}, the routine returns a \code{PMCMC} object, essentially a 
          \code{list} containing:
 \itemize{
  \item{\code{pars}:}{ an \code{mcmc} object containing posterior samples for the parameters;}
@@ -95,7 +95,7 @@ Runs particle Markov chain Monte Carlo (PMCMC) algorithm using
 }
 \details{
 Function runs a particle MCMC algorithm using a bootstrap particle filter for a given model. 
-                     If running with \code{fixpars = T} then this runs \code{niter} simulations
+                     If running with \code{fixpars = TRUE} then this runs \code{niter} simulations
                      using fixed parameter values. This can be used to optimise the number of 
                      particles after a training run. Also has \code{print()}, \code{summary()},
                      \code{plot()}, \code{predict()} and \code{window()} methods.

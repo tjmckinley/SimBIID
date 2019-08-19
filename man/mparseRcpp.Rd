@@ -5,8 +5,9 @@
 \title{Parse custom model using \code{SimInf} style markup}
 \usage{
 mparseRcpp(transitions = NULL, compartments = NULL, pars = NULL,
-  obsProcess = NULL, addVars = NULL, stopCrit = NULL, tspan = F,
-  incidence = F, afterTstar = NULL, PF = F, runFromR = T)
+  obsProcess = NULL, addVars = NULL, stopCrit = NULL,
+  tspan = FALSE, incidence = FALSE, afterTstar = NULL, PF = FALSE,
+  runFromR = TRUE)
 }
 \arguments{
 \item{transitions}{character vector containing transitions on the form \code{"X ->

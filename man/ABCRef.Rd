@@ -4,7 +4,7 @@
 \alias{ABCRef}
 \title{Produces ABC reference table}
 \usage{
-ABCRef(npart, priors, pars, func, sumNames, parallel = F,
+ABCRef(npart, priors, pars, func, sumNames, parallel = FALSE,
   mc.cores = NA, ...)
 }
 \arguments{

@@ -120,7 +120,7 @@
 #' }
 #' 
 
-plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, transfunc = NA, ...) {
+plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = FALSE, transfunc = NA, ...) {
     
     ## check x
     if(class(x) != "ABCSMC"){
@@ -135,7 +135,7 @@ plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = F, tran
     if(is.na(gen[1])) {
         gen <- 1:length(x$pars)
     }
-    checkInput(gen, c("vector", "numeric"), int = T, inSet = 1:length(x$pars))
+    checkInput(gen, c("vector", "numeric"), int = TRUE, inSet = 1:length(x$pars))
     gen <- as.character(sort(gen))
     
     ## check joint

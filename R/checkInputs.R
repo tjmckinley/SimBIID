@@ -1,8 +1,8 @@
 ## Checks input arguments for consistency
 checkInput <- function(input, type = NULL, length = NA, 
-        nrow = NA, ncol = NA, int = F, naAllow = F, 
+        nrow = NA, ncol = NA, int = FALSE, naAllow = FALSE, 
         gt = NA, gte = NA, lt = NA, lte = NA, inSet = NULL, 
-        uni = F
+        uni = FALSE
 ) {
     ## input is input object
     ## type is set of characters denoting is.*() type functions to test input

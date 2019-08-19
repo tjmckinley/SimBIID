@@ -22,7 +22,7 @@ bootStates <- function(dataset, func, pars, u, npart = 50, ...) {
     }
     checkInput(dataset$t, "numeric")
     for(j in 2:ncol(dataset)) {
-        checkInput(dataset[, j, drop = T], "numeric", int = T)
+        checkInput(dataset[, j, drop = TRUE], "numeric", int = TRUE)
     }
     if(!identical(func$obsProcess$dataNames, colnames(dataset)[-1])){
         stop("'data' columns do not match 'obsProcess$datanames'")
@@ -30,7 +30,7 @@ bootStates <- function(dataset, func, pars, u, npart = 50, ...) {
     dataset <- as.matrix(dataset)
     
     ## check number of particles
-    checkInput(npart, c("numeric", "vector"), 1, int = T, gt = 0)
+    checkInput(npart, c("numeric", "vector"), 1, int = TRUE, gt = 0)
     
     ## checks on function / input
     if(func$tspan){
@@ -47,8 +47,8 @@ bootStates <- function(dataset, func, pars, u, npart = 50, ...) {
     }
     
     ## check u
-    checkInput(u, c("vector", "numeric"), int = T, gte = 0)
-    checkInput(sum(u), "numeric", int = T, gt = 1)
+    checkInput(u, c("vector", "numeric"), int = TRUE, gte = 0)
+    checkInput(sum(u), "numeric", int = TRUE, gt = 1)
     checkInput(u, length = length(func$compartments))
     if(!identical(names(u), func$compartments)) {
         stop("'names(u)' does not match 'func$compartments'")
@@ -65,11 +65,11 @@ bootStates <- function(dataset, func, pars, u, npart = 50, ...) {
         obsProcess = func$obsProcess,
         addVars = NULL,
         stopCrit = NULL,
-        tspan = F,
+        tspan = FALSE,
         incidence = func$incidence,
         afterTstar = NULL,
-        PF = T,
-        runFromR = F
+        PF = TRUE,
+        runFromR = FALSE
     )
     
     ## compile model

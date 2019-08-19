@@ -109,5 +109,5 @@ print.PMCMC <- function(x, ...) {
         dplyr::select(temp)
     colnames(temp) <- ""
     cat("\nPriors:\n")
-    print(temp, row.names = F, col.names = F, quote = F)
+    print(temp, row.names = FALSE, col.names = FALSE, quote = FALSE)
 }

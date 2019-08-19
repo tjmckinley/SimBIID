@@ -128,7 +128,7 @@ summary.ABCSMC <- function(object, gen = NA, transfunc = NA, ...) {
         stop("'gen' must be of length 1")
     }
     gen <- ifelse(is.na(gen), length(object$pars), gen)
-    checkInput(gen, "numeric", 1, int = T, gt = 0, lte = length(object$pars))
+    checkInput(gen, "numeric", 1, int = TRUE, gt = 0, lte = length(object$pars))
     
     ## extract relevant parts of the object
     weights <- object$weights[[gen]]

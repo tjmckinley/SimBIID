@@ -112,11 +112,11 @@ mparseRcpp <- function(
     obsProcess = NULL,
     addVars = NULL,
     stopCrit = NULL,
-    tspan = F,
-    incidence = F,
+    tspan = FALSE,
+    incidence = FALSE,
     afterTstar = NULL,
-    PF = F,
-    runFromR = T
+    PF = FALSE,
+    runFromR = TRUE
 ) {
     ## Check transitions
     if (!is.atomic(transitions) || !is.character(transitions) || any(nchar(transitions) == 0)) {
@@ -153,7 +153,7 @@ mparseRcpp <- function(
     ## check PF
     checkInput(PF, "logical", 1)
     if(PF & is.null(obsProcess[1])){
-        stop("Must have 'obsProcess' specified if 'PF = T'")
+        stop("Must have 'obsProcess' specified if 'PF = TRUE'")
     }
     
     ## check tspan
@@ -177,13 +177,13 @@ mparseRcpp <- function(
     ## check obsProcess
     obsProcess_orig <- obsProcess
     if(!is.null(obsProcess[1])){
-        checkInput(obsProcess, "data.frame", ncol = 4, naAllow = T)
+        checkInput(obsProcess, "data.frame", ncol = 4, naAllow = TRUE)
         checkInput(colnames(obsProcess), inSet = c("dataNames", "dist", "p1", "p2"))
         # checkInput(obsProcess$dataNames, "character", inSet = compartments)
         checkInput(obsProcess$dist, "character", inSet = c("unif", "pois", "norm", "binom"))
         checkInput(obsProcess$p1, "character")
         if(!all(is.na(obsProcess$p2))){
-            checkInput(obsProcess$p2, "character", naAllow = T)
+            checkInput(obsProcess$p2, "character", naAllow = TRUE)
         }
         ## set up compiled column
         obsProcess$compiled <- NA

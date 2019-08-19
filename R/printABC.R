@@ -121,7 +121,7 @@ print.ABCSMC <- function(x, ...) {
     
     ## print data information
     cat("\nData:\n")
-    print(x$data, row.names = F)
+    print(x$data, row.names = FALSE)
     
     ## print tolerance information
     temp <- x$tols %>%
@@ -130,7 +130,7 @@ print.ABCSMC <- function(x, ...) {
         dplyr::select(Generation, everything()) %>%
         mutate(ESS = do.call("c", x$ESS))
     cat("\nTolerances:\n")
-    print(temp, row.names = F)
+    print(temp, row.names = FALSE)
     
     ## print prior information
     temp <- x$priors %>%
@@ -143,6 +143,6 @@ print.ABCSMC <- function(x, ...) {
         dplyr::select(temp)
     colnames(temp) <- ""
     cat("\nPriors:\n")
-    print(temp, row.names = F, col.names = F, quote = F)
+    print(temp, row.names = FALSE, col.names = FALSE, quote = FALSE)
 }
 

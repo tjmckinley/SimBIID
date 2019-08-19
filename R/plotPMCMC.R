@@ -99,7 +99,7 @@
 #' }
 #' 
 
-plot.PMCMC <- function(x, type = c("post", "trace"), joint = F, transfunc = NA, ask = T, ...) {
+plot.PMCMC <- function(x, type = c("post", "trace"), joint = FALSE, transfunc = NA, ask = TRUE, ...) {
     
     ## check x
     if(class(x) != "PMCMC"){
@@ -127,7 +127,7 @@ plot.PMCMC <- function(x, type = c("post", "trace"), joint = F, transfunc = NA, 
         p <- as.matrix(x$pars) %>% as.data.frame()
                 
         ## check for transformations if required
-        checkInput(transfunc, length = 1, naAllow = T)
+        checkInput(transfunc, length = 1, naAllow = TRUE)
         if(is.function(transfunc)) {
         
             ## check function arguments
@@ -167,7 +167,7 @@ plot.PMCMC <- function(x, type = c("post", "trace"), joint = F, transfunc = NA, 
          }
          return(p)
      } else {
-        plot(x$pars, density = F, ask = ask)
+        plot(x$pars, density = FALSE, ask = ask)
      }
 }
     

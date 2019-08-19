@@ -5,7 +5,7 @@
 #'      time series count data.
 #'
 #' @details             Function runs a particle MCMC algorithm using a bootstrap particle filter for a given model. 
-#'                      If running with \code{fixpars = T} then this runs \code{niter} simulations
+#'                      If running with \code{fixpars = TRUE} then this runs \code{niter} simulations
 #'                      using fixed parameter values. This can be used to optimise the number of 
 #'                      particles after a training run. Also has \code{print()}, \code{summary()},
 #'                      \code{plot()}, \code{predict()} and \code{window()} methods.
@@ -47,14 +47,14 @@
 #' @param ...           Not used here.
 #'
 #' @return If the code throws an error, then it returns a missing value (\code{NA}). If 
-#'         \code{fixpars = T} it returns a list of length 2 containing:
+#'         \code{fixpars = TRUE} it returns a list of length 2 containing:
 #' \itemize{
 #'      \item{\code{output}:}{ a matrix with two columns. The first contains the simulated
 #'          log-likelihood, and the second is a binary indicator relating to whether the
 #'          simulation was 'skipped' or not (1 = skipped, 0 = not skipped);}
 #'      \item{\code{pars}:}{ a vector of parameters used for the simulations.}
 #' }
-#' If \code{fixpars = F}, the routine returns a \code{PMCMC} object, essentially a 
+#' If \code{fixpars = FALSE}, the routine returns a \code{PMCMC} object, essentially a 
 #'          \code{list} containing:
 #' \itemize{
 #'  \item{\code{pars}:}{ an \code{mcmc} object containing posterior samples for the parameters;}
@@ -160,7 +160,7 @@ PMCMC <- function(x, ...) {
 #' @export
 
 PMCMC.PMCMC <- function(x, niter = 1000, nprintsum = 100, 
-                        adapt = T, adaptmixprop = 0.05, 
+                        adapt = TRUE, adaptmixprop = 0.05, 
                         nupdate = 100, ...) {
     ## check object
     if(class(x) != "PMCMC") {
@@ -178,7 +178,7 @@ PMCMC.PMCMC <- function(x, niter = 1000, nprintsum = 100,
         u = x$u, 
         npart = x$npart,
         iniPars = x$pars[nrow(x$pars), -ncol(x$pars)], 
-        fixpars = F, 
+        fixpars = FALSE, 
         niter = niter, 
         nprintsum = nprintsum, 
         adapt = adapt, 
@@ -202,9 +202,9 @@ PMCMC.PMCMC <- function(x, niter = 1000, nprintsum = 100,
 
 PMCMC.default <- function(
     x, priors, func, u, npart = 100,
-    iniPars = NA, fixpars = F, 
+    iniPars = NA, fixpars = FALSE, 
     niter = 1000, nprintsum = 100, 
-    adapt = T, propVar = NA, adaptmixprop = 0.05, nupdate = 100, ...
+    adapt = TRUE, propVar = NA, adaptmixprop = 0.05, nupdate = 100, ...
 ) {
     
     ## check inputs are present
@@ -232,7 +232,7 @@ PMCMC.default <- function(
     }
     checkInput(data$t, "numeric")
     for(j in 2:ncol(data)) {
-        checkInput(data[, j, drop = T], "numeric", int = T)
+        checkInput(data[, j, drop = TRUE], "numeric", int = TRUE)
     }  
     ## check time periods start at zero
     if(data$t[1] <= 0) {
@@ -254,21 +254,21 @@ PMCMC.default <- function(
     checkInput(priors$p1, "numeric")
     checkInput(priors$p2, "numeric")
     checkInput(priors$dist, inSet = c("unif", "norm", "gamma"))
-    temp <- priors[priors$dist == "unif", , drop = F]
+    temp <- priors[priors$dist == "unif", , drop = FALSE]
     if(nrow(temp) > 0) {
         ## check uniform bounds correct
-        if(!all(apply(temp[, 3:4, drop = F], 1, diff) > 0)) {
+        if(!all(apply(temp[, 3:4, drop = FALSE], 1, diff) > 0)) {
             stop("Priors: 'uniform' bounds not in correct order")
         }
     }
-    temp <- priors[priors$dist == "norm", , drop = F]
+    temp <- priors[priors$dist == "norm", , drop = FALSE]
     if(nrow(temp) > 0) {
         ## check normal hyperparameters correct
         if(!all(temp$p2 > 0)){
             stop("Priors: 'normal' variance not positive")
         }
     }
-    temp <- priors[priors$dist == "gamma", , drop = F]
+    temp <- priors[priors$dist == "gamma", , drop = FALSE]
     if(nrow(temp) > 0) {
         ## check gamma bounds correct
         if(!all(temp$p1 > 0) | !all(temp$p2 > 0)){
@@ -301,8 +301,8 @@ PMCMC.default <- function(
     }
     
     ## check u
-    checkInput(u, c("vector", "numeric"), int = T, gte = 0)
-    checkInput(sum(u), "numeric", int = T, gt = 1)
+    checkInput(u, c("vector", "numeric"), int = TRUE, gte = 0)
+    checkInput(sum(u), "numeric", int = TRUE, gt = 1)
     if(class(func) == "SimBIID_model") {
         checkInput(u, length = length(funcorig$compartments))
         if(!identical(names(u), funcorig$compartments)) {
@@ -349,11 +349,11 @@ PMCMC.default <- function(
             obsProcess = func$obsProcess,
             addVars = NULL,
             stopCrit = NULL,
-            tspan = F,
+            tspan = FALSE,
             incidence = func$incidence,
             afterTstar = NULL,
-            PF = T,
-            runFromR = F
+            PF = TRUE,
+            runFromR = FALSE
         )
         
         ## compile model
@@ -375,14 +375,14 @@ PMCMC.default <- function(
     if(fixpars & any(is.na(iniPars))) {
         stop("Must input initial parameters if fixing parameters.")
     }
-    checkInput(niter, c("numeric", "vector"), 1, int = T, gt = 0)
-    checkInput(npart, c("numeric", "vector"), 1, int = T, gt = 0)
-    checkInput(nprintsum, c("numeric", "vector"), 1, int = T, gt = 0)
+    checkInput(niter, c("numeric", "vector"), 1, int = TRUE, gt = 0)
+    checkInput(npart, c("numeric", "vector"), 1, int = TRUE, gt = 0)
+    checkInput(nprintsum, c("numeric", "vector"), 1, int = TRUE, gt = 0)
     
     ## check adaptive update and proposal covariance matrices
     checkInput(adapt, c("logical", "vector"), 1)
     checkInput(adaptmixprop, c("numeric", "vector"), 1, gt = 0, lt = 1)
-    checkInput(nupdate, c("numeric", "vector"), 1, int = T, gt = 0)
+    checkInput(nupdate, c("numeric", "vector"), 1, int = TRUE, gt = 0)
     
     ## run function
     output <- PMCMC_cpp(as.matrix(data), priors, orig_priors$parnames, iniPars, propVar, niter, npart, 
@@ -403,7 +403,7 @@ PMCMC.default <- function(
     output[[1]] <- coda::as.mcmc(output[[1]])
     
     ## finalise output and set names
-    output <- c(output[1], list(u), output[-1], list(data[-1, , drop = F]), list(orig_priors), list(funcorig))
+    output <- c(output[1], list(u), output[-1], list(data[-1, , drop = FALSE]), list(orig_priors), list(funcorig))
     names(output) <- c("pars", "u", "accrate", "npart", "time", "propVar", "data", "priors", "func")
         
     ## export class and object

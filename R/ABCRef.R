@@ -87,7 +87,7 @@
 #' }
 #' 
 
-ABCRef <- function(npart, priors, pars, func, sumNames, parallel = F, mc.cores = NA, ...) {
+ABCRef <- function(npart, priors, pars, func, sumNames, parallel = FALSE, mc.cores = NA, ...) {
     
     ## check inputs
     if(missing(npart)){
@@ -110,7 +110,7 @@ ABCRef <- function(npart, priors, pars, func, sumNames, parallel = F, mc.cores =
         nc <- parallel::detectCores()
         nc <- ifelse(is.na(nc), 1, nc)
         if(!is.na(mc.cores[1])) {
-            checkInput(mc.cores, "numeric", 1, int = T)
+            checkInput(mc.cores, "numeric", 1, int = TRUE)
             mc.cores <- min(nc, mc.cores)
         } else {
             mc.cores <- nc
@@ -118,7 +118,7 @@ ABCRef <- function(npart, priors, pars, func, sumNames, parallel = F, mc.cores =
         parallel <- (mc.cores > 1)
         cat(paste0("Number of cores: ", mc.cores, "\n"))
     }
-    checkInput(npart, "numeric", 1, int = T)
+    checkInput(npart, "numeric", 1, int = TRUE)
     if(!missing(priors)){
         if(!missing(pars)) {
             stop("Don't provide 'priors' and 'pars', you must choose one or the other.")
@@ -163,21 +163,21 @@ ABCRef <- function(npart, priors, pars, func, sumNames, parallel = F, mc.cores =
         checkInput(priors$p1, "numeric")
         checkInput(priors$p2, "numeric")
         checkInput(priors$dist, inSet = c("unif", "norm", "gamma"))
-        temp <- priors[priors$dist == "unif", , drop = F]
+        temp <- priors[priors$dist == "unif", , drop = FALSE]
         if(nrow(temp) > 0) {
             ## check uniform bounds correct
-            if(!all(apply(temp[, 3:4, drop = F], 1, diff) > 0)){
+            if(!all(apply(temp[, 3:4, drop = FALSE], 1, diff) > 0)){
                 stop("Priors: uniform bounds in incorrect order")
             }
         }
-        temp <- priors[priors$dist == "norm", , drop = F]
+        temp <- priors[priors$dist == "norm", , drop = FALSE]
         if(nrow(temp) > 0) {
             ## check normal hyperparameters correct
             if(!all(temp$p2 > 0)){
                 stop("Priors: normal variance must be > 0")
             }
         }
-        temp <- priors[priors$dist == "gamma", , drop = F]
+        temp <- priors[priors$dist == "gamma", , drop = FALSE]
         if(nrow(temp) > 0) {
             ## check gamma bounds correct
             if(!all(temp$p1 > 0) | !all(temp$p2 > 0)){
@@ -195,7 +195,7 @@ ABCRef <- function(npart, priors, pars, func, sumNames, parallel = F, mc.cores =
             }
         }
         if(is.vector(pars)){
-            priors <- matrix(rep(pars, npart), ncol = length(pars), byrow = T)
+            priors <- matrix(rep(pars, npart), ncol = length(pars), byrow = TRUE)
             priors <- as.data.frame(priors)
         } else {
             priors <- pars

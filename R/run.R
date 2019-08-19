@@ -102,7 +102,7 @@ run <- function(
     u,
     tspan,
     nrep = 1,
-    parallel = F,
+    parallel = FALSE,
     mc.cores = NA
 ) {
     ## check inputs
@@ -126,7 +126,7 @@ run <- function(
     }
     ## check inputs
     if(!model$runFromR) {
-        stop("'model' must be specified with 'runFromR = T'")
+        stop("'model' must be specified with 'runFromR = TRUE'")
     }
     checkInput(pars, c("vector", "numeric"), length(model$pars))
     parnames <- names(pars)
@@ -135,7 +135,7 @@ run <- function(
     }
     checkInput(tstart, c("vector", "numeric"), 1)
     checkInput(tstop, c("vector", "numeric"), 1, gt = tstart)
-    checkInput(u, c("vector", "numeric"), length(model$compartments), int = T, gte = 0)
+    checkInput(u, c("vector", "numeric"), length(model$compartments), int = TRUE, gte = 0)
     if(sum(u) <= 0){
         stop("'sum(u)' not greater than zero.")
     }
@@ -150,10 +150,10 @@ run <- function(
         stop("'SimBIID_model' does not allow a 'tspan' argument")
     }
     if(!missing(tspan)){
-        checkInput(tspan, c("vector", "numeric"), int = T, gte = tstart)
+        checkInput(tspan, c("vector", "numeric"), int = TRUE, gte = tstart)
         tspan <- sort(tspan)
     }
-    checkInput(nrep, "numeric", 1, int = T, gt = 0)
+    checkInput(nrep, "numeric", 1, int = TRUE, gt = 0)
     checkInput(parallel, c("vector", "logical"), 1)
     if(parallel) {
         if(!requireNamespace("parallel", quietly = TRUE)) {
@@ -162,7 +162,7 @@ run <- function(
         nc <- parallel::detectCores()
         nc <- ifelse(is.na(nc), 1, nc)
         if(!is.na(mc.cores[1])) {
-            checkInput(mc.cores, "numeric", 1, int = T)
+            checkInput(mc.cores, "numeric", 1, int = TRUE)
             mc.cores <- min(nc, mc.cores)
         } else {
             mc.cores <- nc

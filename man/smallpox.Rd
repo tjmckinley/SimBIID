@@ -10,7 +10,7 @@
   \item{removals}{number of new removals in (time - 1, time)}
 }}
 \source{
-Thompson D and Foege W (1968), "Faith Tabernacle Smallpox Epidemic." World Health Organization.
+Thompson D and Foege W (1968) <https://apps.who.int/iris/bitstream/handle/10665/67462/WHO_SE_68.3.pdf>
 }
 \usage{
 smallpox

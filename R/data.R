@@ -11,8 +11,7 @@
 #'   \item{clin_signs}{number of new clinical cases at each day}
 #'   \item{removals}{number of new removals at each day}
 #' }
-#' @source Khan AS et al. (1999), "The reemergence of Ebola Hemorrhagic Fever, Democratic Republic of Congo, 1995,"
-#'    The Journal of Infectious Diseases, 179, 76--86.
+#' @source Khan AS et al. (1999) <doi:10.1086/514306>
 "ebola"
 
 #' @title Time series counts of smallpox cases
@@ -25,6 +24,6 @@
 #'   \item{time}{days from initial observed removal}
 #'   \item{removals}{number of new removals in (time - 1, time)}
 #' }
-#' @source Thompson D and Foege W (1968), "Faith Tabernacle Smallpox Epidemic." World Health Organization.
+#' @source Thompson D and Foege W (1968) <https://apps.who.int/iris/bitstream/handle/10665/67462/WHO_SE_68.3.pdf>
 "smallpox"
 

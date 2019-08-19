@@ -11,8 +11,7 @@
   \item{removals}{number of new removals at each day}
 }}
 \source{
-Khan AS et al. (1999), "The reemergence of Ebola Hemorrhagic Fever, Democratic Republic of Congo, 1995,"
-   The Journal of Infectious Diseases, 179, 76--86.
+Khan AS et al. (1999) <doi:10.1086/514306>
 }
 \usage{
 ebola

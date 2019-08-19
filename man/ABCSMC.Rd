@@ -194,14 +194,9 @@ plot(post, "output")
 
 }
 \references{
-Toni T, Welch D, Strelkowa N, Ipsen A and Stumpf MP (2009), 
-    "Approximate Bayesian computation scheme for parameter inference and 
-    model selection in dynamical systems", 
-    Journal of the Royal Society Interface, 6 (31), 187--202.
+Toni T, Welch D, Strelkowa N, Ipsen A and Stumpf MP (2009) <doi:10.1098/rsif.2008.0172>
 
-McKinley TJ, Cook AR and Deardon R (2009), "Inference in 
-    Epidemic Models without Likelihoods", International Journal of Biostatistics,
-    5 (1), Article 24.
+McKinley TJ, Cook AR and Deardon R (2009) <doi:10.2202/1557-4679.1171>
 }
 \seealso{
 \code{\link{print.ABCSMC}}, \code{\link{plot.ABCSMC}}, \code{\link{summary.ABCSMC}}

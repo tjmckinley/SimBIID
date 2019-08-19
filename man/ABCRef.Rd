@@ -101,7 +101,5 @@ refTable
 
 }
 \references{
-Raynal, L, Marin J-M, Pudlo P, Ribatet M, Robert CP and Estoup A. (2017), 
-    "ABC random forests for Bayesian parameter inference",  
-    arXiv1605.05537v4, https://arxiv.org/pdf/1605.05537
+Raynal, L, Marin J-M, Pudlo P, Ribatet M, Robert CP and Estoup A. (2017) <ArXiv:1605.05537>
 }

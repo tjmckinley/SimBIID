@@ -33,9 +33,7 @@
 #' @return An \code{data.frame} object with \code{npart} rows, where the first \code{p} columns correspond to 
 #'         the proposed parameters, and the remaining columns correspond to the simulated outputs.
 #'         
-#' @references Raynal, L, Marin J-M, Pudlo P, Ribatet M, Robert CP and Estoup A. (2017), 
-#'     "ABC random forests for Bayesian parameter inference",  
-#'     arXiv1605.05537v4, https://arxiv.org/pdf/1605.05537
+#' @references Raynal, L, Marin J-M, Pudlo P, Ribatet M, Robert CP and Estoup A. (2017) <ArXiv:1605.05537>
 #'         
 #' @examples 
 #' \dontrun{

@@ -69,8 +69,7 @@
 #' 
 #' @rdname PMCMC
 #' 
-#' @references Andrieu C, Doucet A and Holenstein R (2010). "Particle Markov Chain Monte Carlo
-#'     Methods", Journal of the Royal Statistical Society, Series B (Methodological), 72 (3), 269--342.
+#' @references Andrieu C, Doucet A and Holenstein R (2010) <doi:10.1111/j.1467-9868.2009.00736.x>
 #'
 #' @export
 #' 

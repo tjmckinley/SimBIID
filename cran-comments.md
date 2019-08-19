@@ -1,3 +1,19 @@
+## Resubmission
+
+This is a re-submission. Many thanks for your feedback. 
+In this version I have:
+
+* Updated the references in the documentation as suggested.
+* Expanded acronyms where relevant in the documentation (except if
+  referring specifically to objects with ABCSMC/PMCMC classes).
+* Swapped 'dontrun{}' statements for 'donttest{}' statements. This was
+  due to some tests taking >5 seconds to run. Apologies for specifying
+  this incorrectly first time around.
+* Updated copyright holders in the DESCRIPTION file.
+* Amended all instances of T and F with TRUE or FALSE.
+* Amended to write messages to console using 'message()' rather
+  than 'cat()' or 'print()', except in specific 'print()' generics.
+
 ## Test environments
 * local Ubuntu 19.04 install, R 3.5.2
 * R-oldrel (via travis-ci): Ubuntu 16.04.6 LTS, R 3.5.3
@@ -17,6 +33,7 @@ There were no ERRORs or WARNINGs.
 There was 1 NOTE:
 
 * Maintainer: 'Trevelyan J. McKinley <t.mckinley@exeter.ac.uk>'
+
    New submission
      Andrieu (10:43)
      al (9:51, 10:54)

@@ -116,7 +116,7 @@ ABCRef <- function(npart, priors, pars, func, sumNames, parallel = FALSE, mc.cor
             mc.cores <- nc
         }
         parallel <- (mc.cores > 1)
-        cat(paste0("Number of cores: ", mc.cores, "\n"))
+        message(paste0("Number of cores: ", mc.cores, "\n"))
     }
     checkInput(npart, "numeric", 1, int = TRUE)
     if(!missing(priors)){
@@ -242,7 +242,7 @@ ABCRef <- function(npart, priors, pars, func, sumNames, parallel = FALSE, mc.cor
         ptm <- ptm1
         
         ## print progress
-        cat(paste0("Current pars = ", length(out), ", time = ", signif(ptm1[3], 2), " secs\n"))
+        message(paste0("Current pars = ", length(out), ", time = ", signif(ptm1[3], 2), " secs\n"))
         
         ## run generation
         if(!parallel) {
@@ -272,7 +272,7 @@ ABCRef <- function(npart, priors, pars, func, sumNames, parallel = FALSE, mc.cor
     ptm1 <- proc.time() - ptm_ini
     
     ## print progress to the screen
-    cat(paste0("Final run time = ", signif(ptm1[3], 2), " secs\n"))
+    message(paste0("Final run time = ", signif(ptm1[3], 2), " secs\n"))
     
     return(cbind(pars, out))
 }

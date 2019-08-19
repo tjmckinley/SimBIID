@@ -295,7 +295,7 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
             mc.cores <- nc
         }
         parallel <- (mc.cores > 1)
-        cat(paste0("Number of cores: ", mc.cores, "\n"))
+        message(paste0("Number of cores: ", mc.cores, "\n"))
     }
     checkInput(npart, "numeric", 1, int = TRUE, gt = 1)
     checkInput(priors, "data.frame", ncol = 4)
@@ -517,14 +517,14 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
             ptm1 <- proc.time() - ptm
             
             ## print progress to the screen
-            cat(paste0("Generation ", t + genstart, ", accrate = ", signif(accrate[t], 2), 
+            message(paste0("Generation ", t + genstart, ", accrate = ", signif(accrate[t], 2), 
                        ", time = ", signif(ptm1[3], 2), " secs\n"))
         }
     }
     
     ## stop timer
     ptm1 <- proc.time() - ptm_ini
-    cat(paste0("\nFinal run time = ", signif(ptm1[3], 2), " secs\n"))
+    message(paste0("\nFinal run time = ", signif(ptm1[3], 2), " secs\n"))
     
     ## remove extraneous components if extending runs
     if(init > 1) {

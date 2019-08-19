@@ -168,7 +168,7 @@ run <- function(
             mc.cores <- nc
         }
         parallel <- (mc.cores > 1)
-        cat(paste0("Number of cores: ", mc.cores, "\n"))
+        message(paste0("Number of cores: ", mc.cores, "\n"))
     }
     
     ## compile model

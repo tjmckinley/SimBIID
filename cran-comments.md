@@ -3,6 +3,14 @@
 This is a re-submission. Many thanks for your feedback. 
 In this version I have:
 
+* Added references in the documentation as suggested, 
+  and amended the start of the description field.
+
+## Resubmission
+
+This is a re-submission. Many thanks for your feedback. 
+In this version I have:
+
 * Updated the references in the documentation as suggested.
 * Expanded acronyms where relevant in the documentation (except if
   referring specifically to objects with ABCSMC/PMCMC classes).

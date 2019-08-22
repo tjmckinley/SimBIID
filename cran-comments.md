@@ -5,6 +5,10 @@ In this version I have:
 
 * Added references in the documentation as suggested, 
   and amended the start of the description field.
+  
+I have re-run a local check and the Travis checks below,
+but have not re-run on R-Hub due to the amends being on
+purely on the documentation.
 
 ## Resubmission
 

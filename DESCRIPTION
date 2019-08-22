@@ -9,9 +9,9 @@ Authors@R: c(person("Trevelyan J.", "McKinley", email = "t.mckinley@exeter.ac.uk
             person("Robin", "Eriksson", role = "cph", comment = 'R/mparse.R'),
             person("Stefan", "Engblom", role = "cph", comment = 'R/mparse.R'))
 Description: Package provides some code to run simulations of state-space models, and then
-    use these in the Approximate Bayesian Computation Sequential Monte Carlo (ABC-SMC) 
-    algorithm, and a bootstrap particle filter based particle Markov Chain Monte Carlo 
-    (PMCMC) algorithm. Also provides functions to plot and summarise the outputs.
+    use these in the ABC-SMC algorithm of Toni et al. (2009) and the bootstrap particle
+    filter based particle MCMC algorithm (Andrieu et al., 2010). Also provides functions
+    to plot and summarise the outputs.
 License: GPL (>= 3)
 Depends: R (>= 3.5)
 Imports:

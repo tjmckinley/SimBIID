@@ -3,10 +3,12 @@
 #' @description Package implements various simulation-based inference routines for infectious
 #' disease models.
 #'
-#' @details Package provides some code to run simulations of state-space models, and then
-#' use these in the ABC-SMC algorithm of Toni et al. (2009)
-#' and the bootstrap particle filter based particle MCMC algorithm (Andrieu et al., 2010). 
-#' Also provides functions to plot and summarise the outputs.
+#' @details Provides some code to run simulations of state-space models, and then
+#  use these in the Approximate Bayesian Computation Sequential Monte Carlo (ABC-SMC) 
+#  algorithm of Toni et al. (2009) <doi:10.1098/rsif.2008.0172> and a bootstrap particle
+#  filter based particle Markov chain Monte Carlo (PMCMC) algorithm 
+#  (Andrieu et al., 2010 <doi:10.1111/j.1467-9868.2009.00736.x>). 
+#  Also provides functions to plot and summarise the outputs.
 #'
 #' @docType package
 #' @name SimBIID-package

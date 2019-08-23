@@ -3,6 +3,17 @@
 This is a re-submission. Many thanks for your feedback. 
 In this version I have:
 
+* Added DOIs to the references in the documentation as suggested.
+  
+I have re-run a local check and the Travis checks below,
+but have not re-run on R-Hub due to the amends being on
+purely on the documentation.
+
+## Resubmission
+
+This is a re-submission. Many thanks for your feedback. 
+In this version I have:
+
 * Added references in the documentation as suggested, 
   and amended the start of the description field.
   

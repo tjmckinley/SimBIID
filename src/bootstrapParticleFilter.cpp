@@ -111,7 +111,7 @@ double bootstrapPartFilter (int N, arma::vec pars, IntegerMatrix state, IntegerM
             // getchar();
             
             // update log-likelihood
-            LL += totWeight - log(N);
+            LL += totWeight - log((double) N);
         } else {
             LL = NA_REAL;
             // Rprintf("LL = %f\n", LL);

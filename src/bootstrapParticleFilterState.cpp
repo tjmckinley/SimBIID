@@ -80,6 +80,9 @@ List bootstrapPartFilterState (int N, NumericMatrix pars, NumericMatrix dataset,
                         r++;
                         cumWeight += weights[r];
                     }
+                    if(r >= N) {
+                        stop("Incorrect sampling of particle in bootPartFilterState\n");
+                    }
                 }
                 
                 // update trajectories
@@ -150,19 +153,23 @@ List bootstrapPartFilterState (int N, NumericMatrix pars, NumericMatrix dataset,
             r++;
             cumWeight += weights[r];
         }
+        if(r >= N) {
+            stop("Incorrect sampling of particle in bootPartFilterState\n");
+        }
+        // Rprintf("t = %d k = %d N = %d r = %d\n", t, k, N, r);
         for(k = 0; k < nclass; k++){
             tempout(t, k) = states(t * N + r, k);
         }
-        while(t >= 0){
+        while(t > 0){
             r = trajectories(r, t);
             t--;
             for(k = 0; k < nclass; k++){
                 tempout(t, k) = states(t * N + r, k);
             }
         }
-        for(k = 0; k < nclass; k++){
-            tempout(0, k) = iniStates[k];
-        }
+        // for(k = 0; k < nclass; k++){
+        //     tempout(0, k) = iniStates[k];
+        // }
         
         // save output
         outlist[i] = clone(tempout);

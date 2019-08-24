@@ -2,16 +2,16 @@
 
 Summaries of outputs at final time point:
    completed            t                S               I         
- Min.   :0.0000   Min.   : 3.000   Min.   :  0.0   Min.   :  0.00  
- 1st Qu.:0.0000   1st Qu.: 9.469   1st Qu.: 45.0   1st Qu.:  0.00  
- Median :1.0000   Median :13.121   Median :167.0   Median :  0.00  
- Mean   :0.5544   Mean   :11.434   Mean   :254.1   Mean   : 15.16  
- 3rd Qu.:1.0000   3rd Qu.:14.000   3rd Qu.:396.0   3rd Qu.:  3.00  
- Max.   :1.0000   Max.   :14.000   Max.   :762.0   Max.   :445.00  
+ Min.   :0.0000   Min.   : 4.478   Min.   :  0.0   Min.   :  0.00  
+ 1st Qu.:0.0000   1st Qu.: 9.871   1st Qu.: 42.0   1st Qu.:  0.00  
+ Median :1.0000   Median :13.414   Median :161.0   Median :  0.00  
+ Mean   :0.5415   Mean   :11.924   Mean   :208.5   Mean   : 15.06  
+ 3rd Qu.:1.0000   3rd Qu.:14.000   3rd Qu.:330.0   3rd Qu.:  2.00  
+ Max.   :1.0000   Max.   :14.000   Max.   :746.0   Max.   :445.00  
        R                R1             Robs       
- Min.   :  0.00   Min.   :  1.0   Min.   :  0.00  
- 1st Qu.:  0.00   1st Qu.:345.0   1st Qu.:  0.00  
- Median :  0.00   Median :559.0   Median :  0.00  
- Mean   : 13.11   Mean   :485.6   Mean   : 13.15  
- 3rd Qu.:  3.00   3rd Qu.:680.0   3rd Qu.:  3.00  
- Max.   :637.00   Max.   :805.0   Max.   :651.00  
+ Min.   :  0.00   Min.   : 11.0   Min.   :  0.00  
+ 1st Qu.:  0.00   1st Qu.:406.0   1st Qu.:  0.00  
+ Median :  0.00   Median :565.0   Median :  0.00  
+ Mean   : 14.26   Mean   :525.2   Mean   : 14.21  
+ 3rd Qu.:  4.00   3rd Qu.:681.0   3rd Qu.:  3.00  
+ Max.   :656.00   Max.   :761.0   Max.   :630.00  

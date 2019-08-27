@@ -22,6 +22,8 @@ https://teuder.github.io/rcpp4everyone_en/020_install.html
 
 Install [Rtools](https://cran.r-project.org/bin/windows/Rtools/index.html).
 
+(Make sure you tick the option to add Rtools to the PATH whilst installing.)
+
 ### Mac
 
 Install Xcode command line tools. Execute the command `xcode-select --install` in a Terminal.
@@ -38,7 +40,13 @@ In Ubuntu Linux, execute the command `sudo apt-get install r-base-dev` in a Term
 
 ### Install package
 
-Once the compilers have been installed, then install the `remotes` package in R and run:
+Once the compilers have been installed, then the CRAN version can be installed in the usual way, e.g.
+
+```
+install.packages("SimBIID")
+```
+
+Alternatively, the *development* version can be installed from source using the `remotes` package in R. That is, install the `remotes` package and then run:
 
 ```
 library(remotes)

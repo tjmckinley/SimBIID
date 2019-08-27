@@ -38,10 +38,10 @@ In Ubuntu Linux, execute the command `sudo apt-get install r-base-dev` in a Term
 
 ### Install package
 
-Once the compilers have been installed, then install the `devtools` package in R and run:
+Once the compilers have been installed, then install the `remotes` package in R and run:
 
 ```
-library(devtools)
+library(remotes)
 install_github("tjmckinley/SimBIID")
 ```
 

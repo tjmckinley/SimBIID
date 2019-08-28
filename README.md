@@ -12,7 +12,7 @@ Package provides some code to run simulations of state-space models, and then us
 
 A detailed vignette is provided at: [https://tjmckinley.github.io/SimBIID_tutorial/](https://tjmckinley.github.io/SimBIID_tutorial/)
 
-## To install development version of package
+## To install package
 
 The package depends on the `Rcpp` and `RcppArmadillo` packages, which require the installation of the correct C++ compilers. The guidance below is taken from Sections 2.1.1, 2.1.2 or 2.1.3 here:
 

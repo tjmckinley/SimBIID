@@ -34,7 +34,7 @@ https://cran.r-project.org/bin/macosx/tools/gfortran-6.1.pkg
 
 ### Linux
 
-Install gcc and related packages.
+Install gcc and related packages (you might also need `gcc-fortran` for some of the dependencies).
 
 In Ubuntu Linux, execute the command `sudo apt-get install r-base-dev` in a Terminal.
 

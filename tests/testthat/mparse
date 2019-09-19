@@ -38,7 +38,7 @@ Rcpp_object <- Rcpp::cppFunction('NumericVector simFunction(NumericVector pars, 
     if(totrate > 0.0) {
         tstar = t + R::rexp(1.0 / totrate);
         while(tstar < tstop){
-            // sample event type
+            // update event type
             u_tmp = R::runif(0.0, totrate);
             cumrate = rates[0];
             if(u_tmp < cumrate) {

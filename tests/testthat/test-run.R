@@ -1,5 +1,22 @@
 test_that("mparse/run works", {
     
+    ## test that single transition model compiles
+    
+    ## set up transition rates
+    transitions <- "S -> beta * S * I -> I"
+    
+    ## set compartment and parameter names
+    compartments <- c("S", "I")
+    pars <- "beta"
+    
+    ## parse model
+    model <- mparseRcpp(
+        transitions = transitions, 
+        compartments = compartments,
+        pars = pars
+    )
+    expect_error(compileRcpp(model), NA)
+    
     ## parse model
     transitions <- c(
         "S -> beta * S * I -> I",

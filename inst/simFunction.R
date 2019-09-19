@@ -35,7 +35,7 @@
         tstar = t + R::rexp(1.0 / totrate);
         AFTER_TSTAR0
         while(tstar < tstop){
-            // sample event type
+            // update event type
             u_tmp = R::runif(0.0, totrate);
             RATELINES2  
             

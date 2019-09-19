@@ -178,18 +178,16 @@ Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, t
     ## update states
     tempnSpace <- 12
     tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
-    upStates <- paste0(tempSpace, "cumrate = rates[0];")
-    for(i in 1:length(transitions)) {
-        if(i < length(transitions)) {
-            if(i > 1) {
-                upStates <- c(upStates, paste0(tempSpace, "cumrate += rates[", i - 1, "];"))
-            }
-            upStates <- c(upStates, paste0(tempSpace, "if(u_tmp < cumrate) {"))
-            tempnSpace <- tempnSpace + 4
-            tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
-        }
+    if(length(transitions) == 1) {
+        ## remove u_tmp and cumrate
+        temp <- grep("u_tmp = 0.0, ", Rcpp_code)
+        Rcpp_code[temp] <- gsub("u_tmp = 0.0, ", "", Rcpp_code[temp])
+        temp <- grep("cumrate = 0.0;", Rcpp_code)
+        Rcpp_code[temp] <- gsub(", cumrate = 0.0", "", Rcpp_code[temp])
+        
+        upStates <- NULL
         ## update negative states
-        temp <- which(transitions[[i]]$S < 0)
+        temp <- which(transitions[[1]]$S < 0)
         if(length(temp) > 1){
             stop("Cannot update more than one state for each transition")
         }
@@ -197,7 +195,7 @@ Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, t
             upStates <- c(upStates, paste0(tempSpace, "u[", temp - 1, "]--;"))
         }
         ## update positive states
-        temp <- which(transitions[[i]]$S > 0)
+        temp <- which(transitions[[1]]$S > 0)
         if(length(temp) > 1){
             stop("Cannot update more than one state for each transition")
         }
@@ -210,16 +208,50 @@ Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, t
         }
         tempnSpace <- tempnSpace - 4
         tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
-        if(i < length(transitions)) {
-            upStates <- c(upStates, paste0(tempSpace, "} else {"))
-            tempnSpace <- tempnSpace + 4
+    } else {
+        upStates <- paste0(tempSpace, "cumrate = rates[0];")
+        for(i in 1:length(transitions)) {
+            if(i < length(transitions)) {
+                if(i > 1) {
+                    upStates <- c(upStates, paste0(tempSpace, "cumrate += rates[", i - 1, "];"))
+                }
+                upStates <- c(upStates, paste0(tempSpace, "if(u_tmp < cumrate) {"))
+                tempnSpace <- tempnSpace + 4
+                tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
+            }
+            ## update negative states
+            temp <- which(transitions[[i]]$S < 0)
+            if(length(temp) > 1){
+                stop("Cannot update more than one state for each transition")
+            }
+            if(length(temp) > 0) {
+                upStates <- c(upStates, paste0(tempSpace, "u[", temp - 1, "]--;"))
+            }
+            ## update positive states
+            temp <- which(transitions[[i]]$S > 0)
+            if(length(temp) > 1){
+                stop("Cannot update more than one state for each transition")
+            }
+            if(length(temp) > 0) {
+                upStates <- c(upStates, paste0(tempSpace, "u[", temp - 1, "]++;"))
+                ## add incidence curve if required
+                if(incidence) {
+                    upStates <- c(upStates, paste0(tempSpace, "u[", length(transitions) + temp, "]++;"))
+                }
+            }
+            tempnSpace <- tempnSpace - 4
+            tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
+            if(i < length(transitions)) {
+                upStates <- c(upStates, paste0(tempSpace, "} else {"))
+                tempnSpace <- tempnSpace + 4
+                tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
+            }
+        }
+        for(i in 1:(length(transitions) - 1)) {
+            upStates <- c(upStates, paste0(tempSpace, "}"))
+            tempnSpace <- tempnSpace - 4
             tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
         }
-    }
-    for(i in 1:(length(transitions) - 1)) {
-        upStates <- c(upStates, paste0(tempSpace, "}"))
-        tempnSpace <- tempnSpace - 4
-        tempSpace <- paste0(rep(" ", tempnSpace), collapse = "")
     }
     
     ## update after_tstar
@@ -239,6 +271,12 @@ Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, t
     upRates <- sapply(as.list(upRates), function(x) {
         paste0("        ", x)
     })
+    ## if only one event, then remove random event draw
+    if(length(transitions) == 1) {
+        currline <- ratelines[1]
+        Rcpp_code <- c(Rcpp_code[1:(currline - 2)], Rcpp_code[currline:length(Rcpp_code)])
+        ratelines <- ratelines - 1
+    }
     currline <- ratelines[1]
     ratelines <- ratelines[-1]
     Rcpp_code <- c(Rcpp_code[1:(currline - 1)], upStates, upRates, Rcpp_code[(currline + 1):length(Rcpp_code)])

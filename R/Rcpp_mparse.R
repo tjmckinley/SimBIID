@@ -267,6 +267,24 @@ Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, t
         ratelines <- ratelines[-1] - 1
     }
     
+    ## update tspan
+    if(tspan) {
+        currline <- ratelines[1]
+        upTspan[1] <- "    while(tspan[k] < tstar && k < tspan.size()) {"
+        upTspan <- paste(paste(rep(" ", 7), collapse = ""), upTspan)
+        Rcpp_code <- c(
+            Rcpp_code[1:(currline - 1)], 
+            "",
+            paste0(paste(rep(" ", 12), collapse = ""), "// update tspan"),
+            upTspan, 
+            Rcpp_code[(currline + 1):length(Rcpp_code)]
+        )
+        ratelines <- ratelines[-1] + length(upTspan) + 1
+    } else {
+        Rcpp_code <- Rcpp_code[-ratelines[1]]
+        ratelines <- ratelines[-1] - 1
+    }
+    
     ## update rates
     upRates <- sapply(as.list(upRates), function(x) {
         paste0("        ", x)
@@ -289,23 +307,6 @@ Rcpp_mparse <- function(transitions, matchCrit, obsProcess, addVars, stopCrit, t
         ratelines <- ratelines[-1]
         Rcpp_code <- c(Rcpp_code[1:(currline - 1)], afterTstar, Rcpp_code[(currline + 1):length(Rcpp_code)])
         ratelines <- ratelines + length(afterTstar) - 1
-    } else {
-        Rcpp_code <- Rcpp_code[-ratelines[1]]
-        ratelines <- ratelines[-1] - 1
-    }
-    
-    ## update tspan
-    if(tspan) {
-        currline <- ratelines[1]
-        upTspan <- paste(paste(rep(" ", 7), collapse = ""), upTspan)
-        Rcpp_code <- c(
-            Rcpp_code[1:(currline - 1)], 
-            "",
-            paste0(paste(rep(" ", 12), collapse = ""), "// update tspan"),
-            upTspan, 
-            Rcpp_code[(currline + 1):length(Rcpp_code)]
-        )
-        ratelines <- ratelines[-1] + length(upTspan) + 1
     } else {
         Rcpp_code <- Rcpp_code[-ratelines[1]]
         ratelines <- ratelines[-1] - 1

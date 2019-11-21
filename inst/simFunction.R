@@ -35,6 +35,7 @@
         tstar = t + R::rexp(1.0 / totrate);
         AFTER_TSTAR0
         while(tstar < tstop){
+            TSPAN1
             // update event type
             u_tmp = R::runif(0.0, totrate);
             RATELINES2  
@@ -67,7 +68,6 @@
                 tstar = tstop;
             }
             AFTER_TSTAR1
-            TSPAN1
             RATELINES3
         }
     }

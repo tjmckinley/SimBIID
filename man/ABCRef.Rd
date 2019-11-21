@@ -4,8 +4,16 @@
 \alias{ABCRef}
 \title{Produces ABC reference table}
 \usage{
-ABCRef(npart, priors, pars, func, sumNames, parallel = FALSE,
-  mc.cores = NA, ...)
+ABCRef(
+  npart,
+  priors,
+  pars,
+  func,
+  sumNames,
+  parallel = FALSE,
+  mc.cores = NA,
+  ...
+)
 }
 \arguments{
 \item{npart}{The number of particles (must be a positive integer).}

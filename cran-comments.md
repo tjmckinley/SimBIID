@@ -2,7 +2,8 @@
 
 This is a patch submission in which I have:
 
-* fixed a parsing error when creating models with only a single transition rate.
+* fixed the order in which `tspan` objects are updated in code 
+  produced from `mparseRcpp`.
 
 ## Test environments
 

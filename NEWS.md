@@ -1,3 +1,8 @@
+# v0.1.3
+
+Patch release to fix the order in which `tspan` objects are
+updated in code produced from `mparseRcpp`.
+
 # v0.1.2
 
 Patch release to fix a parsing error when compiling models

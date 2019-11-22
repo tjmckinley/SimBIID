@@ -8,29 +8,11 @@
 \usage{
 ABCSMC(x, ...)
 
-\method{ABCSMC}{ABCSMC}(
-  x,
-  tols = NULL,
-  ptols = NULL,
-  ngen = 1,
-  parallel = FALSE,
-  mc.cores = NA,
-  ...
-)
+\method{ABCSMC}{ABCSMC}(x, tols = NULL, ptols = NULL, ngen = 1,
+  parallel = FALSE, mc.cores = NA, ...)
 
-\method{ABCSMC}{default}(
-  x,
-  priors,
-  func,
-  u,
-  tols = NULL,
-  ptols = NULL,
-  ngen = 1,
-  npart = 100,
-  parallel = FALSE,
-  mc.cores = NA,
-  ...
-)
+\method{ABCSMC}{default}(x, priors, func, u, tols = NULL, ptols = NULL,
+  ngen = 1, npart = 100, parallel = FALSE, mc.cores = NA, ...)
 }
 \arguments{
 \item{x}{An \code{ABCSMC} object or a named vector with entries

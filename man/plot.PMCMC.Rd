@@ -4,14 +4,8 @@
 \alias{plot.PMCMC}
 \title{Plots \code{PMCMC} objects}
 \usage{
-\method{plot}{PMCMC}(
-  x,
-  type = c("post", "trace"),
-  joint = FALSE,
-  transfunc = NA,
-  ask = TRUE,
-  ...
-)
+\method{plot}{PMCMC}(x, type = c("post", "trace"), joint = FALSE,
+  transfunc = NA, ask = TRUE, ...)
 }
 \arguments{
 \item{x}{A \code{PMCMC} object.}

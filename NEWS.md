@@ -1,4 +1,4 @@
-#v 0.1.4
+# v0.1.4
 
 Patch release to fix minor bug in the `predict.PMCMC` method.
 

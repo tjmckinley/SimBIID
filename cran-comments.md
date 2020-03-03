@@ -2,12 +2,12 @@
 
 This is a patch submission in which I have:
 
-* fixed the order in which `tspan` objects are updated in code 
-  produced from `mparseRcpp`.
+* made minor changes to the `predict.PMCMC` method to remove particles
+  with non-zero weight.
 
 ## Test environments
 
-* local Ubuntu 19.04 install, R 3.5.2
+* local Ubuntu 19.04 install, R 3.6.1
 * R-oldrel (via travis-ci): Ubuntu 16.04.6 LTS, R 3.5.3
 * R-release (via travis-ci): Ubuntu 16.04.6 LTS, R 3.6.1
 * R-devel (via travis-ci): Ubuntu 16.04.6 LTS

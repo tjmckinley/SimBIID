@@ -8,12 +8,32 @@
 \usage{
 PMCMC(x, ...)
 
-\method{PMCMC}{PMCMC}(x, niter = 1000, nprintsum = 100, adapt = TRUE,
-  adaptmixprop = 0.05, nupdate = 100, ...)
+\method{PMCMC}{PMCMC}(
+  x,
+  niter = 1000,
+  nprintsum = 100,
+  adapt = TRUE,
+  adaptmixprop = 0.05,
+  nupdate = 100,
+  ...
+)
 
-\method{PMCMC}{default}(x, priors, func, u, npart = 100, iniPars = NA,
-  fixpars = FALSE, niter = 1000, nprintsum = 100, adapt = TRUE,
-  propVar = NA, adaptmixprop = 0.05, nupdate = 100, ...)
+\method{PMCMC}{default}(
+  x,
+  priors,
+  func,
+  u,
+  npart = 100,
+  iniPars = NA,
+  fixpars = FALSE,
+  niter = 1000,
+  nprintsum = 100,
+  adapt = TRUE,
+  propVar = NA,
+  adaptmixprop = 0.05,
+  nupdate = 100,
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{PMCMC} object, or a \code{data.frame} containing time series count data, 

@@ -77,6 +77,12 @@ bootStates <- function(dataset, func, pars, u, npart = 50, ...) {
     
     ## run function
     output <- bootstrapPartFilterState(npart, pars, dataset, u, compfunc)
+    pars <- pars[!is.na(output) & !map_lgl(output, is.null), ]
+    output <- output[!is.na(output)]
+    output <- output[!map_lgl(output, is.null)]
+    if(length(output) == 0) {
+        stop("No particles with non-zero weight at the end of the fitted period")
+    }
     output <- lapply(1:length(output), function(i, x, time){
         x <- x[[i]]
         x <- cbind(rep(i, nrow(x)), time, x)
@@ -110,6 +116,6 @@ bootStates <- function(dataset, func, pars, u, npart = 50, ...) {
         }
     }
     ## return output
-    output
+    list(pars = pars, output = output)
 }
 

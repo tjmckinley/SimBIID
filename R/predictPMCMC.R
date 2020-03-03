@@ -115,6 +115,8 @@ predict.PMCMC <- function(object, tspan, npart = 50, ...) {
     
     ## run bootstrap filter to get states at each time point of the dataset
     prevStates <- bootStates(object$data, object$func, pars, object$u, npart)
+    pars <- prevStates$pars
+    prevStates <- prevStates$output
     
     ## extract final states
     iniStates <- prevStates %>%

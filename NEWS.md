@@ -1,3 +1,7 @@
+#v 0.1.4
+
+Patch release to fix minor bug in the `predict.PMCMC` method.
+
 # v0.1.3
 
 Patch release to fix the order in which `tspan` objects are

@@ -4,11 +4,13 @@
 \name{smallpox}
 \alias{smallpox}
 \title{Time series counts of smallpox cases}
-\format{A data frame with 23 rows and 2 variables:
+\format{
+A data frame with 23 rows and 2 variables:
 \describe{
   \item{time}{days from initial observed removal}
   \item{removals}{number of new removals in (time - 1, time)}
-}}
+}
+}
 \source{
 Thompson D and Foege W (1968) <https://apps.who.int/iris/bitstream/handle/10665/67462/WHO_SE_68.3.pdf>
 }

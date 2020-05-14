@@ -219,7 +219,7 @@ ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = FAL
     } else {
         checkInput(ngen, c("vector", "numeric"), 1, int = TRUE, gt = 0)
         checkInput(ptols, c("vector", "numeric"), 1, gt = 0, lt = 1)
-        tols <- apply(abs(t(x$output[[length(x$output)]]) - x$data), 1, stats::quantile, probs = ptols)
+        tols <- bisectTols(x$output[[length(x$output)]], x$data, x$tols[nrow(x$tols), ], ptols, ptollim = 0.1)
         tols <- ifelse(tols < 0, 0, tols)
         if(all(tols == x$tols[nrow(x$tols), ])){
             stop("Tolerances same as previous generation at this 'ptol'")
@@ -464,7 +464,7 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
         if(t != init){
             ## set tolerances if required
             if(!is.null(ptols[1])){
-                tols[t, ] <- apply(abs(t(out[[t - 1]]) - data), 1, stats::quantile, probs = ptols)
+                tols[t, ] <- bisectTols(out[[t - 1]], data, tols[t - 1, ], ptols, ptollim = 0.1)
                 tols[t, ] <- ifelse(tols[t, ] < 0, 0, tols[t, ])
                 if(all(tols[t, ] == tols[t - 1, ])){
                     tols <- tols[1:(t - 1), , drop = FALSE]

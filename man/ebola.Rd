@@ -4,12 +4,14 @@
 \name{ebola}
 \alias{ebola}
 \title{Time series counts of ebola cases}
-\format{A data frame with 192 rows and 3 variables:
+\format{
+A data frame with 192 rows and 3 variables:
 \describe{
   \item{time}{days from 1st January 1995}
   \item{clin_signs}{number of new clinical cases at each day}
   \item{removals}{number of new removals at each day}
-}}
+}
+}
 \source{
 Khan AS et al. (1999) <doi:10.1086/514306>
 }

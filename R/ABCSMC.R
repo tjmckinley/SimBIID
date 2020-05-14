@@ -463,7 +463,7 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
         runind <- T
         if(t != init){
             ## set tolerances if required
-            if(!is.null(ptols[1])){
+            if(!is.null(ptols[1])) {
                 tols[t, ] <- bisectTols(out[[t - 1]], data, tols[t - 1, ], ptols, ptollim = 0.1)
                 tols[t, ] <- ifelse(tols[t, ] < 0, 0, tols[t, ])
                 if(all(tols[t, ] == tols[t - 1, ])){

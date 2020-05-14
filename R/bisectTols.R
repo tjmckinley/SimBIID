@@ -2,12 +2,21 @@
 bisectTols <- function(out, data, tols, ptol, ptollim = 0.1) {
     
     ## select initial candidate tolerances
-    diffs <- t(apply(out, 1, function(x, data) {
+    diffs <- apply(out, 1, function(x, data) {
         abs(x - data)
-    }, data = data))
+    }, data = data)
+    if(is.null(nrow(diffs))) {
+        diffs <- matrix(diffs, ncol = 1)
+    } else {
+        diffs <- t(diffs)
+    }
     tolcand <- apply(diffs, 2, function(x, tolprop) {
         quantile(x, probs = tolprop)
     }, tolprop = ptol)
+    
+    if(length(tolcand) == 1) {
+        return(tolcand)
+    }
     
     ## now check the proportion of particles in current generation that 
     ## would have been accepted under candidate tolerances

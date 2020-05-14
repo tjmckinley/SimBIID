@@ -7,9 +7,9 @@ finalsize finaltime
 
 Tolerances:
  Generation finalsize finaltime      ESS
-          1        50 50.000000 50.00000
-          2        18 12.355820 40.67079
-          3        10  5.816974 40.54504
+          1      50.0  50.00000 50.00000
+          2      26.0  21.76687 34.52730
+          3      20.5  14.97173 36.39753
 
 Priors:
                                    

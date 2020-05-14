@@ -220,6 +220,7 @@ ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = FAL
         checkInput(ngen, c("vector", "numeric"), 1, int = TRUE, gt = 0)
         checkInput(ptols, c("vector", "numeric"), 1, gt = 0, lt = 1)
         tols <- bisectTols(x$output[[length(x$output)]], x$data, x$tols[nrow(x$tols), ], ptols, ptollim = 0.1)
+        names(tols) <- colnames(x$tols)
         tols <- ifelse(tols < 0, 0, tols)
         if(all(tols == x$tols[nrow(x$tols), ])){
             stop("Tolerances same as previous generation at this 'ptol'")

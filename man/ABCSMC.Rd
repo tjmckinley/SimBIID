@@ -12,6 +12,7 @@ ABCSMC(x, ...)
   x,
   tols = NULL,
   ptols = NULL,
+  mintols = NULL,
   ngen = 1,
   parallel = FALSE,
   mc.cores = NA,
@@ -25,6 +26,7 @@ ABCSMC(x, ...)
   u,
   tols = NULL,
   ptols = NULL,
+  mintols = NULL,
   ngen = 1,
   npart = 100,
   parallel = FALSE,
@@ -45,6 +47,8 @@ The columns/entries must match to those in `x`.}
 
 \item{ptols}{The proportion of simulated outcomes at each generation to use to derive adaptive 
 tolerances.}
+
+\item{mintols}{A vector of minimum tolerance levels.}
 
 \item{ngen}{The number of generations of ABC-SMC to run.}
 
@@ -93,6 +97,7 @@ An \code{ABCSMC} object, essentially a \code{list} containing:
                      acceptance rates for each generation of ABC;}
 \item{\code{tols}:}{ a copy of the \code{tols} input;}
 \item{\code{ptols}:}{ a copy of the \code{ptols} input;}
+\item{\code{mintols}:}{ a copy of the \code{mintols} input;}
 \item{\code{priors}:}{ a copy of the \code{priors} input;}
 \item{\code{data}:}{ a copy of the \code{data} input;}
 \item{\code{func}:}{ a copy of the \code{func} input;}

@@ -36,6 +36,7 @@
 #'                  The columns/entries must match to those in `x`. 
 #' @param ptols     The proportion of simulated outcomes at each generation to use to derive adaptive 
 #'                  tolerances.
+#' @param mintols   A vector of minimum tolerance levels.
 #' @param ngen      The number of generations of ABC-SMC to run.
 #' @param npart     An integer specifying the number of particles.
 #' @param parallel  A \code{logical} determining whether to use parallel processing or not.
@@ -63,6 +64,7 @@
 #'                      acceptance rates for each generation of ABC;}
 #' \item{\code{tols}:}{ a copy of the \code{tols} input;}
 #' \item{\code{ptols}:}{ a copy of the \code{ptols} input;}
+#' \item{\code{mintols}:}{ a copy of the \code{mintols} input;}
 #' \item{\code{priors}:}{ a copy of the \code{priors} input;}
 #' \item{\code{data}:}{ a copy of the \code{data} input;}
 #' \item{\code{func}:}{ a copy of the \code{func} input;}
@@ -181,7 +183,7 @@ ABCSMC <- function(x, ...) {
 #' @rdname ABCSMC
 #' @export
 
-ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = FALSE, mc.cores = NA, ...) {
+ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, mintols = NULL, ngen = 1, parallel = FALSE, mc.cores = NA, ...) {
     
     ## check inputs
     if(class(x) != "ABCSMC"){
@@ -192,6 +194,11 @@ ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = FAL
     }
     if(!is.null(tols[1]) & !is.null(ptols[1])){
         stop("Must choose either 'tols' or 'ptols'")
+    }
+    
+    ## set ne mintols if needed
+    if(!is.null(mintols)) {
+        x$mintols <- mintols
     }
     
     if(!is.null(tols[1])){
@@ -217,7 +224,7 @@ ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = FAL
             stop("New tolerances not less than or equal to original tolerances")
         }
         ngen <- ifelse(is.null(nrow(tols)), 1, nrow(tols))
-        temp <- rbind(post$tols[nrow(post$tols), ], tols)
+        temp <- rbind(x$tols[nrow(x$tols), ], tols)
         if(!all(apply(temp, 2, function(x) {
             all(diff(x) <= 0)
         }))){
@@ -238,6 +245,10 @@ ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = FAL
         tols <- bisectTols(x$output[[length(x$output)]], x$data, x$tols[nrow(x$tols), ], ptols, ptollim = 0.1)
         names(tols) <- colnames(x$tols)
         tols <- ifelse(tols < 0, 0, tols)
+        ## check against min tols
+        if(!is.null(x$mintols[1])) {
+            tols <- ifelse(tols < x$mintols, x$mintols, tols)
+        }
         if(all(tols == x$tols[nrow(x$tols), ])){
             stop("Tolerances same as previous generation at this 'ptol'")
         }
@@ -249,6 +260,7 @@ ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = FAL
         npart = nrow(x$pars[[1]]), 
         tols = tols, 
         ptols = ptols,
+        mintols = x$mintols,
         ngen = ngen,
         priors = x$priors, 
         func = x$func, 
@@ -272,6 +284,7 @@ ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = FAL
     x$ESS <- c(x$ESS, temp$ESS)
     x$accrate <- c(x$accrate, temp$accrate)
     x$tols <- rbind(x$tols, temp$tols)
+    x$ptols <- temp$ptols
     
     ## return new object
     x
@@ -280,7 +293,7 @@ ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = FAL
 #' @rdname ABCSMC
 #' @export
 
-ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
+ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL, mintols = NULL,
                            ngen = 1, npart = 100, parallel = FALSE, mc.cores = NA, ...) {
     
     ## check missing arguments
@@ -374,6 +387,18 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
         }
         if(ngen > nrow(tols)) {
             tols <- rbind(tols, matrix(NA, ngen - 1, ncol(tols)))
+        }
+    }
+    
+    if(!is.null(mintols[1])) {
+        checkInput(mintols, c("vector", "numeric"), gte = 0, length = ncol(tols))
+        checkInput(names(mintols), c("vector", "character"), ident = colnames(tols))
+        if(is.null(ptols[1])) {
+            if(any(apply(rbind(mintols, tols), 2, function(x) {
+                any(x[1] > x[-1])
+            }))) {
+                stop("'tols' can't be less than 'mintols'")
+            }
         }
     }
     
@@ -492,10 +517,14 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
             if(!is.null(ptols[1])) {
                 tols[t, ] <- bisectTols(out[[t - 1]], data, tols[t - 1, ], ptols, ptollim = 0.1)
                 tols[t, ] <- ifelse(tols[t, ] < 0, 0, tols[t, ])
+                ## check against min tols
+                if(!is.null(mintols[1])) {
+                    tols[t, ] <- ifelse(tols[t, ] < mintols, mintols, tols[t, ])
+                }
                 if(all(tols[t, ] == tols[t - 1, ])){
                     tols <- tols[1:(t - 1), , drop = FALSE]
                     runind <- F
-                    warning("Tolerances same as previous generation, so now stopping algorithm.")
+                    message("Tolerances same as previous generation, so now stopping algorithm.")
                 }
             }
         }
@@ -563,7 +592,7 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
     
     ## output results
     output <- list(pars = pars, output = out, weights = weights, ESS = ESS, accrate = accrate,
-                   tols = tols, ptols = ptols, priors = orig_priors, data = data,
+                   tols = tols, ptols = ptols, mintols = mintols, priors = orig_priors, data = data,
                    func = func, u = u, addargs = args)
     class(output) <- "ABCSMC"
     output

@@ -192,4 +192,85 @@ test_that("ABCSMC works", {
     colnames(newtols) <- c("finalsize", "finaltime")
     post <- ABCSMC(post, tols = newtols)
     
+    ## test minimum tolerances in various situations
+    tols <- matrix(c(50, 50), 1, 2, byrow = TRUE)
+    colnames(tols) <- c("finalsize", "finaltime")
+    expect_error(ABCSMC(
+        x = data,
+        priors = priors,
+        func = simSIR,
+        u = iniStates,
+        tols = tols,
+        npart = 50,
+        model = model,
+        mintols = c(40, 40)
+    ))
+    mintols <- matrix(c(40, 40), 1, 2, byrow = TRUE)
+    colnames(mintols) <- c("finalsize", "finaltime")
+    expect_error(ABCSMC(
+        x = data,
+        priors = priors,
+        func = simSIR,
+        u = iniStates,
+        tols = tols,
+        npart = 50,
+        model = model,
+        mintols = mintols
+    ))
+    mintols <- c(finalsize = 40, finaltime = 40)
+    post <- ABCSMC(
+        x = data,
+        priors = priors,
+        func = simSIR,
+        u = iniStates,
+        tols = tols,
+        npart = 50,
+        model = model,
+        mintols = mintols
+    )
+    mintols <- c(finalsize = 50, finaltime = 40)
+    post <- ABCSMC(
+        x = data,
+        priors = priors,
+        func = simSIR,
+        u = iniStates,
+        tols = tols,
+        npart = 50,
+        model = model,
+        mintols = mintols
+    )
+    mintols <- c(finalsize = 51, finaltime = 50)
+    expect_error(ABCSMC(
+        x = data,
+        priors = priors,
+        func = simSIR,
+        u = iniStates,
+        tols = tols,
+        npart = 50,
+        model = model,
+        mintols = mintols
+    ))
+    
+    ## run two further generations
+    newtols <- matrix(c(40, 40, 38, 38), 2, 2, byrow = TRUE)
+    colnames(newtols) <- c("finalsize", "finaltime")
+    expect_error(ABCSMC(post, tols = newtols))
+    
+    ## run two further generations
+    mintols <- c(40, 40)
+    names(mintols) <- c("finalsize", "finaltime")
+    expect_error(ABCSMC(post, tols = newtols, mintols = mintols))
+    
+    ## run two further generations
+    mintols <- c(35, 35)
+    names(mintols) <- c("finalsize", "finaltime")
+    post <- ABCSMC(post, tols = newtols, mintols = mintols)
+    
+    ## run two further generations
+    post <- ABCSMC(post, ptols = 0.5, ngen = 1)
+    expect_error(ABCSMC(post, ptols = 0.5, ngen = 1))
+    mintols <- c(30, 30)
+    names(mintols) <- c("finalsize", "finaltime")
+    post <- ABCSMC(post, ptols = 0.5, ngen = 1, mintols = mintols)
+    
 })

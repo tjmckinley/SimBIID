@@ -99,4 +99,97 @@ test_that("ABCSMC works", {
     ## the first run always succeeds, but warns
     expect_known_output(summary(post), tmp, print = TRUE)
     
+    ## try to run 2 generations of ABC-SMC using fixed tolerances
+    tols <- matrix(c(50, 50, 50, 50), 2, 2, byrow = TRUE)
+    colnames(tols) <- c("finalsize", "finaltime")
+    expect_error(ABCSMC(
+        x = data,
+        priors = priors,
+        func = simSIR,
+        u = iniStates,
+        tols = tols,
+        ngen = 2,
+        npart = 50,
+        model = model
+    ))
+    tols <- matrix(c(50, 50, 51, 20), 2, 2, byrow = TRUE)
+    colnames(tols) <- c("finalsize", "finaltime")
+    expect_error(ABCSMC(
+        x = data,
+        priors = priors,
+        func = simSIR,
+        u = iniStates,
+        tols = tols,
+        ngen = 2,
+        npart = 50,
+        model = model
+    ))
+    
+    ## run 2 generations of ABC-SMC using fixed tolerances
+    tols <- matrix(c(50, 50, 50, 20), 2, 2, byrow = TRUE)
+    colnames(tols) <- c("finalsize", "finaltime")
+    post <- ABCSMC(
+        x = data,
+        priors = priors,
+        func = simSIR,
+        u = iniStates,
+        tols = tols,
+        ngen = 2,
+        npart = 50,
+        model = model
+    )
+    ## file to save results
+    tmp <- "ABCSMCtol"
+    ## the first run always succeeds, but warns
+    expect_known_output(post, tmp, print = TRUE)
+    
+    ## run one further generation
+    newtols <- c(finalsize = 20, finaltime = 15)
+    post <- ABCSMC(post, tols = newtols)
+    ## file to save results
+    tmp <- "ABCSMCtol1"
+    ## the first run always succeeds, but warns
+    expect_known_output(post, tmp, print = TRUE)
+    
+    ## run one further generation
+    expect_error(ABCSMC(post, tols = newtols))
+    newtols <- c(finalsize = 21, finaltime = 15)
+    expect_error(ABCSMC(post, tols = newtols))
+    
+    ## run further generation using ptols
+    expect_error(ABCSMC(post, tols = newtols, ptols = 0.8, ngen = 1))
+    post <- ABCSMC(post, ptols = 0.8, ngen = 1)
+    ## file to save results
+    tmp <- "ABCSMCtol2"
+    ## the first run always succeeds, but warns
+    expect_known_output(post, tmp, print = TRUE)
+    
+    ## run 2 generations of ABC-SMC using fixed tolerances
+    tols <- matrix(c(50, 50), 1, 2, byrow = TRUE)
+    colnames(tols) <- c("finalsize", "finaltime")
+    post <- ABCSMC(
+        x = data,
+        priors = priors,
+        func = simSIR,
+        u = iniStates,
+        tols = tols,
+        npart = 50,
+        model = model
+    )
+    
+    ## run two further generations
+    newtols <- matrix(c(50, 50, 40, 40), 2, 2, byrow = TRUE)
+    colnames(newtols) <- c("finalsize", "finaltime")
+    expect_error(ABCSMC(post, tols = newtols))
+    
+    ## run two further generations
+    newtols <- matrix(c(45, 45, 45, 45), 2, 2, byrow = TRUE)
+    colnames(newtols) <- c("finalsize", "finaltime")
+    expect_error(ABCSMC(post, tols = newtols))
+    
+    ## run two further generations
+    newtols <- matrix(c(45, 45, 40, 40), 2, 2, byrow = TRUE)
+    colnames(newtols) <- c("finalsize", "finaltime")
+    post <- ABCSMC(post, tols = newtols)
+    
 })

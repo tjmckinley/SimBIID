@@ -212,9 +212,25 @@ ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, ngen = 1, parallel = FAL
         }
         checkInput(tols, c("numeric"))
         if(sum(apply(rbind(x$tols[nrow(x$tols), ], tols), 2, function(x) {
-            sum(x[-1] >= x[1])
+            sum(x[-1] > x[1])
         })) > 0) {
-            stop("New tolerances not less than original tolerances")
+            stop("New tolerances not less than or equal to original tolerances")
+        }
+        ngen <- ifelse(is.null(nrow(tols)), 1, nrow(tols))
+        temp <- rbind(post$tols[nrow(post$tols), ], tols)
+        if(!all(apply(temp, 2, function(x) {
+            all(diff(x) <= 0)
+        }))){
+            stop("'tols' cannot increase")
+        }
+        temp <- apply(temp, 2, function(x) {
+            diff(x)
+        })
+        if(is.null(nrow(temp))) {
+            temp <- matrix(temp, nrow = 1)
+        }
+        if(any(apply(temp, 1, function(x) !any(x < 0)))){
+            stop("Some 'tols' must decrease between generations")
         }
     } else {
         checkInput(ngen, c("vector", "numeric"), 1, int = TRUE, gt = 0)
@@ -336,9 +352,18 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL,
     }
     if(nrow(tols) > 1){
         if(!all(apply(tols, 2, function(x) {
-            all(diff(x) < 0)
+            all(diff(x) <= 0)
         }))){
             stop("'tols' cannot increase")
+        }
+        temp <- apply(tols, 2, function(x) {
+            diff(x)
+        })
+        if(is.null(nrow(temp))) {
+            temp <- matrix(temp, nrow = 1)
+        }
+        if(apply(temp, 1, function(x) !any(x < 0))){
+            stop("Some 'tols' must decrease between generations")
         }
     }
     if(is.null(ptols[1])){

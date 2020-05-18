@@ -2,7 +2,7 @@
 checkInput <- function(input, type = NULL, length = NA, 
         nrow = NA, ncol = NA, int = FALSE, naAllow = FALSE, 
         gt = NA, gte = NA, lt = NA, lte = NA, inSet = NULL, 
-        uni = FALSE
+        uni = FALSE, ident = NULL
 ) {
     ## input is input object
     ## type is set of characters denoting is.*() type functions to test input
@@ -88,6 +88,12 @@ checkInput <- function(input, type = NULL, length = NA,
         output <- all(input[!is.na(input)] %in% inSet)
         if(!output){
             stop(paste0(inputName, " elements must be in (", paste(inSet, collapse = ", "), ")"))
+        }
+    }
+    if(!is.null(ident)) {
+        output <- identical(input, ident)
+        if(!output){
+            stop(paste0(inputName, " elements must be identical to (", paste(ident, collapse = ", "), ")"))
         }
     }
     if(uni) {

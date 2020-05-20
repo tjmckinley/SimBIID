@@ -1,3 +1,8 @@
+# v0.1.5
+
+Adding bisection method of choosing tolerances when multiple
+data points are being used in the ABC-SMC algorithm.
+
 # v0.1.4
 
 Patch release to fix minor bug in the `predict.PMCMC` method.

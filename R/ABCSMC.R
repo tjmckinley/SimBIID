@@ -536,7 +536,7 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL, mintol
         
         ## run generation
         if(runind){
-            if(!parallel) {
+            if(!parallel | npart == 1) {
                 temp <- lapply(1:npart, runProp,
                     t = t, priors = priors, 
                     prevWeights = tempWeights, prevPars = tempPars, 
@@ -544,6 +544,8 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL, mintol
                     u = u,
                     func = func, func_args = fargs)
             } else  {
+                ## set RNG generator to ensure reproducibility
+                RNGkind("L'Ecuyer-CMRG")
                 temp <- parallel::mclapply(1:npart, runProp,
                     t = t, priors = priors, 
                     prevWeights = tempWeights, prevPars = tempPars, 
@@ -551,6 +553,8 @@ ABCSMC.default <- function(x, priors, func, u, tols = NULL, ptols = NULL, mintol
                     u = u,
                     func = func, func_args = fargs, 
                     mc.cores = mc.cores)
+                ## reset RNG generator
+                RNGkind("default")
             }
             
             ## extract relative components

@@ -1,7 +1,9 @@
 # v0.1.5
 
-Adding bisection method of choosing tolerances when multiple
+Added bisection method for choosing tolerances when multiple
 data points are being used in the ABC-SMC algorithm.
+
+Added option to set minimum tolerances for ABC-SMC.
 
 # v0.1.4
 

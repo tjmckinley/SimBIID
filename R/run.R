@@ -186,6 +186,8 @@ run <- function(
             }, model = compModel, pars = pars, tstart = tstart, tstop = tstop, u = u)
         }
     } else {
+        ## set RNG generator to ensure reproducibility
+        RNGkind("L'Ecuyer-CMRG")
         if(!missing(tspan)) {
             sims <- parallel::mclapply(1:nrep, function(i, model, pars, tstart, tstop, u, tspan){
                 model(pars, tstart, tstop, u, tspan)
@@ -195,6 +197,8 @@ run <- function(
                 model(pars, tstart, tstop, u)
             }, model = compModel, pars = pars, tstart = tstart, tstop = tstop, u = u, mc.cores = mc.cores)
         }
+        ## reset RNG generator
+        RNGkind("default")
     }
     ## extract simulations in useful format
     if(missing(tspan)) {

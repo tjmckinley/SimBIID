@@ -135,4 +135,103 @@ test_that("mparse/run works", {
     ## the first run always succeeds, but warns
     expect_known_output(sims, tmp, print = TRUE)
     
+    ## CHECK PARALLELISATION REPRODUCIBILITY
+    
+    ## check serial runs with set seed are identical
+    
+    ## set seed
+    set.seed(50)
+    ## compile and run model
+    sims <- run(
+        model = model,
+        pars = c(beta = 0.001, gamma = 0.1),
+        tstart = 0,
+        tstop = 20,
+        u = c(S = 119, I = 1, R = 0, S_inc = 0, I_inc = 1, R_inc = 0),
+        tspan = 1:20
+    )
+    
+    ## set seed
+    set.seed(50)
+    ## compile and run model
+    sims1 <- run(
+        model = model,
+        pars = c(beta = 0.001, gamma = 0.1),
+        tstart = 0,
+        tstop = 20,
+        u = c(S = 119, I = 1, R = 0, S_inc = 0, I_inc = 1, R_inc = 0),
+        tspan = 1:20
+    )
+    
+    ## check same output
+    expect_identical(sims, sims1)
+    
+    ## check reproducibility in parallel for the same mc.cores
+    
+    ## set seed
+    set.seed(50)
+    ## compile and run model
+    sims <- run(
+        model = model,
+        pars = c(beta = 0.001, gamma = 0.1),
+        tstart = 0,
+        tstop = 20,
+        u = c(S = 119, I = 1, R = 0, S_inc = 0, I_inc = 1, R_inc = 0),
+        tspan = 1:20,
+        nrep = 2,
+        parallel = TRUE,
+        mc.cores = 2
+    )
+    
+    ## set seed
+    set.seed(50)
+    ## compile and run model
+    sims1 <- run(
+        model = model,
+        pars = c(beta = 0.001, gamma = 0.1),
+        tstart = 0,
+        tstop = 20,
+        u = c(S = 119, I = 1, R = 0, S_inc = 0, I_inc = 1, R_inc = 0),
+        tspan = 1:20,
+        nrep = 2,
+        parallel = TRUE,
+        mc.cores = 2
+    )
+    
+    ## check same output
+    expect_identical(sims, sims1)
+    
+    ## check result when not setting seed second time
+    
+    ## set seed
+    set.seed(50)
+    ## compile and run model
+    sims <- run(
+        model = model,
+        pars = c(beta = 0.001, gamma = 0.1),
+        tstart = 0,
+        tstop = 20,
+        u = c(S = 119, I = 1, R = 0, S_inc = 0, I_inc = 1, R_inc = 0),
+        tspan = 1:20,
+        nrep = 2,
+        parallel = TRUE,
+        mc.cores = 2
+    )
+    
+    ## compile and run model
+    sims1 <- run(
+        model = model,
+        pars = c(beta = 0.001, gamma = 0.1),
+        tstart = 0,
+        tstop = 20,
+        u = c(S = 119, I = 1, R = 0, S_inc = 0, I_inc = 1, R_inc = 0),
+        tspan = 1:20,
+        nrep = 2,
+        parallel = TRUE,
+        mc.cores = 2
+    )
+    
+    ## check same output
+    expect_false(identical(sims, sims1))
+    
 })

@@ -301,61 +301,63 @@ test_that("ABCSMC works", {
     
     ## check reproducibility in parallel
     
-    tols <- c(finalsize = 50, finaltime = 50)
-    set.seed(50)
-    post <- ABCSMC(
-        x = data,
-        priors = priors,
-        func = simSIR,
-        u = iniStates,
-        tols = tols,
-        npart = 10,
-        model = model,
-        parallel = TRUE,
-        mc.cores = 2
-    )
-    set.seed(50)
-    post1 <- ABCSMC(
-        x = data,
-        priors = priors,
-        func = simSIR,
-        u = iniStates,
-        tols = tols,
-        npart = 10,
-        model = model,
-        parallel = TRUE,
-        mc.cores = 2
-    )
-    
-    expect_identical(post, post1)
-    
-    ## check for changing seeds in parallel
-    
-    tols <- c(finalsize = 50, finaltime = 50)
-    set.seed(50)
-    post <- ABCSMC(
-        x = data,
-        priors = priors,
-        func = simSIR,
-        u = iniStates,
-        tols = tols,
-        npart = 10,
-        model = model,
-        parallel = TRUE,
-        mc.cores = 2
-    )
-    post1 <- ABCSMC(
-        x = data,
-        priors = priors,
-        func = simSIR,
-        u = iniStates,
-        tols = tols,
-        npart = 10,
-        model = model,
-        parallel = TRUE,
-        mc.cores = 2
-    )
-    
-    expect_false(identical(post, post1))
+    if(.Platform$OS.type != "windows" & requireNamespace("parallel", quietly = TRUE)) {
+        tols <- c(finalsize = 50, finaltime = 50)
+        set.seed(50)
+        post <- ABCSMC(
+            x = data,
+            priors = priors,
+            func = simSIR,
+            u = iniStates,
+            tols = tols,
+            npart = 10,
+            model = model,
+            parallel = TRUE,
+            mc.cores = 2
+        )
+        set.seed(50)
+        post1 <- ABCSMC(
+            x = data,
+            priors = priors,
+            func = simSIR,
+            u = iniStates,
+            tols = tols,
+            npart = 10,
+            model = model,
+            parallel = TRUE,
+            mc.cores = 2
+        )
+        
+        expect_identical(post, post1)
+        
+        ## check for changing seeds in parallel
+        
+        tols <- c(finalsize = 50, finaltime = 50)
+        set.seed(50)
+        post <- ABCSMC(
+            x = data,
+            priors = priors,
+            func = simSIR,
+            u = iniStates,
+            tols = tols,
+            npart = 10,
+            model = model,
+            parallel = TRUE,
+            mc.cores = 2
+        )
+        post1 <- ABCSMC(
+            x = data,
+            priors = priors,
+            func = simSIR,
+            u = iniStates,
+            tols = tols,
+            npart = 10,
+            model = model,
+            parallel = TRUE,
+            mc.cores = 2
+        )
+        
+        expect_false(identical(post, post1))
+    }
     
 })

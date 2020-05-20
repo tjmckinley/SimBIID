@@ -11,7 +11,7 @@ bisectTols <- function(out, data, tols, ptol, ptollim = 0.1) {
         diffs <- t(diffs)
     }
     tolcand <- apply(diffs, 2, function(x, tolprop) {
-        quantile(x, probs = tolprop)
+        stats::quantile(x, probs = tolprop)
     }, tolprop = ptol)
     
     if(length(tolcand) == 1) {

@@ -82,4 +82,63 @@ test_that("ABCRef works", {
     ## the first run always succeeds, but warns
     expect_known_output(refTable, tmp, print = TRUE)
     
+    ## check for reproducibility in serial
+    set.seed(50)
+    refTable1 <- ABCRef(
+        pars = as.matrix(refTable[, 1:2]),
+        npart = 100,
+        func = simRef,
+        sumNames = c("finaltime", "finalsize"),
+        model = model
+    )
+    
+    expect_identical(refTable, refTable1)
+    
+    ## check for reproducibility in parallel
+    set.seed(50)
+    refTable <- ABCRef(
+        pars = as.matrix(refTable[, 1:2]),
+        npart = 100,
+        func = simRef,
+        sumNames = c("finaltime", "finalsize"),
+        model = model,
+        parallel = TRUE,
+        mc.cores = 2
+    )
+    set.seed(50)
+    refTable1 <- ABCRef(
+        pars = as.matrix(refTable[, 1:2]),
+        npart = 100,
+        func = simRef,
+        sumNames = c("finaltime", "finalsize"),
+        model = model,
+        parallel = TRUE,
+        mc.cores = 2
+    )
+    
+    expect_identical(refTable, refTable1)
+    
+    ## check for changing seeds in parallel
+    set.seed(50)
+    refTable <- ABCRef(
+        pars = as.matrix(refTable[, 1:2]),
+        npart = 100,
+        func = simRef,
+        sumNames = c("finaltime", "finalsize"),
+        model = model,
+        parallel = TRUE,
+        mc.cores = 2
+    )
+    refTable1 <- ABCRef(
+        pars = as.matrix(refTable[, 1:2]),
+        npart = 100,
+        func = simRef,
+        sumNames = c("finaltime", "finalsize"),
+        model = model,
+        parallel = TRUE,
+        mc.cores = 2
+    )
+    
+    expect_false(identical(refTable, refTable1))
+    
 })

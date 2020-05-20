@@ -222,11 +222,15 @@ ABCRef <- function(npart, priors, pars, func, sumNames, parallel = FALSE, mc.cor
     pars <- list(); out <- list(); 
     
     ## run generation
-    if(!parallel) {
+    if(!parallel | npart == 1) {
         temp <- lapply(1:npart, runRef, priors = priors, func = func, func_args = fargs)
     } else  {
+        ## set RNG generator to ensure reproducibility
+        RNGkind("L'Ecuyer-CMRG")
         temp <- parallel::mclapply(1:npart, runRef, priors = priors, func = func, func_args = fargs, 
                          mc.cores = mc.cores)
+        ## reset RNG generator
+        RNGkind("default")
     }
     
     ## extract relative components

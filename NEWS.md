@@ -5,6 +5,12 @@ data points are being used in the ABC-SMC algorithm.
 
 Added option to set minimum tolerances for ABC-SMC.
 
+Changed way that random seeds are passed to `mclapply()` to
+aid reproducibility when setting seeds and using parallelisation.
+Runs will only be reproducible if using the same number of cores
+each time (which can be specified using `mc.cores` argument to
+various functions).
+
 # v0.1.4
 
 Patch release to fix minor bug in the `predict.PMCMC` method.

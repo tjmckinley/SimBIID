@@ -8,9 +8,9 @@
 #'     then runs a series of generations of ABC-SMC. The generations can either be 
 #'     specified with a set of fixed tolerances, or by setting the tolerances at 
 #'     each new generation as a quantile of the tolerances of the accepted particles 
-#'     at the previous generation. Passing an \code{ABCSMC} object into the 
-#'     \code{ABCSMC()} function acts as a continuation method, allowing further 
-#'     generations to be run.
+#'     at the previous generation. Uses bisection method as detailed in McKinley et al. (2018).
+#'     Passing an \code{ABCSMC} object into the \code{ABCSMC()} function acts as a 
+#'     continuation method, allowing further generations to be run.
 #'
 #' @export
 #'
@@ -76,6 +76,8 @@
 #' @references Toni T, Welch D, Strelkowa N, Ipsen A and Stumpf MP (2009) <doi:10.1098/rsif.2008.0172>
 #'     
 #' @references McKinley TJ, Cook AR and Deardon R (2009) <doi:10.2202/1557-4679.1171>
+#' 
+#' @references McKinley TJ, Vernon I, Andrianakis I, McCreesh N, Oakley JE, Nsubuga RN, Goldstein M and White RG (2018) <doi:10.1214/17-STS618>
 #'     
 #' @seealso \code{\link{print.ABCSMC}}, \code{\link{plot.ABCSMC}}, \code{\link{summary.ABCSMC}}
 #'     

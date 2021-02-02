@@ -53,10 +53,8 @@ test_that("ABCRef works", {
         sumNames = c("finaltime", "finalsize"),
         model = model
     )
-    ## file to save results
-    tmp <- "ABCRef"
     ## the first run always succeeds, but warns
-    expect_known_output(refTable, tmp, print = TRUE)
+    expect_snapshot_output(refTable)
     
     ## produce reference table by adding in parameters
     ## as matrix (first test should fail since pars and priors
@@ -77,10 +75,8 @@ test_that("ABCRef works", {
         sumNames = c("finaltime", "finalsize"),
         model = model
     )
-    ## file to save results
-    tmp <- "ABCRef1"
     ## the first run always succeeds, but warns
-    expect_known_output(refTable, tmp, print = TRUE)
+    expect_snapshot_output(refTable)
     
     ## check for reproducibility in serial
     set.seed(50)

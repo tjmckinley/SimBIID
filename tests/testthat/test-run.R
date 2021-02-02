@@ -31,10 +31,8 @@ test_that("mparse/run works", {
         compartments = compartments,
         pars = pars
     )
-    ## file to save results
-    tmp <- "mparse"
     ## the first run always succeeds, but warns
-    expect_known_output(model, tmp, print = TRUE)
+    expect_snapshot_output(model)
     
     ## set seed
     set.seed(50)
@@ -46,10 +44,8 @@ test_that("mparse/run works", {
         tstop = 20,
         u = c(S = 119, I = 1, R = 0)
     )
-    ## file to save results
-    tmp <- "run"
     ## the first run always succeeds, but warns
-    expect_known_output(sims, tmp, print = TRUE)
+    expect_snapshot_output(sims)
     
     ## check model with incidence
     model <- mparseRcpp(
@@ -58,10 +54,8 @@ test_that("mparse/run works", {
         pars = pars,
         incidence = TRUE
     )
-    ## file to save results
-    tmp <- "mparseinc"
     ## the first run always succeeds, but warns
-    expect_known_output(model, tmp, print = TRUE)
+    expect_snapshot_output(model)
     
     ## set seed
     set.seed(50)
@@ -73,10 +67,8 @@ test_that("mparse/run works", {
         tstop = 20,
         u = c(S = 119, I = 1, R = 0, S_inc = 0, I_inc = 1, R_inc = 0)
     )
-    ## file to save results
-    tmp <- "runinc"
     ## the first run always succeeds, but warns
-    expect_known_output(sims, tmp, print = TRUE)
+    expect_snapshot_output(sims)
     
     ## check model with tspan
     model <- mparseRcpp(
@@ -85,10 +77,8 @@ test_that("mparse/run works", {
         pars = pars,
         tspan = TRUE
     )
-    ## file to save results
-    tmp <- "mparsetspan"
     ## the first run always succeeds, but warns
-    expect_known_output(model, tmp, print = TRUE)
+    expect_snapshot_output(model)
     
     ## set seed
     set.seed(50)
@@ -101,10 +91,8 @@ test_that("mparse/run works", {
         u = c(S = 119, I = 1, R = 0),
         tspan = 1:20
     )
-    ## file to save results
-    tmp <- "runtspan"
     ## the first run always succeeds, but warns
-    expect_known_output(sims, tmp, print = TRUE)
+    expect_snapshot_output(sims)
     
     ## check model with incidence and tspan
     model <- mparseRcpp(
@@ -114,10 +102,8 @@ test_that("mparse/run works", {
         incidence = TRUE,
         tspan = TRUE
     )
-    ## file to save results
-    tmp <- "mparseinctspan"
     ## the first run always succeeds, but warns
-    expect_known_output(model, tmp, print = TRUE)
+    expect_snapshot_output(model)
     
     ## set seed
     set.seed(50)
@@ -130,10 +116,8 @@ test_that("mparse/run works", {
         u = c(S = 119, I = 1, R = 0, S_inc = 0, I_inc = 1, R_inc = 0),
         tspan = 1:20
     )
-    ## file to save results
-    tmp <- "runinctspan"
     ## the first run always succeeds, but warns
-    expect_known_output(sims, tmp, print = TRUE)
+    expect_snapshot_output(sims)
     
     ## CHECK PARALLELISATION REPRODUCIBILITY
     

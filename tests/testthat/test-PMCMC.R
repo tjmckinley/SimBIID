@@ -54,19 +54,15 @@ test_that("PMCMC works", {
         niter = 5000,
         nprintsum = 1000
     )
-    ## file to save results
-    tmp <- "PMCMC"
     ## the first run always succeeds, but warns
-    expect_known_output(post, tmp, print = TRUE)
+    expect_snapshot_output(post)
 
     ## run predictions forward in time
     post_pred <- predict(
         window(post, start = 2000, thin = 3),
         tspan = 4:14
     )
-    ## file to save results
-    tmp <- "PMCMCpred"
     ## the first run always succeeds, but warns
-    expect_known_output(post_pred, tmp, print = TRUE)
+    expect_snapshot_output(post_pred)
     
 })

@@ -82,22 +82,16 @@ test_that("ABCSMC works", {
         npart = 50,
         model = model
     )
-    ## file to save results
-    tmp <- "ABCSMC"
     ## the first run always succeeds, but warns
-    expect_known_output(post, tmp, print = TRUE)
+    expect_snapshot_output(post)
 
     ## run one further generation
     post <- ABCSMC(post, ptols = 0.5, ngen = 1)
-    ## file to save results
-    tmp <- "ABCSMC1"
     ## the first run always succeeds, but warns
-    expect_known_output(post, tmp, print = TRUE)
+    expect_snapshot_output(post)
     
-    ## file to save results
-    tmp <- "ABCSMCsum"
     ## the first run always succeeds, but warns
-    expect_known_output(summary(post), tmp, print = TRUE)
+    expect_snapshot_output(summary(post))
     
     ## try to run 2 generations of ABC-SMC using fixed tolerances
     tols <- matrix(c(50, 50, 50, 50), 2, 2, byrow = TRUE)
@@ -138,18 +132,14 @@ test_that("ABCSMC works", {
         npart = 50,
         model = model
     )
-    ## file to save results
-    tmp <- "ABCSMCtol"
     ## the first run always succeeds, but warns
-    expect_known_output(post, tmp, print = TRUE)
+    expect_snapshot_output(post)
     
     ## run one further generation
     newtols <- c(finalsize = 20, finaltime = 15)
     post <- ABCSMC(post, tols = newtols)
-    ## file to save results
-    tmp <- "ABCSMCtol1"
     ## the first run always succeeds, but warns
-    expect_known_output(post, tmp, print = TRUE)
+    expect_snapshot_output(post)
     
     ## run one further generation
     expect_error(ABCSMC(post, tols = newtols))
@@ -159,10 +149,8 @@ test_that("ABCSMC works", {
     ## run further generation using ptols
     expect_error(ABCSMC(post, tols = newtols, ptols = 0.8, ngen = 1))
     post <- ABCSMC(post, ptols = 0.8, ngen = 1)
-    ## file to save results
-    tmp <- "ABCSMCtol2"
     ## the first run always succeeds, but warns
-    expect_known_output(post, tmp, print = TRUE)
+    expect_snapshot_output(post)
     
     ## run 2 generations of ABC-SMC using fixed tolerances
     tols <- matrix(c(50, 50), 1, 2, byrow = TRUE)

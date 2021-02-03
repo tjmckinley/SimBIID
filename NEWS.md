@@ -1,3 +1,8 @@
+#v 0.2.1
+
+Made a few changes to amend some tests to use functions in the 
+third edition of the `testthat` package.
+
 # v0.2.0
 
 Added bisection method for choosing tolerances when multiple

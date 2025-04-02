@@ -102,7 +102,7 @@
 plot.PMCMC <- function(x, type = c("post", "trace"), joint = FALSE, transfunc = NA, ask = TRUE, ...) {
     
     ## check x
-    if(class(x) != "PMCMC"){
+    if(!inherits(x, "PMCMC")){
         stop("'x' not a PMCMC object")
     }
     

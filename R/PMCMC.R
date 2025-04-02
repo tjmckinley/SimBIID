@@ -160,7 +160,7 @@ PMCMC.PMCMC <- function(x, niter = 1000, nprintsum = 100,
                         adapt = TRUE, adaptmixprop = 0.05, 
                         nupdate = 100, ...) {
     ## check object
-    if(class(x) != "PMCMC") {
+    if(!inherits(x, "PMCMC")) {
         stop("'x' not a PMCMC object")
     }
     if(length(x) <= 2){
@@ -293,21 +293,21 @@ PMCMC.default <- function(
     
     ## check function
     funcorig <- func
-    if(class(func) != "XPtr" & class(func) != "SimBIID_model"){
+    if(!inherits(func, "XPtr") & !inherits(func, "SimBIID_model")){
         stop("'func' not a 'SimBIID_model' object or an 'XPtr' object")
     }
     
     ## check u
     checkInput(u, c("vector", "numeric"), int = TRUE, gte = 0)
     checkInput(sum(u), "numeric", int = TRUE, gt = 1)
-    if(class(func) == "SimBIID_model") {
+    if(inherits(func, "SimBIID_model")) {
         checkInput(u, length = length(funcorig$compartments))
         if(!identical(names(u), funcorig$compartments)) {
             stop("'names(u)' does not match 'func$compartments'")
         }
     }
     
-    if(class(func) == "XPtr"){
+    if(inherits(func, "XPtr")){
         RcppXPtrUtils::checkXPtr(func, "SEXP", c("NumericVector", "double", "double", "IntegerVector",
            "IntegerVector"))
     } else {

@@ -88,11 +88,11 @@
 predict.PMCMC <- function(object, tspan, npart = 50, ...) {
     
     ## check object
-    if(class(object) != "PMCMC"){
+    if(!inherits(object, "PMCMC")){
         stop("'object' not a PMCMC object")
     }
     
-    if(class(object$func) != "SimBIID_model"){
+    if(!inherits(object$func, "SimBIID_model")){
         stop("'object$func' not a SimBIID_model object")
     }
     

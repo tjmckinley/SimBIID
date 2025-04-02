@@ -91,7 +91,7 @@
 
 print.PMCMC <- function(x, ...) {
     ## check object is a PMCMC object
-    if(class(x) != "PMCMC"){
+    if(!inherits(x, "PMCMC")){
         stop("'x' is not a PMCMC object")
     }
     

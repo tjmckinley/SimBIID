@@ -123,7 +123,7 @@
 plot.ABCSMC <- function(x, type = c("post", "output"), gen = NA, joint = FALSE, transfunc = NA, ...) {
     
     ## check x
-    if(class(x) != "ABCSMC"){
+    if(!inherits(x, "ABCSMC")){
         stop("'x' is not a ABCSMC object")
     }
     

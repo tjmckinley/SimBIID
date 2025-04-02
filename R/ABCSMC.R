@@ -186,7 +186,7 @@ ABCSMC <- function(x, ...) {
 ABCSMC.ABCSMC <- function(x, tols = NULL, ptols = NULL, mintols = NULL, ngen = 1, parallel = FALSE, mc.cores = NA, ...) {
     
     ## check inputs
-    if(class(x) != "ABCSMC"){
+    if(!inherits(x, "ABCSMC")){
         stop("'x' not ABCSMC object")
     }
     if(is.null(tols[1]) & is.null(ptols[1])){

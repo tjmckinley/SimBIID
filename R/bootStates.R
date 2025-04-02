@@ -2,7 +2,7 @@
 bootStates <- function(dataset, func, pars, u, npart = 50, ...) {
     
     ## 'func' must be SimBIID_model object
-    if(class(func) != "SimBIID_model"){
+    if(!inherits(func, "SimBIID_model")){
         stop("'func' must be 'SimBIID_model' object")
     }
     

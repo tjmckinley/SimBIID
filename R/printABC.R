@@ -112,7 +112,7 @@
 
 print.ABCSMC <- function(x, ...) {
     ## check object is a ABCSMC object
-    if(class(x) != "ABCSMC"){
+    if(!inherits(x, "ABCSMC")){
         stop("'x' is not a ABCSMC object")
     }
     

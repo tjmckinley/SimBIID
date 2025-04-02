@@ -96,7 +96,7 @@
 summary.PMCMC <- function(object, transfunc = NA, ...) {
     
     ## check object is a PMCMC object
-    if(class(object) != "PMCMC"){
+    if(!inherits(object, "PMCMC")){
         stop("'object' is not a PMCMC object")
     }
     

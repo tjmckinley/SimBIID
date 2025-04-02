@@ -119,7 +119,7 @@
 summary.ABCSMC <- function(object, gen = NA, transfunc = NA, ...) {
     
     ## check x is an ABCSMC object
-    if(class(object) != "ABCSMC"){
+    if(!inherits(object, "ABCSMC")){
         stop("'object' not of type ABCSMC")
     }
     

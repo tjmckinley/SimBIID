@@ -48,7 +48,7 @@ compileRcpp <- function(model) {
     if(missing(model)) {
         stop("'model' object missing")
     }
-    if(class(model) != "SimBIID_model") {
+    if(!inherits(model, "SimBIID_model")) {
         stop("'model' object not of class 'SimBIID_model'")
     }
     ## write to temporary file

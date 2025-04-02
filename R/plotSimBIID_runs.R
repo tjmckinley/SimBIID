@@ -63,7 +63,7 @@
 plot.SimBIID_runs <- function(x, which = c("all", "t"), type = c("runs", "sums"), 
                               rep = NA, quant = 0.9, data = NULL, matchData = NULL, ...) {
     ## check x
-    if(class(x) != "SimBIID_runs"){
+    if(!inherits(x, "SimBIID_runs")){
         stop("'x' is not a SimBIID_runs object")
     }
     ## check type

@@ -93,7 +93,7 @@
 #' 
 
 window.PMCMC <- function(x, ...) {
-    if(class(x) != "PMCMC"){
+    if(!inherits(x, "PMCMC")){
         stop("'x' is not a PMCMC object")
     }
     

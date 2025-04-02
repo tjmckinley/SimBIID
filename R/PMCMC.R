@@ -24,11 +24,11 @@
 #' @param func          A \code{SimBIID_model} object or an \code{XPtr} to simulation function. If the latter, 
 #'                      then this function must take the following arguments in order: 
 #'                      \itemize{
-#'                      \item{\code{NumericVector pars}:}{ a vector of parameters;}
-#'                      \item{\code{double tstart}:}{ the start time;}
-#'                      \item{\code{double tstop}:}{ the end time;}
-#'                      \item{\code{IntegerVector u}:}{ a vector of states at time \code{tstart};}
-#'                      \item{\code{IntegerVector counts}:}{ a vector of observed counts at \code{tstop}.}}
+#'                      \item \code{NumericVector pars}: a vector of parameters;
+#'                      \item \code{double tstart}: the start time;
+#'                      \item \code{double tstop}: the end time;
+#'                      \item \code{IntegerVector u}: a vector of states at time \code{tstart};
+#'                      \item \code{IntegerVector counts}: a vector of observed counts at \code{tstop}.}
 #' @param u             A named vector of initial states.
 #' @param npart         An integer specifying the number of particles for the bootstrap particle filter.
 #' @param iniPars       A named vector of initial values for the parameters of the model. If left unspecified, 
@@ -48,15 +48,13 @@
 #'
 #' @return If the code throws an error, then it returns a missing value (\code{NA}). If 
 #'         \code{fixpars = TRUE} it returns a list of length 2 containing:
-#' \itemize{
-#'      \item{\code{output}:}{ a matrix with two columns. The first contains the simulated
+#' \item{\code{output}:}{ a matrix with two columns. The first contains the simulated
 #'          log-likelihood, and the second is a binary indicator relating to whether the
 #'          simulation was 'skipped' or not (1 = skipped, 0 = not skipped);}
-#'      \item{\code{pars}:}{ a vector of parameters used for the simulations.}
-#' }
+#' \item{\code{pars}:}{ a vector of parameters used for the simulations.}
+#' 
 #' If \code{fixpars = FALSE}, the routine returns a \code{PMCMC} object, essentially a 
 #'          \code{list} containing:
-#' \itemize{
 #'  \item{\code{pars}:}{ an \code{mcmc} object containing posterior samples for the parameters;}
 #'  \item{\code{u}:}{ a copy of the \code{u} input;}
 #'  \item{\code{accrate}:}{ the cumulative acceptance rate;}
@@ -66,7 +64,6 @@
 #'  \item{\code{data}:}{ a copy of the \code{x} input;}
 #'  \item{\code{priors}:}{ a copy of the \code{priors} input;}
 #'  \item{\code{func}:}{ a copy of the \code{func} input.}
-#' }
 #' 
 #' @rdname PMCMC
 #' 

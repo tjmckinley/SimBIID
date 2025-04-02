@@ -19,7 +19,6 @@
 #'
 #' @return An object of class \code{SimBIID_run}, essentially a list 
 #'         containing elements:
-#'         \itemize{
 #'             \item{sums:}{ a \code{data.frame()} with summaries of the model runs. This
 #'             includes columns \code{run}, \code{completed}, \code{t}, \code{u*} 
 #'             (see help file for \code{SimBIID_model} for more details);}
@@ -29,7 +28,6 @@
 #'             only be returned if \code{tspan = TRUE} in the original \code{SimBIID_model} object.}
 #'             \item{bootEnd:}{ a time point denoting when bootstrapped estimates end and predictions
 #'             begin (for \code{predict.PMCMC()} method). }
-#'         } 
 #' 
 #' @export
 #' 

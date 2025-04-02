@@ -44,7 +44,6 @@
 #' @param ...       Further arguments to pass to \code{func}. (Not used if extending runs.)
 #'
 #' @return An \code{ABCSMC} object, essentially a \code{list} containing:
-#' \itemize{
 #' \item{\code{pars}:}{ a \code{list} of \code{matrix} objects containing the accepted
 #'                      particles. Each element of the list corresponds to a generation 
 #'                      of ABC-SMC, with each matrix being of dimension 
@@ -70,7 +69,6 @@
 #' \item{\code{func}:}{ a copy of the \code{func} input;}
 #' \item{\code{u}}{ a copy of the \code{u} input;}
 #' \item{\code{addargs}:}{ a copy of the \code{...} inputs.}
-#' }
 #' @rdname ABCSMC
 #' 
 #' @references Toni T, Welch D, Strelkowa N, Ipsen A and Stumpf MP (2009) <doi:10.1098/rsif.2008.0172>

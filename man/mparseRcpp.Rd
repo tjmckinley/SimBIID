@@ -66,7 +66,6 @@ or whether to be compiled as an \code{XPtr} object for use in Rcpp.}
 \value{
 An object of class \code{SimBIID_model}, which is essentially a \code{list} 
         containing elements:
-        \itemize{
             \item{code:}{ parsed code to compile;}
             \item{transitions:}{ copy of \code{transitions} argument;}
             \item{compartments:}{ copy of \code{compartments} argument;}
@@ -79,7 +78,6 @@ An object of class \code{SimBIID_model}, which is essentially a \code{list}
             \item{afterTstar:}{ copy of \code{afterTstar} argument;}
             \item{PF:}{ copy of \code{PF} argument;}
             \item{runFromR:}{ copy of \code{runFromR} argument.}
-        }
         This can be compiled into an \code{XPtr} or \code{function} object
         using \code{compileRcpp()}.
 }

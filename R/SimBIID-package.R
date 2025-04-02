@@ -10,8 +10,9 @@
 #'  (Andrieu et al., 2010 <doi:10.1111/j.1467-9868.2009.00736.x>). 
 #'  Also provides functions to plot and summarise the outputs.
 #'
-#' @docType package
-#' @name SimBIID-package
+#' @name SimBIID
+#' @aliases SimBIID-package
+"_PACKAGE"
 #' @author Trevelyan J. McKinley <t.mckinley@@exeter.ac.uk>
 #' @import dplyr
 #' @import purrr

@@ -10,7 +10,7 @@
 \item{x}{a \code{PMCMC} object, usually as a result of a call to
 \code{PMCMC}.}
 
-\item{\dots}{arguments to pass to \code{\link{window.mcmc}}}
+\item{\dots}{arguments to pass to \code{\link[coda]{window.mcmc}}}
 }
 \value{
 a \code{PMCMC} object

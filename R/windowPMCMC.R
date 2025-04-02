@@ -7,7 +7,7 @@
 #' 
 #' @param x a \code{PMCMC} object, usually as a result of a call to
 #'          \code{PMCMC}.
-#' @param \dots arguments to pass to \code{\link{window.mcmc}}
+#' @param \dots arguments to pass to \code{\link[coda]{window.mcmc}}
 #' @return a \code{PMCMC} object
 #'
 #' @export

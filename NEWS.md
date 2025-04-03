@@ -1,3 +1,8 @@
+# v0.2.2
+
+Made a few minor updates to documentation and compilation flags
+to fix CRAN check errors.
+
 # v0.2.1
 
 Made a few changes to amend some tests to use functions in the 

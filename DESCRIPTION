@@ -1,6 +1,6 @@
 Package: SimBIID
 Title: Simulation-Based Inference Methods for Infectious Disease Models
-Version: 0.2.1.9000
+Version: 0.2.2
 Authors@R: c(person("Trevelyan J.", "McKinley", email = "t.mckinley@exeter.ac.uk",
                 role = c("aut", "cre")),
              person("Stefan", "Widgren", role = "aut", email = "stefan.widgren@gmail.com", 
@@ -41,4 +41,4 @@ LinkingTo:
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.0
+RoxygenNote: 7.3.2

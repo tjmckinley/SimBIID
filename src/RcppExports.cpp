@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // bootstrapPartFilterState
 List bootstrapPartFilterState(int N, NumericMatrix pars, NumericMatrix dataset, IntegerVector iniStates, SEXP func_);
 RcppExport SEXP _SimBIID_bootstrapPartFilterState(SEXP NSEXP, SEXP parsSEXP, SEXP datasetSEXP, SEXP iniStatesSEXP, SEXP func_SEXP) {

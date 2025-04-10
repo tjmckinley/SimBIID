@@ -1,7 +1,6 @@
 # SimBIID
 
 <!-- badges: start -->
-[![Travis build status](https://travis-ci.org/tjmckinley/SimBIID.svg?branch=master)](https://travis-ci.org/tjmckinley/SimBIID)
 [![Lifecycle:maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![CRAN Status](https://www.r-pkg.org/badges/version/SimBIID)](https://cran.r-project.org/package=SimBIID)
 <!-- badges: end -->
